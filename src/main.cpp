@@ -129,7 +129,6 @@ int main(int argc, char* argv[]) {
     graphValue(algs, RANDOM10_REPEAT10_STRING, 1000, "results/value-repeat10-10.txt", 1000);
     graphValue(algs, ALL_A_STRING, 1000, "results/value-alla.txt", 10000);
 
-    /*
     Algorithm* filealgs[] = {
         new AlgorithmDirectComp,
         new Fingerprint2AQ(&sqrt_n),
@@ -140,16 +139,15 @@ int main(int argc, char* argv[]) {
     };
     const char* files[] = {
         "tests/test.txt",
-        "tests/pizzachili/sources",
-        "tests/pizzachili/pitches",
-        "tests/pizzachili/proteins",
-        "tests/pizzachili/dna",
-        "tests/pizzachili/english",
-        "tests/pizzachili/dblp.xml",
+        "tests/canterbury/book1",
+        "tests/canterbury/kennedy.xls",
+        "tests/canterbury/E.coli",
+        "tests/canterbury/bible.txt",
+        "tests/canterbury/world192.txt",
         NULL
     };
     tableFiles(filealgs, files, "results/files.txt", 1000);
-    */
+    
     //plotDirectCompLookup(ALL_A_STRING, "results/complookup-alla.txt", 10000, 499, preproc_limit);
     /*
     Algorithm* cacheAlgs[] = {
