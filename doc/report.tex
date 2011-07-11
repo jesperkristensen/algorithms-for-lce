@@ -202,7 +202,7 @@ depth root = 0
 \section{LCE Algorithms}
 This section describes existing and new algorithms for solving the LCE problem. It contains a theoretical analysis of their asymptotic query times and space requirements, shown in summary in \pref{tab:algorithms}. \pref{sec:results} describes the results from experiments on practical implementations of these algorithms.
 
-\begin{table}[ht]
+\begin{table}[tp]
 \centering
 % \begin{tabular}{l|p{160px}|p{160px}}
 \begin{tabular}{l|l|l|l}
@@ -469,7 +469,7 @@ For larger values of $k$, we can attempt to optimize memory access accros differ
 
 \pref{tab:algorithms-space} shows the space requirement of each of our analyzed algorithms. The size of the input string of $n/4$ words is not included, and we ignore constant terms.
 
-\begin{table}[ht]
+\begin{table}[tp]
 \centering
 \begin{minipage}{0.7\textwidth}
 \centering
@@ -621,11 +621,26 @@ In the worst case, the \proc{DirectCompLookup} variants which use more space are
     \caption{\label{fig:test-fingerprint}Comparison of our new \fprintk\ algorithm for $k=2$, $k=3$ and $k=\logceil$ versus the existing \proc{DirectComp} and \proc{LcpRmq} algorithms.}
 \end{figure}
 
-\pref{fig:test-fingerprint} shows our experimental results on average case strings with a small average LCE value, worst case strings with a large average LCE value, and strings with a medium average LCE value. 
+\begin{table}[tp]
+\centering
+\begin{tabular}{l|r|r|r|r|r|r|r}
+\hline\hline
+% File & \proc{DirectComp} & \fprint[2]\textless$\sqrt n$\textgreater ac & \fprint[3]\textless$n^{2/3}$, $n^{1/3}$\textgreater ac & \fprint[\log n]ac & RMQ<n;1> \\ [0.5ex] \hline
+File & $n$ & $\sigma$ & DC & FP$_2$ & FP$_3$ & FP$_{\log n}$ & RMQ \\ [0.5ex] \hline
+book1 & $0.7\cdot 2^{20}$ & 82 & 8.1 & 11.4 & 10.6 & 12.0 & 218.0 \\ \hline
+kennedy.xls & $1.0\cdot 2^{20}$ & 256 & 11.9 & 16.0 & 16.1 & 18.6 & 114.4 \\ \hline
+E.coli & $4.4\cdot 2^{20}$& 4 & 12.7 & 16.5 & 16.6 & 19.2 & 320.0 \\ \hline
+bible.txt & $3.9\cdot 2^{20}$ & 63 & 8.5 & 11.3 & 10.5 & 12.6 & 284.0 \\ \hline
+world192.txt & $2.3\cdot 2^{20}$ & 93 & 7.9 & 10.5 & 9.8 & 12.7 & 291.7 \\ \hline
+\end{tabular}
+\caption{Query times in nano seconds for \proc{DirectComp} (DC), \fprintk\ (FP$_k$) and \proc{LcpRmq} (RMQ) on the five largest files from the Canterbury corpus.}\label{tab:text-fprint-files}
+\end{table}
 
-On average case strings, our new \fprintk\ algorithm is approximately 20\% slower than \proc{DirectComp}, and it is more than five times faster than \proc{LcpRmq}.
+\pref{fig:test-fingerprint} shows our experimental results on average case strings with a small average LCE value, worst case strings with a large average LCE value, and strings with a medium average LCE value.
 
-On worst case strings, the \fprintk\ algorithms are signicicantly better than \proc{DirectComp} and somewhat worse than \proc{LcpRmq}. Up until $n=30.000$ the three measured \fprintk\ algorithms have nearly the same query times. Of the \fprintk\ algorithms, the $k=2$ variant has a slight advantage for small strings of length less than around $2.000$. For longer strings the $k=3$ variant performs the best up to strings of length $250.000$, at which point the $k=\logceil$ variant becomes the best. This indicates that for shorter strings, it is best to use fewer levels, and when the input size increases, the \fprintk\ variants with better asymptotic query times have better worst case times in practice.
+On average case strings, our new \fprintk\ algorithm is approximately 20\% slower than \proc{DirectComp}, and it is between than 5 and 25 times faster than \proc{LcpRmq}. We see the same results on some real world strings in \pref{tab:text-fprint-files}.
+
+On worst case strings, the \fprintk\ algorithms are signicicantly better than \proc{DirectComp} and somewhat worse than \proc{LcpRmq}. Up until $n=30.000$ the three measured \fprintk\ algorithms have nearly the same query times. Of the \fprintk\ algorithms, the $k=2$ variant has a slight advantage for small strings of length less than around $2.000$. For longer strings the $k=3$ variant performs the best up to strings of length $250.000$, at which point the $k=\logceil$ variant becomes the best. This indicates that for shorter strings, using fewer levels is better, and when the input size increases, the \fprintk\ variants with better asymptotic query times have better worst case times in practice.
 
 On strings with medium aveage LCE values, we see that our \fprintk\ algorithms are faster than both \proc{DirectComp} and \proc{LcpRmq}
 
@@ -639,8 +654,7 @@ We conclude that our new \fprintk\ algorithm acieves a tradeoff between worst ca
 
 \fi % article
 
-\fixme{Results: Add some results on real world files, in a table like Navarro. STATUS: Pizza\&Chili-teksterne er for store. Brug nogle andre?}
-\fixme{Results: Investigate if we can explain the jump in Fingerprint-log}
+% \fixme{Results: Investigate if we can explain the jump in Fingerprint-log}
 % \paragraph{\fprint[\log n] cache limit.}
 % \proc{LcpRmq} uses more space than all of \proc{DirectComp}, \fprint[2] and \fprint[3], so it is expected that it reaches the cache limit before these. However \fprint[\log n] uses more space than \proc{LcpRmq} at the input sizes we measure, since \proc{LcpRmq} uses the same amount of memory as \fprint[6], and $\lceil\log(10.000.000)\rceil = 24$. However, the \fprintk\ algorithms only access the lowest levels of their data structure whenever the LCE values are small, and there is therefore no visible jump due to cache limits for \fprint[\log n] on the plot with average case strings. On the plot with worst case strings however, we see a jump in \fprint[\log n] between $n=20.000$ and $n=50.000$, since it uses all its $\logceil$ levels when the LCE values are large.
 
@@ -727,31 +741,24 @@ We conclude that this cache optimization does not visibly affect average case qu
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Conclusions on Experimental Results}
 
-\fixme{Results: Conclusions on Experimental Results}
+Of the existing best \proc{DirectComp} and \proc{LcpRmq} algorithms, we have seen that \proc{DirectComp} is best on average case strings, while \proc{LcpRmq} is best on worst case strings.
+
+We have found that our new \proc{DirectCompLookup} algorithm can improve the worst case query time performance of \proc{DirectComp}, while it does not degrade the average case query time to the level of \proc{LcpRmq}. However it is not not as interesting as our new \fprintk\ algorithm, because it uses too much space.
+
+Our new \fprintk\ algorithm is able to achieve a balance between worst case and average case query times. It has almost as good average case query times as \proc{DirectComp}, its worst case query times are significantly better than those of \proc{DirectComp}, and we have found cases between average and worst case where \fprintk\ is better than both \proc{DirectComp} and \proc{LcpRmq}. \fprintk\ gives a good time space tradeoff, and it uses less space than \proc{LcpRmq} when $k$ is small. The perfprmance of \fprintk\ can be tweaked on many parameters, and we have found that optimizing for average case queries and for memory caches improve practical query time performance.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Test Code}
 
-Skal vi antage at $i < j$ eller ej, eller skal begge dele testes?
+To test practical performance, we have implemented the algorithms in C++. The implementation is based on that of Ilie~et~al.~\cite{ilie-navarro-tinta}, which we have heavily modified. We have made it compile on a 32-bit Windows archictecture, and generalized it to allow more algorithms and tests to be implemented. \pref{tab:test-variables} summarizes the structure of the code and the parameters we can vary.
 
-Skal vi antage at strengen ender i et specielt tegn eller ej, eller skal begge dele testes?
-
-Hvor meget skal et tegn fylde? Altid 8 bit som i Tinta-artiklen eller varieres?
-
-Er valg af random-generator vigtig?
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Structure}
-
-To test the practical performance of the algorithms, they are implemented in C++. The implementation is split into three parts. \pref{tab:test-variables} summarizes where the different variables for testing are implemented.
-
-\begin{table}[ht]
+\begin{table}[tp]
 \centering
 \begin{tabular}{l l l}
 Variable & Example & Component \\ \hline
 alphabet size & $\sigma = 10$ & string \\
 character pattern & uniformly at random & string \\ \hline
-algorithm & Perfect Hashing & algorithm \\
+algorithm & \fprintk & algorithm \\
 alg. parameter & $t = 2\sqrt n$ & algorithm \\ \hline
 string length & exponentially increasing from $1$ to $100.000$ & test \\
 query pattern & uniformly at random & test \\ \hline
@@ -759,13 +766,20 @@ query pattern & uniformly at random & test \\ \hline
 \caption{List of performance veriables tested.}\label{tab:test-variables}
 \end{table}
 
-("Cache set count is not a power of two.")
+In our implementation, we have made the following assumptions about the LCE problem:
+\begin{itemize}
+\item A character in a string is always eight bits.
+\item A string always ends with a special null character, which does not occur anywehere else in the string. This does not affect our results, since we do not measure practical preprocessing time. If an algorithm has faster query times when the string ends in a special character, it could just add that character to the end of the string in its preprocessing.
+\item We make no assumptions on the order of $i$ and $j$. In some applications of the LCE problem, for example approximate string matching, we know that $i<j$, and some algorithms might be able to take advantage of this knowledge to get faster query times. We do not measure this case.
+\item Wehenever we use random characters or query pairs, we use the \texttt{rand()} function from C. This gives repeatable pseudo-random numbers, which makes it easier for us to compare test runs.
+\end{itemize}
+
+\fixme{Results: Test Code: tell about c++ bug hunting in tinta, cachegrind code "Cache set count is not a power of two."}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Also tell about c++ bug hunting in tinta, cachegrind code}
+\subsubsection{Query time by LCE value}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Also tell about attempting by-LCE-value plot and why it fails}
+\fixme{Results: Test Code: tell about attempting by-LCE-value plot and why it fails}
 
 Plot results using LCE value as x-axis: Results looks wrong, why? Likely because of queries in a given pattern, v=max(i,j)
 
