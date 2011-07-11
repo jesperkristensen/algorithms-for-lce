@@ -1,0 +1,27 @@
+--- cachegrind/cg_main.c.bak	2011-06-30 12:54:12.893099000 +0200
++++ cachegrind/cg_main.c	2011-06-30 11:54:20.000000000 +0200
+@@ -1289,17 +1289,19 @@
+    // architecture).
+    VG_(configure_caches)( I1c, D1c, LLc, all_caches_clo_defined );
+ 
+-   // Check the default/auto-detected values.
+-   checkRes = check_cache(I1c);  tl_assert(!checkRes);
+-   checkRes = check_cache(D1c);  tl_assert(!checkRes);
+-   checkRes = check_cache(LLc);  tl_assert(!checkRes);
+-
+    // Then replace with any defined on the command line.  (Already checked in
+    // parse_cache_opt().)
+    if (DEFINED(clo_I1_cache)) { *I1c = clo_I1_cache; }
+    if (DEFINED(clo_D1_cache)) { *D1c = clo_D1_cache; }
+    if (DEFINED(clo_LL_cache)) { *LLc = clo_LL_cache; }
+ 
++   // Check the default/auto-detected values.
++   checkRes = check_cache(I1c);  tl_assert(!checkRes);
++   checkRes = check_cache(D1c);  tl_assert(!checkRes);
++      VG_(umsg)("  LL: %dB, %d-way, %dB lines\n",
++                LLc->size, LLc->assoc, LLc->line_size);
++   checkRes = check_cache(LLc);  if (checkRes) VG_(umsg)("!LLc cache error: %s\n", checkRes); tl_assert(!checkRes);
++
+    if (VG_(clo_verbosity) >= 2) {
+       VG_(umsg)("Cache configuration used:\n");
+       VG_(umsg)("  I1: %dB, %d-way, %dB lines\n",

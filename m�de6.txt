@@ -1,0 +1,9 @@
+johannes
+    hvad er koden?
+    er der noget nyere der er bedre?
+
+flerniveauer hash
+    3-niveau hashing:
+    hvert hash er n^2/3 substreng
+    hvert hash er n^1/3 substreng
+    hvert hash er n^0/3 substreng (DirectComp)

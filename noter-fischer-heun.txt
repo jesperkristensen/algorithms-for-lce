@@ -1,0 +1,16 @@
+hvad er RMQlog?
+    en twolevel-struktur
+    lav blokke af størrelse O(log n)
+    beregn summary med minimum i hver blok
+    query består af RMQ-minimum i summary + 2 * naiv minimum inden i en blok
+
+    TODO: test hvor blok = sqrt n, og hvor begge levels bruger naiv.
+
+multilevel
+    k levels
+    block size k
+    n=k^k <=> log n = k log k => log n > k
+
+referencer:
+    23, konstruer SA http://www.techfak.uni-bielefeld.de/~stoye/cpublications/alenex2005final.pdf
+        O(n^2) tid ???

@@ -1,0 +1,59 @@
+twolevel
+    k punkter
+    for hvert index j, hvor j kan deles med k, gem lce for hver j-i
+    Antal gemte par: for hvert punkt: j, i alt: k*n.
+    Qurey: Lav DirectComp indtil j når et gemt punkt. Slå derefter op i konstant tid hvad der skal lægges til den foreløbige værdi. Køretid O(n/k)
+    Hvis k=sqrt n, plads O(n*sqrt n), query O(sqrt n)
+    Bedre plads?
+        Hvis vi kun gemmer lce'er >x ? Nej, for S=aaa... er alle LCE'er >x undtagen for sidste x tegn af S.
+            men hvis lce>x, så er der for dem måske et mønster så kun n/x punkter skal gemmes?
+        gem kun de sqrt x største lce'er -> O(n) plads
+            største ikke-gemte lce=n-sqrt n for j=2*sqrt n og S=aaa
+
+tilhørende første LCE
+    for alle LCE(i,j), enten er LCE(i-1,j-1)=0 ellers er LCE(i-1,j-1)=LCE(i,j)+1
+
+    Definition: (i,j) er et første LCE, iff LCE(i,j)>0 og LCE(i-1,j-1)=0
+    Definition: Tilhørende første LCE for et givent (i,j) er et første LCE(i-k,j-k) hvor LCE(i-k,j-k)=LCE(i,j)+k
+    Gem alle første LCE'er <j-i, i, LCE(i,j)>. For hver j-i, lav en predecessor-struktur keyet på i, med LCE(i,j) som satellitdata.
+    query: Brug predecessorstrukturen til at finde tilhørende første LCE, og udregn derefter LCE i konstant tid ud fra den
+    plads: O(n^2), måske bedre
+        hvad hvis vi kun gemte første LCE >k?
+            query: O(predecessor + k) (fordi hvis vi ikke finder svaret i predecessor, så kan DirectComp gøre det i O(k))
+            plads: O(n^2/k), måske bedre, da der for konstant j-i er mindst k afstand mellem hvert gemt punkt.
+                hvis ikke pladsen kan anlyseres til at være bedre, så skal k=n, og så er query som DirectComp
+
+kombination af de to?
+    gem kun første-LCE'er som tilhører et j der kan deles med k
+    nej, det vil svare til kun at gemme LCE>k, eller vil det?
+
+matrix for S=aaaaaaa
+  6 5 4 3 2 1
+    5 4 3 2 1
+      4 3 2 1
+        3 2 1
+          2 1
+            1
+
+max lce
+    max = 0
+    for k = 1 to n-1
+        cur = 0
+        for i = n-k downto 1
+            j = i + k
+            if S[i] == S[j]
+                cur = cur + 1
+            else
+                // hvis cur > 0 er dette en første LCE
+                cur = 0
+            max = max{max, cur}
+
+max lce
+    max (LCP)
+
+sammenhæng for forskellige afstande
+    antag i1 < i2 < j
+    lad k = i2-i1
+    Hvis LCE(i1,j)>0 og LCE(i2,j)>0 og for i1 < i < i2 er LCE(i,j)=0
+    så for i1 < i < j er LCE(i,j)>0 iff i = j1 + x*k, hvor x er naturligt tal.
+    Ikke korrekt!

@@ -1,0 +1,144 @@
+--- RMQ_n_logn/RMQ_n_1_improved.cpp	2007-02-01 13:16:12 +0100
++++ RMQ_n_logn/RMQ_n_logn_4.cpp	2009-04-21 17:44:18 +0200
+@@ -1,6 +1,6 @@
+-#include "RMQ_n_1_improved.hpp"
++#include "RMQ_n_logn_4.hpp"
+ 
+-const DTidx RMQ_n_1_improved::Catalan[17][17] = {
++const DTidx RMQ_n_logn_4::Catalan[17][17] = {
+ 	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+ 	{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16},
+ 	{0,0,2,5,9,14,20,27,35,44,54,65,77,90,104,119,135},
+@@ -20,9 +20,9 @@
+ 	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,35357670}
+ };
+ 
+-const DT RMQ_n_1_improved::minus_infinity = -2147483648;
++const DT RMQ_n_logn_4::minus_infinity = -2147483648;
+ 
+-DTidx RMQ_n_1_improved::query(DTidx i, DTidx j) {
++DTidx RMQ_n_logn_4::query(DTidx i, DTidx j) {
+ 	DTidx block_i = block(i);       // block where i is
+ 	DTidx block_j = block(j);       // j's block
+ 	DTidx i_pos = i - (block_i*bs); // position of i in block_i
+@@ -30,10 +30,15 @@
+ 	DTidx min, min_i, min_j; 		// min: to be returned
+ 
+ 	if (block_j == block_i)
+-		min = (block_i*bs) + Prec[type[block_i]][i_pos*(bs-1)+j_pos-((i_pos-1)*i_pos/2)];
++		//min = (block_i*bs) + Prec[type[block_i]][i_pos*(bs-1)+j_pos-((i_pos-1)*i_pos/2)];
++		min = in_bloc_minimum(i, j);
+ 	else {
+-		min_i = (block_i*bs) + Prec[type[block_i]][(i_pos+1)*(bs-1)-((i_pos-1)*i_pos/2)];
+-		min_j = (block_j*bs) + Prec[type[block_j]][j_pos];
++		//min_i = (block_i*bs) + Prec[type[block_i]][(i_pos+1)*(bs-1)-((i_pos-1)*i_pos/2)];
++		//min_j = (block_j*bs) + Prec[type[block_j]][j_pos];
++
++		min_i = in_bloc_minimum(i, (block_i+1)*bs-1 );
++		min_j = in_bloc_minimum(block_j*bs, j);
++
+ 		min = a[min_i] < a[min_j] ? min_i : min_j;
+ 		if (block_j > block_i + 1) { // out-of-block query:
+ 			min_i = c[RMQ_ST->query(block_i+1, block_j-1)];
+@@ -44,11 +49,20 @@
+ 	return min;
+ }
+ 
++DTidx RMQ_n_logn_4::in_bloc_minimum(const DTidx start, const DTidx end)const{
++			DTidx min_idx = start;
++			for(DTidx b_idx = start+1; b_idx <= end; ++b_idx){
++					if(a[b_idx] < a[min_idx]) min_idx = b_idx;
++			}
++			return min_idx;
++}
++
++
+ /**
+  * Standard Constructor. a is the array to be prepared for RMQ.
+  * n is the size of the array.
+  */
+-RMQ_n_1_improved::RMQ_n_1_improved(DT* a, DTidx n) {
++RMQ_n_logn_4::RMQ_n_logn_4(DT* a, DTidx n) {
+ 	this->a = a;
+ 	this->n = n;
+ 	bs = (DTidx) ceil(log2(n) / 4); // calculate block size
+@@ -58,12 +72,12 @@
+ 	// allocate and fill arrays for out-of-block-queries;
+ 	// combined with type-calculation for the blocks:
+ 	c = new DTidx[nb];
+-	type = new DTidx[nb];
+-	Prec = new DTidx*[Catalan[bs][bs]];
+-	for (DTidx i = 0; i < Catalan[bs][bs]; i++) {
+-		Prec[i] = new DTidx[qpb];
+-		Prec[i][0] = bs; // init with impossible value
+-	}
++//	type = new DTidx[nb];
++//	Prec = new DTidx*[Catalan[bs][bs]];
++//	for (DTidx i = 0; i < Catalan[bs][bs]; i++) {
++//		Prec[i] = new DTidx[qpb];
++//		Prec[i][0] = bs; // init with impossible value
++//	}
+ 	DT* rp = new DT[bs+1];  // rp: rightmost path in Cart. tree
+ 
+ 	DTidx min;   // position of minimum in current block
+@@ -81,14 +95,14 @@
+ 		if (end > n) end = n; // last block could be smaller than bs!
+ 		q = bs;       // init q
+ 		p = bs-1;     // init p
+-		type[i] = 0;  // init type (will be increased!)
++		//type[i] = 0;  // init type (will be increased!)
+ 		rp[1] = a[z]; // init rightmost path
+ 
+ 		while (++z < end) {   // step through current block:
+ 			if (a[z] < a[min]) min = z;   // update minimum
+ 			p--;
+ 			while (rp[q-p-1] > a[z]) {
+-				type[i] += Catalan[p][q]; // update type
++				//type[i] += Catalan[p][q]; // update type
+ 				q--;
+ 			}
+ 			rp[q-p] = a[z]; // add last element to rightmost path
+@@ -96,16 +110,16 @@
+ 		c[i] = min; // store index of minimum
+ 
+ 		// precompute in-block-queries for this block (if necessary):
+-		if (Prec[type[i]][0] == bs) {
+-			p = 0; // now index in Prec[type[i]]
+-			for (DTidx j = start; j < end; j++) {
+-				min = j;
+-				for (DTidx k = j; k < end; k++) {
+-					if (a[k] < a[min]) min = k;
+-					Prec[type[i]][p++] = min-start;
+-				}
+-			}
+-		}
++//		if (Prec[type[i]][0] == bs) {
++//			p = 0; // now index in Prec[type[i]]
++//			for (DTidx j = start; j < end; j++) {
++//				min = j;
++//				for (DTidx k = j; k < end; k++) {
++//					if (a[k] < a[min]) min = k;
++//					Prec[type[i]][p++] = min-start;
++//				}
++//			}
++//		}
+ 	}
+ 	delete[] rp;
+ 
+@@ -115,11 +129,11 @@
+ /**
+  * Destructor. Deletes allocated space.
+  */
+-RMQ_n_1_improved::~RMQ_n_1_improved() {
++RMQ_n_logn_4::~RMQ_n_logn_4() {
+ 	delete RMQ_ST;
+-	delete[] type;
++	//delete[] type;
+ 	delete[] c;
+-	for (DTidx i = 0; i < Catalan[bs][bs]; i++)
+-		delete[] Prec[i];
+-	delete[] Prec;
++//	for (DTidx i = 0; i < Catalan[bs][bs]; i++)
++//		delete[] Prec[i];
++//	delete[] Prec;
+ }

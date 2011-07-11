@@ -1,0 +1,4 @@
+Cachegrind test for string Random-10 length 2000000
+Time was 6.39981e-06.
+
+The end

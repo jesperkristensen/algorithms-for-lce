@@ -1,0 +1,123 @@
+\pref{alg:lz-forward}
+\begin{algorithm}
+\caption{Without reversing the string\label{alg:lz-forward}}
+\begin{codebox}
+\Procname{$\proc{Preprocess}(z[1\twodots n])$}
+\li $start = 1$
+\li \For $i = 1$ \To n
+    \Indentmore
+\li     \If $reference(z[i]) = 0$
+        \Indentmore
+\li         $length(z[i]) = 1$
+\li     \Else
+\li         $length(z[i]) = length(z[reference(z[i])]) + 1$
+        \End
+\zi     \Comment Add $start$ to the predecessor data structure with $i$ as satellite data.
+\li     $\proc{Predecessor-Add}(start, i)$
+\li     $start = start + length(z[i])$
+    \End
+\li $\proc{Preprocess-Level-Ancestor}()$
+\end{codebox}
+
+\begin{codebox}
+\Procname{$\proc{Query}(i, j)$}
+\zi \Comment Get the predecessor values $i_v$ and $i_v$ of $i$ and $j$ together with their satellite data $i_d$ and $j_d$.
+\li $(i_v, i_d) = \proc{Predecessor}(i)$
+\li $(j_v, j_d) = \proc{Predecessor}(j)$
+\li $i_{outer} = i_d$
+\li $j_{outer} = j_d$
+\li $i_{inner} = i - i_v$
+\li $j_{inner} = j - j_v$
+\li \While $label(z[\proc{Level-Ancestor}(i_{outer}, i_{inner})]) = label(z[\proc{Level-Ancestor}(i_{outer}, i_{inner})])$
+    \Indentmore
+\li     $t = t + 1$
+\li     $i_{inner} = i_{inner} + 1$
+\li     \If $i_{inner} \geq length(z[i_{outer}])$
+        \Indentmore
+\li         $i_{outer} = i_{outer} + 1$
+\li         $i_{inner} = i_{outer}$
+        \End
+\li     $j_{inner} = j_{inner} + 1$
+\li     \If $j_{inner} \geq length(z[j_{outer}])$
+        \Indentmore
+\li         $j_{outer} = j_{outer} + 1$
+\li         $j_{inner} = j_{outer}$
+        \End
+    \End
+\end{codebox}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{Backwards iteration of a LZ78 compressed string\label{alg:lz-rev-iter}}
+\begin{codebox}
+\Procname{$\proc{Iterate-Reverse}(z[1\twodots n])$}
+\li \For $outer = n$ \Downto $1$
+    \Indentmore
+\li     $inner = outer$
+\li     \While $inner \neq 0$
+        \Indentmore
+\zi         \Comment yield works like in Python
+\li         \textbf{yield} $label(z[inner])$
+\li         $inner = reference(z[inner])$
+        \End
+    \End
+\end{codebox}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{CompressedDirectComp: LCE using LZ78 compression\label{alg:lce-lz}}
+\begin{codebox}
+\Procname{$\proc{Preprocess}(s[1\twodots N])$}
+\li $s' = \proc{Reverse}(s)$
+\li $z = \proc{LZ78-Compress}(s')$
+\li \Return $z$
+\end{codebox}
+
+\begin{codebox}
+\Procname{$\proc{Query}(z[1\twodots n], i, j)$}
+\li $I_i = \proc{Iterator-Init}(z, N-i+1)$
+\li $I_j = \proc{Iterator-Init}(z, N-j+1)$
+\li $t = 1$
+\li \While $\proc{Iterator-Next}(I_i) = \proc{Iterator-Next}(I_j)$
+    \Indentmore
+\li     $t = t + 1$
+    \End
+\li \Return $t$
+\end{codebox}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{CompressedDirectComp with constant time jumps\label{alg:lce-lz-jump}}
+\begin{codebox}
+\Procname{$\proc{Query}(z[1\twodots n], i, j)$}
+\li $(i_{inner}, i_{outer}) = \proc{Iterator-Init}(z, N-i+1)$
+\li $(j_{inner}, j_{outer}) = \proc{Iterator-Init}(z, N-j+1)$
+\li $t = 1$
+\li \While $label(z[i_{inner}]) = label(z[i_{inner}])$
+    \Indentmore
+\li     \If $reference(z[i_{inner}]) = reference(z[i_{inner}])$
+        \Indentmore
+\li         $t = t + length(z[i_{inner}])$
+\li         $i_{outer} = i_{outer} - 1$
+\li         $i_{inner} = i_{outer}$
+\li         $j_{outer} = j_{outer} - 1$
+\li         $j_{inner} = j_{outer}$
+\li     \Else
+\li         $t = t + 1$
+\li         $i_{inner} = reference(z[i_{inner}])$
+\li         \If $i_{inner} = 0$
+            \Indentmore
+\li             $i_{outer} = i_{outer} - 1$
+\li             $i_{inner} = i_{outer}$
+            \End
+\li         $j_{inner} = reference(z[j_{inner}])$
+\li         \If $j_{inner} = 0$
+            \Indentmore
+\li             $j_{outer} = j_{outer} - 1$
+\li             $j_{inner} = j_{outer}$
+            \End
+        \End
+    \End
+\li \Return $t$
+\end{codebox}
+\end{algorithm}

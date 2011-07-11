@@ -1,0 +1,77 @@
+Kap 2, bruger RMQ_const og RMQ_log algoritmerne som der refereres til O(n^2) preproc tid som referencen nævner? For så kan den totale tid ikke være O(k*n) for inexact matching
+
+Refs
+19 http://www.springerlink.com.globalproxy.cvt.dk/content/27tt7qrtc6q8vwvv/
+
+=== Kap 2: Bevis for at RMK kan bruges ===
+
+LCE(2, 3) = RMQ_LCP(SA^-1[3] + 1, SA^-1[2]) = RMQ_LCP(7, 9) = 1
+
+Hvad sætningen her sider er med andre ord er at hvis du sorterer alle suffixer leksografisk, så er LCE af to suffixer a og b lig med minimum af LCE for alle par af naboer mellem a og b, hvilket er intuitivt sandt.
+
+I det leksografisk sorterede suff_(SA[i]) udtages delmængden af arrayet med det to ønskede suffixer som endepunkter. Herefter findes minimum af hvor meget hvert suffix har til fælles med sine naboer.
+
+[HALVFÆRDIGT] Bevis for: RMQ(SA^-1[a] + 1, SA^-1[b]) >= LCE(a,b), hvilket er det samme som RMQ(a + 1, b) >= LCE(SA[a], SA[b]). Antag nu modstriden RMQ(a + 1, b) < LCE(SA[a], SA[b]). Der må således findes et c, hvor a + 1 <= c - 1, c <= b, hvor LCP[c] < LCE(SA[a], SA[b]). Da LCP[c] = LCE(SA[c - 1], SA[c]) per definitionen af LCP, har vi nu LCE(SA[c - 1], SA[c]) < LCE(SA[a], SA[b]), hvilket så på en eller anden måde modstrider at c er mellem a og b.
+
+=== Kap 3, side 5 øverst ===
+Vi har
+* l^k
+* l*(l-1)
+* l^(n-2*(k+1)
+Som giver
+* l^(n-k-1)(l-1)
+Hvordan
+* l^k * l*(l-1) * l^(n-2*(k+1) = l^(n-k-1) * (l-1)
+
+=== 8, dynamic programming ===
+Cite: http://portal.acm.org.globalproxy.cvt.dk/citation.cfm?id=12152 sec 2.1
+pattern: p[1..m]
+text: t[1..n]
+dynamic programming matrix: M[0..m,0..n]
+
+forall l in 0..n : M[0,l] = 0
+forall i in 1..m : M[i,0] = i
+forall i in 1..m, l in 1..n : M[i,l] = min {
+    M[i-1,l]+1,
+    M[i,l-1]+1,
+    p[i] == t[l] ? M[i-1][l-1] : M[i-1][l-1]+1
+    }
+
+=== Algoritmer ===
+DirectComp
+preproc: O(1)
+space: O(1)
+query: O(n)
+
+LCA, (nearest common ancestor på et suffix tree)
+preproc: O(n)
+space: O(n)
+query: O(1)
+
+Algoritmer på SA^-1 og LCP:
+preproc: O(n)
+space: O(n)
+
+DirectMin
+preproc: O(1) + SA^-1 og LCP
+space: O(1) + SA^-1 og LCP
+query: O(n)
+
+RMQconst
+preproc: O(n) + SA^-1 og LCP
+space: O(n) + SA^-1 og LCP
+query: O(1)
+
+RMQlog
+preproc: O(n) + SA^-1 og LCP
+space: O(n) + SA^-1 og LCP
+query: O(log n)
+
+Resultater:
+Ved i forvejen RMQ > LCA (indledning)
+Tester at DirectComp > RMQlog > RMQconst average case (tabel 1)
+Tester at oftest kombination af DirectComp + DirectMin > RMQlog worst case (figur 6-8)
+
+Resultater for approximate search:
+Sammenligner LV-RMQconst med LV-DirectComp: LV-DC langt bedre
+Sammenligner LV-DirectComp med Ukkonen's cutoff alg: LV-CD bedre for små k, Ukkonen bedre for store

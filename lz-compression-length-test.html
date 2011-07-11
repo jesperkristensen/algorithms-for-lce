@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<!--
+(0,a)(1,b)(2,c)(3,d)(4,e)(5,f)(6,g)(7,h)
+
+1  2   3    4     5      6       7        8
+a ab abc abcd abcde abcdef abcdefg abcdefgh
+
+h g f e d c b a gf ed cb af edc ba edcb ad cba cbab aa
+1 2 3 4 5 6 7 8  9 10 11 12  13 14   15 16  17   18 19
+-->
+<script>
+// er dette altid den bedste komprimering?
+function compress(s) {
+    var tree = {key: -1};
+    var z = [];
+    var keys = 0;
+    for (var i = 0; i < s.length; i++) {
+        var ref = -1;
+        var val = s[i];
+        var node = tree;
+        while ("child-" + val in node && i+1 < s.length) {
+            i++;
+            ref = node["child-" + val].key;
+            node = node["child-" + val];
+            val = s[i];
+        }
+        node["child-" + val] = {key: keys};
+        keys++;
+        z.push({ref: ref, val: val});
+    }
+    return z;
+}
+
+function decompress(z) {
+    var s = "";
+    var phase = [];
+    for (var i = 0; i < z.length; i++) {
+        if (z[i].ref == -1) {
+            phase[i] = z[i].val;
+        } else {
+            phase[i] = phase[z[i].ref] + z[i].val;
+        }
+        s += phase[i];
+    }
+    return s;
+}
+console.log(compress("aababcabcdabcd"));
+console.log(decompress(compress("aababcabcdabcd")) == "aababcabcdabcd");
+
+function buildSuperCompress(x) {
+    var ch = "a".charCodeAt(0);
+    var ref = -1;
+    var z = [];
+    for (var i = 0; i < x; i++) {
+        z.push({ref: ref, val: String.fromCharCode(ch)});
+        ch++;
+        ref++;
+    }
+    return z;
+}
+
+console.log(decompress(buildSuperCompress(10)));
+
+function reverseString(s) {
+    return s.split("").reverse().join("");
+}
+console.log(reverseString("abcdefg"));
+
+function reversedLength(n1) {
+    return compress(reverseString(decompress(buildSuperCompress(n1)))).length;
+}
+
+function reversedLength2(z) {
+    var outer = z.length - 1;
+    var inner = outer;
+    
+    var tree = {key: -1};
+    var keys = 0;
+    while (inner != -1) {
+        //var ref = -1;
+        var val = z[inner].val;
+        var node = tree;
+        while ("child-" + val in node) {
+            //ref = node["child-" + val].key;
+            node = node["child-" + val];
+            inner = z[inner].ref;
+            if (inner == -1) {
+                outer--;
+                inner = outer;
+            }
+            if (inner == -1)
+                break;
+            val = z[inner].val;
+        }
+        node["child-" + val] = {/*key: keys*/};
+        keys++;
+        if (inner == -1)
+            break;
+        inner = z[inner].ref;
+        if (inner == -1) {
+            outer--;
+            inner = outer;
+        }
+    }
+    return keys;
+}
+
+for (var i = 1; i < 50; i++) {
+    var r = reversedLength(i);
+    var r2 = reversedLength2(buildSuperCompress(i));
+    console.log("compr(s) = " + i+ ", compr(s^R) = " + r + "-" + r2 + ", ratio = " + (r/i));
+}
+
+console.log(compress(reverseString(decompress(buildSuperCompress(20)))));
+</script>

@@ -1,0 +1,904 @@
+--------------------------------------------------------------------------------
+I1 cache:         32768 B, 64 B, 8-way associative
+D1 cache:         32768 B, 64 B, 8-way associative
+LL cache:         3145728 B, 64 B, 12-way associative
+Command:          main.exe
+Data file:        cachegrind-rand10.out
+Events recorded:  Ir I1mr ILmr Dr D1mr DLmr Dw D1mw DLmw
+Events shown:     Ir I1mr ILmr Dr D1mr DLmr Dw D1mw DLmw
+Event sort order: Ir I1mr ILmr Dr D1mr DLmr Dw D1mw DLmw
+Thresholds:       0.1 100 100 100 100 100 100 100 100
+Include dirs:     
+User annotated:   
+Auto-annotation:  on
+
+--------------------------------------------------------------------------------
+           Ir  I1mr  ILmr          Dr       D1mr       DLmr          Dw      D1mw      DLmw 
+--------------------------------------------------------------------------------
+1,493,465,057 1,624 1,614 681,480,135 32,238,084 15,012,800 221,605,263 7,942,511 5,754,409  PROGRAM TOTALS
+
+--------------------------------------------------------------------------------
+         Ir I1mr ILmr          Dr       D1mr      DLmr         Dw      D1mw      DLmw  file:function
+--------------------------------------------------------------------------------
+457,361,701   23   23 210,230,109 14,819,863 2,422,440 40,461,432 1,001,206   384,065  /xbar/nas2/home4/s06/s062397/thesis/src/qsufsort.c:sort_split
+187,741,936    4    4  71,870,968          2         2 44,000,000         0         0  ???:random_r
+141,659,120   11   11  71,276,489  4,131,588 3,091,900 16,000,026 4,241,098 3,357,781  /xbar/nas2/home4/s06/s062397/thesis/src/buildSa.cpp:TestString::buildSa()
+137,773,183    7    7  91,225,840  1,146,956   844,605 22,213,796   375,018   375,013  /xbar/nas2/home4/s06/s062397/thesis/src/algRmq1.cpp:AlgorithmRmq1::logpreproc(int*, unsigned int*, unsigned int)
+128,552,150    7    7  66,999,511  9,137,454 6,303,927 17,739,884         1         0  /xbar/nas2/home4/s06/s062397/thesis/src/algRmq1.cpp:AlgorithmRmq1::query(unsigned int, unsigned int)
+104,000,000    2    2  32,000,000          1         0 24,000,000         0         0  ???:random
+ 76,259,416   14   14  41,468,430    131,463   122,189  7,536,514    41,746    41,725  /xbar/nas2/home4/s06/s062397/thesis/src/algRmq1.cpp:AlgorithmRmq1::preproc(TestString*)
+ 68,160,689    8    8  14,693,550  2,468,760 1,839,845 10,277,566 2,117,972 1,430,546  /xbar/nas2/home4/s06/s062397/thesis/src/qsufsort.c:suffixsort
+ 51,313,852   11   11  22,131,489    258,217   258,213  8,131,553     8,221     8,211  /xbar/nas2/home4/s06/s062397/thesis/src/qsufsort.c:transform
+ 36,000,000    1    1  12,000,000          0         0 16,000,000         0         0  ???:rand
+ 28,017,550  204  195  28,016,169        127        65        640         5         2  ???:???
+ 28,000,040    4    4   8,000,014          0         0  4,000,012    31,250    31,250  /xbar/nas2/home4/s06/s062397/thesis/src/str.cpp:strRandom(TestString*, unsigned char, bool)
+ 14,998,148    2    2   3,999,928     10,844         6    999,982         0         0  /xbar/nas2/home4/s06/s062397/thesis/src/algRmq1.cpp:AlgorithmRmq1::log2fast(unsigned int)
+ 11,000,085    5    5   5,000,030    125,010   125,010  4,000,030         2         2  /xbar/nas2/home4/s06/s062397/thesis/src/testRandom.cpp:testRandom(TestString*, unsigned int*, unsigned int, Algorithm*, bool, double)
+ 11,000,080    7    7           9          0         0  4,000,056   125,001   125,001  /xbar/nas2/home4/s06/s062397/thesis/src/cacheTest.cpp:cacheTest(unsigned int, string_type)
+ 10,000,000    1    1   2,000,000          0         0  2,000,000         0         0  /xbar/nas2/home4/s06/s062397/thesis/src/algRmq1.h:AlgorithmRmq1::query(unsigned int, unsigned int)
+
+--------------------------------------------------------------------------------
+-- Auto-annotated source: /xbar/nas2/home4/s06/s062397/thesis/src/qsufsort.c
+--------------------------------------------------------------------------------
+         Ir I1mr ILmr         Dr      D1mr      DLmr        Dw      D1mw      DLmw 
+
+-- line 31 ----------------------------------------
+          .    .    .          .         .         .         .         .         .  
+          .    .    .          .         .         .         .         .         .  /* Subroutine for select_sort_split and sort_split. Sets group numbers for a
+          .    .    .          .         .         .         .         .         .     group whose lowest position in I is pl and highest position is pm.*/
+          .    .    .          .         .         .         .         .         .  
+          .    .    .          .         .         .         .         .         .  static void update_group(MY_INT *pl, MY_INT *pm)
+          .    .    .          .         .         .         .         .         .  {
+          .    .    .          .         .         .         .         .         .     MY_INT g;
+          .    .    .          .         .         .         .         .         .  
+  7,299,354    0    0  2,433,118         0         0 1,480,466         0         0     g=pm-I;                      /* group number.*/
+  3,785,821    1    1  2,092,936       245         0 1,692,885   330,177   212,010     V[*pl]=g;                    /* update group number of first position.*/
+  3,489,220    0    0          0         0         0         0         0         0     if (pl==pm)
+  2,970,312    0    0  1,485,156         0         0 1,485,156         0         0        *pl=-1;                   /* one element, sorted group.*/
+          .    .    .          .         .         .         .         .         .     else
+          .    .    .          .         .         .         .         .         .        do                        /* more than one element, unsorted group.*/
+  4,130,784    0    0  1,376,928    18,635         0 1,376,928   539,612   109,640           V[*++pl]=g;            /* update group numbers.*/
+  2,753,856    0    0          0         0         0         0         0         0        while (pl<pm);
+          .    .    .          .         .         .         .         .         .  }
+          .    .    .          .         .         .         .         .         .  
+          .    .    .          .         .         .         .         .         .  /* Quadratic sorting method to use for small subarrays. To be able to update
+          .    .    .          .         .         .         .         .         .     group numbers consistently, a variant of selection sorting is used.*/
+          .    .    .          .         .         .         .         .         .  
+          .    .    .          .         .         .         .         .         .  static void select_sort_split(MY_INT *p, MY_INT n) {
+          .    .    .          .         .         .         .         .         .     MY_INT *pa, *pb, *pi, *pn;
+          .    .    .          .         .         .         .         .         .     MY_INT f, v, tmp;
+          .    .    .          .         .         .         .         .         .  
+          .    .    .          .         .         .         .         .         .     pa=p;                        /* pa is start of group being picked out.*/
+  1,722,576    0    0    574,192         0         0   574,192         0         0     pn=p+n-1;                    /* pn is last position of subarray.*/
+  8,807,636    0    0  4,854,118         0         0   756,150         0         0     while (pa<pn) {
+ 23,523,403    2    2 11,646,481    50,814    32,152 1,829,518         0         0        for (pi=pb=pa+1, f=KEY(pa); pi<=pn; ++pi)
+ 16,896,654    1    1  8,448,327   394,666   254,534         0         0         0           if ((v=KEY(pi))<f) {
+          .    .    .          .         .         .         .         .         .              f=v;                /* f is smallest key found.*/
+  7,681,482    0    0  3,840,741         0         0 2,560,494         0         0              SWAP(pi, pa);       /* place smallest element at beginning.*/
+          .    .    .          .         .         .         .         .         .              pb=pa+1;            /* pb is position for elements equal to f.*/
+  3,071,724    0    0          0         0         0         0         0         0           } else if (v==f) {     /* if equal to smallest key.*/
+    550,947    0    0    183,649         0         0   367,298         0         0              SWAP(pi, pb);       /* place next to other smallest elements.*/
+    367,298    0    0          0         0         0         0         0         0              ++pb;
+          .    .    .          .         .         .         .         .         .           }
+  2,585,668    0    0  1,292,834         0         0         0         0         0        update_group(pa, pb-1);   /* update group values for new group.*/
+          .    .    .          .         .         .         .         .         .        pa=pb;                    /* continue sorting rest of the subarray.*/
+          .    .    .          .         .         .         .         .         .     }
+  1,722,576    1    1  1,148,384         0         0         0         0         0     if (pa==pn) {                /* check if last part is single element.*/
+  3,603,901    0    0  2,059,372         0         0   514,843    95,756    62,238        V[*pa]=pa-I;
+  1,029,686    0    0    514,843         0         0   514,843         0         0        *pa=-1;                   /* sorted group.*/
+          .    .    .          .         .         .         .         .         .     }
+          .    .    .          .         .         .         .         .         .  }
+          .    .    .          .         .         .         .         .         .  
+          .    .    .          .         .         .         .         .         .  /* Subroutine for sort_split, algorithm by Bentley & McIlroy.*/
+          .    .    .          .         .         .         .         .         .  
+          .    .    .          .         .         .         .         .         .  static MY_INT choose_pivot(MY_INT *p, MY_INT n) {
+          .    .    .          .         .         .         .         .         .     MY_INT *pl, *pm, *pn;
+          .    .    .          .         .         .         .         .         .     MY_INT s;
+          .    .    .          .         .         .         .         .         .     
+  1,200,153    1    1          0         0         0         0         0         0     pm=p+(n>>1);                 /* small arrays, middle element.*/
+  1,016,532    0    0          0         0         0    43,286         0         0     if (n>7) {
+          .    .    .          .         .         .         .         .         .        pl=p;
+  1,427,060    1    1          0         0         0   356,765         0         0        pn=p+n-1;
+  1,427,060    0    0          0         0         0   356,765         0         0        if (n>40) {               /* big arrays, pseudomedian of 9.*/
+          .    .    .          .         .         .         .         .         .           s=n>>3;
+  2,132,371    3    3  1,096,971    60,976    17,945   370,806     3,221        11           pl=MED3(pl, pl+s, pl+s+s);
+  1,819,735    2    2  1,031,622    79,194    25,634   146,894         0         0           pm=MED3(pm-s, pm, pm+s);
+  1,743,771    2    2    834,505    67,444    25,645   146,894         0         0           pn=MED3(pn-s-s, pn-s, pn);
+          .    .    .          .         .         .         .         .         .        }
+  6,319,431    2    2  4,051,628     1,123       717         0         0         0        pm=MED3(pl, pm, pn);      /* midsize arrays, median of 3.*/
+          .    .    .          .         .         .         .         .         .     }
+  3,818,102    1    1  2,407,353     7,472       920 1,207,200         0         0     return KEY(pm);
+          .    .    .          .         .         .         .         .         .  }
+          .    .    .          .         .         .         .         .         .  
+          .    .    .          .         .         .         .         .         .  /* Sorting routine called for each unsorted group. Sorts the array of integers
+          .    .    .          .         .         .         .         .         .     (suffix numbers) of length n starting at p. The algorithm is a ternary-split
+          .    .    .          .         .         .         .         .         .     quicksort taken from Bentley & McIlroy, "Engineering a Sort Function",
+          .    .    .          .         .         .         .         .         .     Software -- Practice and Experience 23(11), 1249-1265 (November 1993). This
+          .    .    .          .         .         .         .         .         .     function is based on Program 7.*/
+          .    .    .          .         .         .         .         .         .  
+          .    .    .          .         .         .         .         .         .  static void sort_split(MY_INT *p, MY_INT n)
+  3,546,660    1    1          0         0         0 2,955,550    28,335       147  {
+          .    .    .          .         .         .         .         .         .     MY_INT *pa, *pb, *pc, *pd, *pl, *pm, *pn;
+          .    .    .          .         .         .         .         .         .     MY_INT f, v, s, t, tmp;
+          .    .    .          .         .         .         .         .         .  
+  3,512,235    0    0    196,502        45         0   196,502        38         0     if (n<7) {                   /* multi-selection sort smallest arrays.*/
+          .    .    .          .         .         .         .         .         .        select_sort_split(p, n);
+          .    .    .          .         .         .         .         .         .        return;
+          .    .    .          .         .         .         .         .         .     }
+          .    .    .          .         .         .         .         .         .  
+          .    .    .          .         .         .         .         .         .     v=choose_pivot(p, n);
+          .    .    .          .         .         .         .         .         .     pa=pb=p;
+          .    .    .          .         .         .         .         .         .     pc=pd=p+n-1;
+          .    .    .          .         .         .         .         .         .     while (1) {                  /* split-end partition.*/
+114,091,573    0    0 75,994,970 7,298,185 1,027,473         0         0         0        while (pb<=pc && (f=KEY(pb))<=v) {
+  7,581,499    0    0          0         0         0         0         0         0           if (f==v) {
+  5,171,460    0    0  2,068,584     8,545         0 2,068,584         0         0              SWAP(pa, pb);
+  1,034,292    0    0          0         0         0         0         0         0              ++pa;
+          .    .    .          .         .         .         .         .         .           }
+  7,581,499    0    0  7,581,499         0         0         0         0         0           ++pb;
+          .    .    .          .         .         .         .         .         .        }
+100,555,133    0    0 55,092,770 6,798,562 1,037,405         0         0         0        while (pc>=pb && (f=KEY(pc))>=v) {
+ 14,277,948    0    0          0         0         0         0         0         0           if (f==v) {
+  2,323,632    0    0  1,161,816     8,527         0 1,161,816         0         0              SWAP(pc, pd);
+  1,742,724    0    0          0         0         0   580,908         0         0              --pd;
+          .    .    .          .         .         .         .         .         .           }
+  7,138,974    0    0          0         0         0         0         0         0           --pc;
+          .    .    .          .         .         .         .         .         .        }
+          .    .    .          .         .         .         .         .         .        if (pb>pc)
+          .    .    .          .         .         .         .         .         .           break;
+  9,698,950    0    0          0         0         0 9,698,950         0         0        SWAP(pb, pc);
+ 14,548,425    1    1          0         0         0 4,849,475         0         0        ++pb;
+  4,849,475    0    0          0         0         0         0         0         0        --pc;
+          .    .    .          .         .         .         .         .         .     }
+          .    .    .          .         .         .         .         .         .     pn=p+n;
+  3,970,542    1    1    800,102         0         0         0         0         0     if ((s=pa-p)>(t=pb-pa))
+          .    .    .          .         .         .         .         .         .        s=t;
+  4,196,374    0    0    460,864         0         0         0         0         0     for (pl=p, pm=pb-s; s; --s, ++pl, ++pm)
+  2,474,544    0    0  1,237,272     9,477         0 1,237,272         0         0        SWAP(pl, pm);
+  4,003,114    1    1  1,200,153     1,596         0         0         0         0     if ((s=pd-pc)>(t=pn-pd-1))
+          .    .    .          .         .         .         .         .         .        s=t;
+  4,182,717    1    1    434,918         0         0         0         0         0     for (pl=pb, pm=pn-s; s; --s, ++pl, ++pm)
+  2,295,320    0    0  1,147,660     8,969         0 1,147,660         0         0        SWAP(pl, pm);
+          .    .    .          .         .         .         .         .         .  
+          .    .    .          .         .         .         .         .         .     s=pb-pa;
+          .    .    .          .         .         .         .         .         .     t=pd-pc;
+    800,102    0    0          0         0         0         0         0         0     if (s>0)
+  1,149,843    0    0    383,281         0         0   383,281     4,067        19        sort_split(p, s);
+  3,200,408    0    0    800,102     3,887         2   400,051         0         0     update_group(p+s, p+n-t-1);
+    800,102    0    0          0         0         0         0         0         0     if (t>0)
+          .    .    .          .         .         .         .         .         .        sort_split(p+n-t, t);
+ 15,737,043    1    1 10,296,458     1,501        13         0         0         0  }
+          .    .    .          .         .         .         .         .         .  
+          .    .    .          .         .         .         .         .         .  /* Bucketsort for first iteration.
+          .    .    .          .         .         .         .         .         .  
+          .    .    .          .         .         .         .         .         .     Input: x[0...n-1] holds integers in the range 1...k-1, all of which appear
+          .    .    .          .         .         .         .         .         .     at least once. x[n] is 0. (This is the corresponding output of transform.) k
+          .    .    .          .         .         .         .         .         .     must be at most n+1. p is array of size n+1 whose contents are disregarded.
+          .    .    .          .         .         .         .         .         .  
+          .    .    .          .         .         .         .         .         .     Output: x is V and p is I after the initial sorting stage of the refined
+          .    .    .          .         .         .         .         .         .     suffix sorting algorithm.*/
+          .    .    .          .         .         .         .         .         .        
+          .    .    .          .         .         .         .         .         .  static void bucketsort(MY_INT *x, MY_INT *p, MY_INT n, MY_INT k)
+          .    .    .          .         .         .         .         .         .  {
+          .    .    .          .         .         .         .         .         .     MY_INT *pi, i, c, d, g;
+          .    .    .          .         .         .         .         .         .  
+        310    1    1          0         0         0         0         0         0     for (pi=p; pi<p+k; ++pi)
+        102    0    0          0         0         0       102         7         7        *pi=-1;                   /* mark linked lists empty.*/
+  6,000,010    1    1          3         1         1         0         0         0     for (i=0; i<=n; ++i) {
+ 10,000,005    0    0  6,000,003   125,001   125,001 2,000,001         0         0        x[i]=p[c=x[i]];           /* insert in linked list.*/
+  2,000,001    0    0          0         0         0 2,000,001         0         0        p[c]=i;
+          .    .    .          .         .         .         .         .         .     }
+        311    0    0        205       100         0         1         1         1     for (pi=p+k-1, i=n; pi>=p; --pi) {
+        510    0    0        408       199        77         0         0         0        d=x[c=*pi];               /* c is position, d is next in list.*/
+        102    0    0          0         0         0       102         0         0        x[c]=g=i;                 /* last position equals group number.*/
+        204    0    0          0         0         0         0         0         0        if (d>=0) {               /* if more than one element in group.*/
+        400    0    0          0         0         0       100         9         9           p[i--]=c;              /* p is permutation for the sorted x.*/
+          .    .    .          .         .         .         .         .         .           do {
+  5,999,697    1    1  3,999,798 1,858,003 1,307,203         0         0         0              d=x[c=d];           /* next in linked list.*/
+  1,999,899    0    0          0         0         0 1,999,899         0         0              x[c]=g;             /* group number in x.*/
+  5,999,697    0    0          0         0         0 1,999,899   124,992   124,991              p[i--]=c;           /* permutation in p.*/
+  5,999,697    0    0          0         0         0         0         0         0           } while (d>=0);
+          .    .    .          .         .         .         .         .         .        } else
+          6    0    0          0         0         0         2         0         0           p[i--]=-1;             /* one element, sorted group.*/
+          .    .    .          .         .         .         .         .         .     }
+          .    .    .          .         .         .         .         .         .  }
+          .    .    .          .         .         .         .         .         .  
+          .    .    .          .         .         .         .         .         .  /* Transforms the alphabet of x by attempting to aggregate several symbols into
+          .    .    .          .         .         .         .         .         .     one, while preserving the suffix order of x. The alphabet may also be
+          .    .    .          .         .         .         .         .         .     compacted, so that x on output comprises all integers of the new alphabet
+          .    .    .          .         .         .         .         .         .     with no skipped numbers.
+          .    .    .          .         .         .         .         .         .  
+-- line 195 ----------------------------------------
+-- line 200 ----------------------------------------
+          .    .    .          .         .         .         .         .         .     compaction is guaranteed; if k-l>n, compaction is never done; if q is
+          .    .    .          .         .         .         .         .         .     INT_MAX, the maximum number of symbols are aggregated into one.
+          .    .    .          .         .         .         .         .         .     
+          .    .    .          .         .         .         .         .         .     Output: Returns an integer j in the range 1...q representing the size of the
+          .    .    .          .         .         .         .         .         .     new alphabet. If j<=n+1, the alphabet is compacted. The global variable r is
+          .    .    .          .         .         .         .         .         .     set to the number of old symbols grouped into one. Only x[n] is 0.*/
+          .    .    .          .         .         .         .         .         .  
+          .    .    .          .         .         .         .         .         .  static MY_INT transform(MY_INT *x, MY_INT *p, MY_INT n, MY_INT k, MY_INT l, MY_INT q)
+          9    1    1          1         0         0         5         1         1  {
+          .    .    .          .         .         .         .         .         .     MY_INT b, c, d, e, i, j, m, s;
+          .    .    .          .         .         .         .         .         .     MY_INT *pi, *pj;
+          .    .    .          .         .         .         .         .         .     
+         28    1    1          4         0         0         3         0         0     for (s=0, i=k-l; i; i>>=1)
+          9    0    0          9         0         0         0         0         0        ++s;                      /* s is number of bits in old symbol.*/
+          .    .    .          .         .         .         .         .         .     e=MY_INT_MAX>>s;                /* e is for overflow checking.*/
+         45    3    3         15         0         0         4         0         0     for (b=d=r=0; r<n && d<=e && (c=d<<s|(k-l))<=q; ++r) {
+         14    0    0         10         1         1         2         0         0        b=b<<s|(x[r]-l+1);        /* b is start of x in chunk alphabet.*/
+          .    .    .          .         .         .         .         .         .        d=c;                      /* d is max symbol in chunk alphabet.*/
+          .    .    .          .         .         .         .         .         .     }
+          4    1    1          1         0         0         0         0         0     m=(1<<(r-1)*s)-1;            /* m masks off top old symbol from chunk.*/
+          5    0    0          2         0         0         1         0         0     x[n]=l-1;                    /* emulate zero terminator.*/
+          2    0    0          1         0         0         0         0         0     if (d<=n) {                  /* if bucketing possible, compact alphabet.*/
+    393,992    0    0          1         0         0         0         0         0        for (pi=p; pi<=p+d; ++pi)
+    131,329    0    0          0         0         0   131,329     8,209     8,209           *pi=0;                 /* zero transformation table.*/
+  6,000,011    1    1          6         2         0         3         0         0        for (pi=x+r, c=b; pi<=x+n; ++pi) {
+  3,999,998    0    0  1,999,999         0         0 1,999,999        10         0           p[c]=1;                /* mark used chunk symbol.*/
+ 11,999,994    1    1  5,999,997   125,001   125,000 1,999,999         0         0           c=(c&m)<<s|(*pi-l+1);  /* shift in next old symbol in chunk.*/
+          .    .    .          .         .         .         .         .         .        }
+          8    0    0          4         1         1         0         0         0        for (i=1; i<r; ++i) {     /* handle last r-1 positions.*/
+          1    0    0          0         0         0         1         0         0           p[c]=1;                /* mark used chunk symbol.*/
+          3    0    0          0         0         0         1         0         0           c=(c&m)<<s;            /* shift in next old symbol in chunk.*/
+          .    .    .          .         .         .         .         .         .        }
+    393,992    1    1          0         0         0         1         0         0        for (pi=p, j=1; pi<=p+d; ++pi)
+    393,987    0    0    131,329     8,199     8,199         0         0         0           if (*pi)
+        404    0    0        101         0         0       202         0         0              *pi=j++;            /* j is new alphabet size.*/
+  8,000,006    1    1          6         2         1         2         0         0        for (pi=x, pj=x+r, c=b; pj<=x+n; ++pi, ++pj) {
+  5,999,997    0    0  3,999,998        10        10 1,999,999         1         1           *pi=p[c];              /* transform to new alphabet.*/
+ 13,999,993    0    0  9,999,995   125,000   125,000 1,999,999         0         0           c=(c&m)<<s|(*pj-l+1);  /* shift in next old symbol in chunk.*/
+          .    .    .          .         .         .         .         .         .        }
+          5    0    0          0         0         0         0         0         0        while (pi<x+n) {          /* handle last r-1 positions.*/
+          4    1    1          2         0         0         1         0         0           *pi++=p[c];            /* transform to new alphabet.*/
+          4    0    0          2         0         0         1         0         0           c=(c&m)<<s;            /* shift right-end zero in chunk.*/
+          .    .    .          .         .         .         .         .         .        }
+          .    .    .          .         .         .         .         .         .     } else {                     /* bucketing not possible, don't compact.*/
+          .    .    .          .         .         .         .         .         .        for (pi=x, pj=x+r, c=b; pj<=x+n; ++pi, ++pj) {
+          .    .    .          .         .         .         .         .         .           *pi=c;                 /* transform to new alphabet.*/
+          .    .    .          .         .         .         .         .         .           c=(c&m)<<s|(*pj-l+1);  /* shift in next old symbol in chunk.*/
+          .    .    .          .         .         .         .         .         .        }
+          .    .    .          .         .         .         .         .         .        while (pi<x+n) {          /* handle last r-1 positions.*/
+          .    .    .          .         .         .         .         .         .           *pi++=c;               /* transform to new alphabet.*/
+          .    .    .          .         .         .         .         .         .           c=(c&m)<<s;            /* shift right-end zero in chunk.*/
+          .    .    .          .         .         .         .         .         .        }
+          .    .    .          .         .         .         .         .         .        j=d+1;                    /* new alphabet size.*/
+          .    .    .          .         .         .         .         .         .     }
+          1    0    0          0         0         0         1         0         0     x[n]=0;                      /* end-of-string symbol is zero.*/
+          .    .    .          .         .         .         .         .         .     return j;                    /* return new alphabet size.*/
+          7    0    0          6         1         1         0         0         0  }
+          .    .    .          .         .         .         .         .         .  
+          .    .    .          .         .         .         .         .         .  /* Makes suffix array p of x. x becomes inverse of p. p and x are both of size
+          .    .    .          .         .         .         .         .         .     n+1. Contents of x[0...n-1] are integers in the range l...k-1. Original
+          .    .    .          .         .         .         .         .         .     contents of x[n] is disregarded, the n-th symbol being regarded as
+          .    .    .          .         .         .         .         .         .     end-of-string smaller than all other symbols.*/
+          .    .    .          .         .         .         .         .         .  
+          .    .    .          .         .         .         .         .         .  void suffixsort(MY_INT *x, MY_INT *p, MY_INT n, MY_INT k, MY_INT l)
+          8    2    2          3         0         0         4         0         0  {
+          .    .    .          .         .         .         .         .         .     MY_INT *pi, *pk;
+          .    .    .          .         .         .         .         .         .     MY_INT i, j, s, sl;
+          .    .    .          .         .         .         .         .         .     
+          2    0    0          1         0         0         1         1         1     V=x;                         /* set global values.*/
+          1    0    0          0         0         0         1         0         0     I=p;
+          .    .    .          .         .         .         .         .         .     
+          4    0    0          1         0         0         0         0         0     if (n>=k-l) {                /* if bucketing possible,*/
+          8    0    0          2         0         0         4         0         0        j=transform(V, I, n, k, l, n);
+          .    .    .          .         .         .         .         .         .        bucketsort(V, I, n, j);   /* bucketsort on first r positions.*/
+          .    .    .          .         .         .         .         .         .     } else {
+          .    .    .          .         .         .         .         .         .        transform(V, I, n, k, l, MY_INT_MAX);
+          .    .    .          .         .         .         .         .         .        for (i=0; i<=n; ++i)
+          .    .    .          .         .         .         .         .         .           I[i]=i;                /* initialize I with suffix numbers.*/
+          .    .    .          .         .         .         .         .         .        h=0;
+          .    .    .          .         .         .         .         .         .        sort_split(I, n+1);       /* quicksort on first r positions.*/
+          .    .    .          .         .         .         .         .         .     }
+          2    0    0          1         1         1         1         0         0     h=r;                         /* number of symbols aggregated by transform.*/
+          .    .    .          .         .         .         .         .         .     
+         27    1    1          7         3         3         0         0         0     while (*I>=-n) {
+          .    .    .          .         .         .         .         .         .        pi=I;                     /* pi is first position of group.*/
+          .    .    .          .         .         .         .         .         .        sl=0;                     /* sl is negated length of sorted groups.*/
+          .    .    .          .         .         .         .         .         .        do {
+  6,832,341    0    0  2,277,447   152,833   152,478         0         0         0           if ((s=*pi)<0) {
+  4,139,236    0    0          0         0         0         0         0         0              pi-=s;              /* skip over sorted group.*/
+  2,069,618    0    0          0         0         0         0         0         0              sl+=s;              /* add negated length to sl.*/
+          .    .    .          .         .         .         .         .         .           } else {
+    415,658    0    0          0         0         0         0         0         0              if (sl) {
+     69,615    0    0          0         0         0    69,615        12         0                 *(pi+sl)=sl;     /* combine sorted groups before pi.*/
+          .    .    .          .         .         .         .         .         .                 sl=0;
+          .    .    .          .         .         .         .         .         .              }
+    623,487    0    0    415,658   207,614   130,086         0         0         0              pk=I+V[s]+1;        /* pk-1 is last position of unsorted group.*/
+  1,454,803    0    0          0         0         0   207,829        15         1              sort_split(pi, pk-pi);
+          .    .    .          .         .         .         .         .         .              pi=pk;              /* next group.*/
+          .    .    .          .         .         .         .         .         .           }
+  4,554,894    1    1          0         0         0         0         0         0        } while (pi<=I+n);
+          8    0    0          0         0         0         0         0         0        if (sl)                   /* if the array ends with a sorted group.*/
+          3    0    0          0         0         0         3         2         0           *(pi+sl)=sl;           /* combine sorted groups at end of I.*/
+          4    0    0          4         2         0         0         0         0        h=2*h;                    /* double sorted-depth.*/
+          .    .    .          .         .         .         .         .         .     }
+          .    .    .          .         .         .         .         .         .  
+  6,000,011    0    0          3         1         0         0         0         0     for (i=0; i<=n; ++i)         /* reconstruct suffix array from inverse.*/
+  4,000,002    0    0  2,000,001   125,001   124,994 2,000,001 1,992,933 1,305,536        I[V[i]]=i;
+          6    1    1          5         1         1         0         0         0  }  
+
+--------------------------------------------------------------------------------
+-- Auto-annotated source: /xbar/nas2/home4/s06/s062397/thesis/src/buildSa.cpp
+--------------------------------------------------------------------------------
+        Ir I1mr ILmr         Dr      D1mr      DLmr        Dw      D1mw      DLmw 
+
+         .    .    .          .         .         .         .         .         .  #include <limits.h>
+         .    .    .          .         .         .         .         .         .  #include "qsufsort.h"
+         .    .    .          .         .         .         .         .         .  
+         6    1    1          0         0         0         4         0         0  void TestString::buildSa() {
+         8    0    0          2         0         0         3         0         0      MY_INT *my_sa = new (std::nothrow) MY_INT[n + 1];
+         8    1    1          2         0         0         3         0         0      MY_INT *my_sainv = new (std::nothrow) MY_INT[n + 1];
+         7    0    0          2         0         0         4         0         0      sa = new (std::nothrow) uint32[n];
+         6    0    0          1         0         0         4         0         0      sainv = new (std::nothrow) uint32[n];
+         7    1    1          1         0         0         5         0         0      lcp = new (std::nothrow) uint32[n];
+        12    1    1          2         0         0         0         0         0      if (!(my_sa && my_sainv && sa && sainv && lcp)) {
+         .    .    .          .         .         .         .         .         .          if (my_sa) delete[] my_sa;
+         .    .    .          .         .         .         .         .         .          if (my_sainv) delete[] my_sainv;
+         .    .    .          .         .         .         .         .         .          if (sa) delete[] sa;
+         .    .    .          .         .         .         .         .         .          if (sainv) delete[] sainv;
+         .    .    .          .         .         .         .         .         .          if (lcp) delete[] lcp;
+         .    .    .          .         .         .         .         .         .          sa = NULL;
+         .    .    .          .         .         .         .         .         .          sainv = NULL;
+         .    .    .          .         .         .         .         .         .          lcp = NULL;
+         2    0    0          1         0         0         0         0         0          return;
+         .    .    .          .         .         .         .         .         .      }
+         .    .    .          .         .         .         .         .         .  
+         .    .    .          .         .         .         .         .         .      MY_INT k = UCHAR_MAX + 1;
+         .    .    .          .         .         .         .         .         .      MY_INT l = 0;
+         .    .    .          .         .         .         .         .         .  
+ 8,000,004    0    0  2,000,002         0         0         0         0         0      for (uint32 j = 0; j < n; j++)
+ 4,000,000    0    0  2,000,000    31,251    27,036 2,000,000   125,000   125,000          my_sainv[j] = s[j];
+         6    1    1          0         0         0         6         2         2      suffixsort(my_sainv, my_sa, MY_INT(n), k, l); // qsufsort.h
+         .    .    .          .         .         .         .         .         .  
+         .    .    .          .         .         .         .         .         .      // transform from MY_INT to uint32
+ 8,000,008    0    0  4,000,004         2         2         1         1         1      for (uint32 i = 0; i < n; i++) {
+ 4,000,000    0    0  2,000,000   125,000   124,302 2,000,000   125,001   125,001          sa[i] = (uint32) my_sa[i + 1];
+ 4,000,000    0    0  2,000,000         0         0 2,000,000 1,993,342 1,367,428          sainv[(uint32) my_sa[i + 1]] = i;
+         .    .    .          .         .         .         .         .         .      }
+         4    0    0          0         0         0         2         2         2      delete[] my_sa;
+         5    1    1          0         0         0         2         0         0      delete[] my_sainv;
+         .    .    .          .         .         .         .         .         .  
+         .    .    .          .         .         .         .         .         .      // from code_LiviuTinta/LCE/manzini_ds/lcp_aux.c
+         .    .    .          .         .         .         .         .         .      // Compute the lcp array from the suffix array
+         .    .    .          .         .         .         .         .         .      // using the algorithm by Kasai et al. (CPM '01)
+         .    .    .          .         .         .         .         .         .  
+         .    .    .          .         .         .         .         .         .      // rank = sa^{-1}
+         .    .    .          .         .         .         .         .         .      // traverse suffixes in rank order
+         .    .    .          .         .         .         .         .         .      uint32 h = 0;
+12,000,013    1    1  8,000,005         0         0         5         0         0      for (uint32 i = 0; i < n; i++) {
+ 4,000,000    1    1  4,000,000   125,001   124,783         0         0         0          uint32 k = sainv[i];          // rank of s[i ... n-1]
+ 4,000,000    0    0          0         0         0         0         0         0          if (k > 0) {
+15,999,992    0    0  7,999,996 1,997,694 1,739,739 3,999,998         0         0              uint32 j = sa[k-1];        // predecessor of s[i ... n-1]
+57,659,041    2    2 25,276,470 1,852,640 1,076,038         0         0         0              while (i + h < n && j + h < n && s[i + h] == s[j + h])
+ 1,999,990    0    0          0         0         0 1,999,990         0         0                  h++;
+13,999,993    0    0  9,999,995         0         0 3,999,998 1,997,749 1,740,346              lcp[k] = h;
+         .    .    .          .         .         .         .         .         .          }
+ 4,000,000    0    0  4,000,000         0         0         0         0         0          if (h > 0) h--;
+         .    .    .          .         .         .         .         .         .      }
+         .    .    .          .         .         .         .         .         .  
+         2    1    1          1         0         0         1         1         1      lcp[0] = 0;
+         6    0    0          5         0         0         0         0         0  }
+
+--------------------------------------------------------------------------------
+-- Auto-annotated source: /xbar/nas2/home4/s06/s062397/thesis/src/algRmq1.h
+--------------------------------------------------------------------------------
+        Ir I1mr ILmr        Dr D1mr DLmr        Dw D1mw DLmw 
+
+-- line 37 ----------------------------------------
+         .    .    .         .    .    .         .    .    .  
+         .    .    .         .    .    .         .    .    .      // block size
+         .    .    .         .    .    .         .    .    .      uint32 bs;
+         .    .    .         .    .    .         .    .    .  
+         .    .    .         .    .    .         .    .    .      // number of blocks (always n/bs)
+         .    .    .         .    .    .         .    .    .      uint32 nb;
+         .    .    .         .    .    .         .    .    .  
+         .    .    .         .    .    .         .    .    .      // return block of entry i:
+10,000,000    1    1 2,000,000    0    0 2,000,000    0    0      inline uint32 block(uint32 i) { return i/bs; }
+         .    .    .         .    .    .         .    .    .  
+         .    .    .         .    .    .         .    .    .      // precomputed Catalan triangle (17 is enough for 64bit computing):
+         .    .    .         .    .    .         .    .    .      static const uint32 Catalan[17][17];
+         .    .    .         .    .    .         .    .    .  
+         .    .    .         .    .    .         .    .    .      // minus infinity (change for 64bit version)
+         .    .    .         .    .    .         .    .    .      static const int32 minus_infinity;
+         .    .    .         .    .    .         .    .    .  
+         .    .    .         .    .    .         .    .    .  
+-- line 53 ----------------------------------------
+
+--------------------------------------------------------------------------------
+-- Auto-annotated source: /xbar/nas2/home4/s06/s062397/thesis/src/algRmq1.cpp
+--------------------------------------------------------------------------------
+         Ir I1mr ILmr         Dr      D1mr      DLmr         Dw    D1mw    DLmw 
+
+          .    .    .          .         .         .          .       .       .  #include "algRmq1.h"
+          .    .    .          .         .         .          .       .       .  
+          .    .    .          .         .         .          .       .       .  #include <stdio.h>
+          .    .    .          .         .         .          .       .       .  #include <new>
+          .    .    .          .         .         .          .       .       .  #include <math.h>
+          .    .    .          .         .         .          .       .       .  
+          4    1    1          1         0         0          2       0       0  AlgorithmRmq1::AlgorithmRmq1() {
+          2    0    0          2         0         0          0       0       0  }
+          .    .    .          .         .         .          .       .       .  
+          .    .    .          .         .         .          .       .       .  AlgorithmRmq1::~AlgorithmRmq1() {
+          .    .    .          .         .         .          .       .       .  }
+          .    .    .          .         .         .          .       .       .  
+          4    1    1          2         0         0          1       0       0  void AlgorithmRmq1::getName(char* name, uint32 size) {
+          4    0    0          0         0         0          3       0       0      snprintf(name, size, "RMQ<n;1>");
+          1    0    0          1         0         0          0       0       0  }
+          .    .    .          .         .         .          .       .       .  
+          7    2    2          1         0         0          4       0       0  uint64 AlgorithmRmq1::spaceUsage(uint32 n) {
+         21    0    0          7         1         1          9       0       0      uint32 bs = (uint32) ceil(log2(n) / 4);
+          5    1    1          1         0         0          0       0       0      uint32 nb = (n-1)/bs+1;
+          .    .    .          .         .         .          .       .       .      uint32 qpb = bs * (bs+1) / 2;
+          .    .    .          .         .         .          .       .       .      // log part
+          5    0    0          2         0         0          3       0       0      uint32 depth = log2fast(nb);
+          .    .    .          .         .         .          .       .       .  
+          .    .    .          .         .         .          .       .       .      return sizeof(AlgorithmRmq1)
+          .    .    .          .         .         .          .       .       .          + n*sizeof(uint32) // sainv
+          .    .    .          .         .         .          .       .       .          + n*sizeof(uint32) // a
+          .    .    .          .         .         .          .       .       .          + sizeof(uint32)*nb // c
+          .    .    .          .         .         .          .       .       .          + sizeof(uint32)*nb // type
+          .    .    .          .         .         .          .       .       .          + sizeof(uint32*)*Catalan[bs][bs] // Prec
+          .    .    .          .         .         .          .       .       .          + sizeof(uint32)*qpb*Catalan[bs][bs] // Prec[i]
+          .    .    .          .         .         .          .       .       .          // log part
+          .    .    .          .         .         .          .       .       .          + sizeof(uint32*)*depth // logM
+         19    0    0          2         1         1          0       0       0          + sizeof(uint32)*nb*depth; // logM[i]
+          .    .    .          .         .         .          .       .       .  
+          .    .    .          .         .         .          .       .       .  /*
+          .    .    .          .         .         .          .       .       .      bs = ceil(log2(n) / 4);
+          .    .    .          .         .         .          .       .       .      nb = (n-1)/bs+1;
+          .    .    .          .         .         .          .       .       .      words = 2*n + 2*nb + (bs * (bs+1) / 2 + 1)*Catalan_bs + (nb+1)*log2fast(nb);
+          .    .    .          .         .         .          .       .       .  */
+          6    0    0          5         0         0          0       0       0  }
+          .    .    .          .         .         .          .       .       .  
+          .    .    .          .         .         .          .       .       .  const uint32 AlgorithmRmq1::Catalan[17][17] = {
+          .    .    .          .         .         .          .       .       .      {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+          .    .    .          .         .         .          .       .       .      {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16},
+          .    .    .          .         .         .          .       .       .      {0,0,2,5,9,14,20,27,35,44,54,65,77,90,104,119,135},
+          .    .    .          .         .         .          .       .       .      {0,0,0,5,14,28,48,75,110,154,208,273,350,440,544,663,798},
+          .    .    .          .         .         .          .       .       .      {0,0,0,0,14,42,90,165,275,429,637,910,1260,1700,2244,2907,3705},
+          .    .    .          .         .         .          .       .       .      {0,0,0,0,0,42,132,297,572,1001,1638,2548,3808,5508,7752,10659,14364},
+-- line 48 ----------------------------------------
+-- line 56 ----------------------------------------
+          .    .    .          .         .         .          .       .       .      {0,0,0,0,0,0,0,0,0,0,0,0,0,742900,2674440,7020405,15967980},
+          .    .    .          .         .         .          .       .       .      {0,0,0,0,0,0,0,0,0,0,0,0,0,0,2674440,9694845,25662825},
+          .    .    .          .         .         .          .       .       .      {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9694845,35357670},
+          .    .    .          .         .         .          .       .       .      {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,35357670}
+          .    .    .          .         .         .          .       .       .  };
+          .    .    .          .         .         .          .       .       .  
+          .    .    .          .         .         .          .       .       .  const int32 AlgorithmRmq1::minus_infinity = -1;//-2147483648;
+          .    .    .          .         .         .          .       .       .  
+  8,000,000    1    1  2,000,000         0         0  4,000,000       0       0  uint32 AlgorithmRmq1::query(uint32 i, uint32 j) {
+  2,000,000    0    0          0         0         0          0       0       0      if (i == j)
+          .    .    .          .         .         .          .       .       .          return this->n - i;
+          .    .    .          .         .         .          .       .       .  
+  5,000,000    0    0  4,000,000   999,186   898,565  1,000,000       0       0      i = this->s->sainv[i];
+  1,000,000    0    0  1,000,000   999,188   898,587          0       0       0      j = this->s->sainv[j];
+          .    .    .          .         .         .          .       .       .  
+  3,999,684    0    0          0         0         0          0       0       0      if (i > j) {
+          .    .    .          .         .         .          .       .       .          uint32 m = i;
+          .    .    .          .         .         .          .       .       .          i = j;
+          .    .    .          .         .         .          .       .       .          j = m;
+          .    .    .          .         .         .          .       .       .      }
+          .    .    .          .         .         .          .       .       .  
+  1,000,000    0    0          0         0         0          0       0       0      i++;
+          .    .    .          .         .         .          .       .       .  
+          .    .    .          .         .         .          .       .       .  
+          .    .    .          .         .         .          .       .       .      uint32 block_i = block(i);       // block where i is
+          .    .    .          .         .         .          .       .       .      uint32 block_j = block(j);       // j's block
+  5,000,000    0    0  1,000,000         0         0  1,000,000       0       0      uint32 i_pos = i - (block_i*bs); // position of i in block_i
+  4,000,000    0    0          0         0         0  2,000,000       0       0      uint32 j_pos = j - (block_j*bs); // pos. of j in block_j
+          .    .    .          .         .         .          .       .       .      uint32 min, min_i, min_j; 		// min: to be returned
+          .    .    .          .         .         .          .       .       .  
+  3,000,036    0    0  2,000,020         2         1          0       0       0      if (block_j == block_i)
+          .    .    .          .         .         .          .       .       .          min = (block_i*bs) + Prec[type[block_i]][i_pos*(bs-1)+j_pos-((i_pos-1)*i_pos/2)];
+          .    .    .          .         .         .          .       .       .      else {
+ 17,999,964    1    1  9,999,980 1,373,986   523,374    999,998       0       0          min_i = (block_i*bs) + Prec[type[block_i]][(i_pos+1)*(bs-1)-((i_pos-1)*i_pos/2)];
+  5,999,988    0    0  5,999,988 1,307,675   522,764          0       0       0          min_j = (block_j*bs) + Prec[type[block_j]][j_pos];
+  9,480,022    1    1  3,999,992 1,998,096 1,791,127  1,740,017       0       0          min = a[min_i] < a[min_j] ? min_i : min_j;
+  4,000,007    1    1  1,999,996         0         0          0       0       0          if (block_j > block_i + 1) { // out-of-block query:
+          .    .    .          .         .         .          .       .       .              i = block_i+1;
+  2,999,967    1    1    999,989         0         0    999,989       0       0              j = block_j-1;
+          .    .    .          .         .         .          .       .       .  
+  2,999,987    0    0         15         5         5          0       0       0              if (j-i == 0) min_i = c[j];
+  2,999,976    0    0         24         8         8          0       0       0              else if (j-i == 1) min_i = c[logM[0][i]];
+          .    .    .          .         .         .          .       .       .              else {
+  5,999,880    1    1  2,999,940         0         0  2,999,940       1       0                  uint32 k = log2fast(j-i);
+          .    .    .          .         .         .          .       .       .                  uint32 twotothek = 1 << k; // 2^k
+ 29,072,340    1    1 19,999,600 2,459,306 1,669,494  2,999,940       0       0                  min_i = c[loga[logc[logM[k-1][i]]] <= loga[logc[logM[k-1][j+1-twotothek]]] ? logM[k-1][i] : logM[k-1][j+1-twotothek]];
+          .    .    .          .         .         .          .       .       .              }
+  5,000,299    0    0  2,999,967         0         0          0       0       0              if (a[min_i] < a[min]) min = min_i;
+          .    .    .          .         .         .          .       .       .          }
+          .    .    .          .         .         .          .       .       .      }
+          .    .    .          .         .         .          .       .       .  
+  3,000,000    0    0  3,000,000         2         2          0       0       0      return s->lcp[min];
+  6,000,000    0    0  5,000,000         0         0          0       0       0  }
+          .    .    .          .         .         .          .       .       .  
+          .    .    .          .         .         .          .       .       .  /**
+          .    .    .          .         .         .          .       .       .   * Standard Constructor. a is the array to be prepared for RMQ.
+          .    .    .          .         .         .          .       .       .   * n is the size of the array.
+          .    .    .          .         .         .          .       .       .   */
+          7    1    1          1         0         0          4       0       0  bool AlgorithmRmq1::preproc(TestString* s) {
+          2    0    0          1         0         0          1       0       0      this->s = s;
+          2    1    1          1         0         0          1       0       0      int32* a = (int32*) s->lcp;
+          2    0    0          1         0         0          1       0       0      uint32 n = s->n;
+          .    .    .          .         .         .          .       .       .  
+          .    .    .          .         .         .          .       .       .  
+          1    0    0          0         0         0          1       0       0      this->a = a;
+          1    0    0          0         0         0          1       0       0      this->n = n;
+         23    1    1          8         0         0         10       0       0      bs = (uint32) ceil(log2(n) / 4); // calculate block size
+          6    0    0          1         0         0          1       0       0      nb = block(n-1)+1;              // number of blocks
+          4    0    0          0         0         0          1       0       0      qpb = bs * (bs+1) / 2;          // # of different queries per block
+          .    .    .          .         .         .          .       .       .  
+          .    .    .          .         .         .          .       .       .      // allocate and fill arrays for out-of-block-queries;
+          .    .    .          .         .         .          .       .       .      // combined with type-calculation for the blocks:
+          4    1    1          0         0         0          3       0       0      c = new uint32[nb];
+          5    0    0          1         0         0          3       0       0      type = new uint32[nb];
+          7    0    0          2         0         0          3       0       0      Prec = new uint32*[Catalan[bs][bs]];
+        798    2    2        266         0         0          0       0       0      for (uint32 i = 0; i < Catalan[bs][bs]; i++) {
+      1,056    0    0        396         0         0        396       8       8          Prec[i] = new uint32[qpb];
+        660    0    0        528         0         0        132      17      17          Prec[i][0] = bs; // init with impossible value
+          .    .    .          .         .         .          .       .       .      }
+          4    0    0          0         0         0          3       0       0      int32* rp = new int32[bs+1];  // rp: rightmost path in Cart. tree
+          .    .    .          .         .         .          .       .       .  
+          .    .    .          .         .         .          .       .       .      uint32 min;   // position of minimum in current block
+          .    .    .          .         .         .          .       .       .      uint32 z=0;   // index in array a
+          .    .    .          .         .         .          .       .       .      uint32 end;   // end of current block
+          .    .    .          .         .         .          .       .       .      uint32 start; // start of current block
+          .    .    .          .         .         .          .       .       .      uint32 q;     // position in Catalan triangle
+          .    .    .          .         .         .          .       .       .      uint32 p;     // --------- " ----------------
+          1    0    0          0         0         0          1       0       0      rp[0] = minus_infinity; // stopper (minus infinity)
+          .    .    .          .         .         .          .       .       .  
+  3,000,020    1    1  1,666,675         0         0    333,340       0       0      for (uint32 i = 0; i < nb; i++) { // step through blocks
+          .    .    .          .         .         .          .       .       .          start = z;            // init start
+          .    .    .          .         .         .          .       .       .          min = start;          // init minimum
+  3,333,341    1    1  1,333,336         0         0    666,669       0       0          end = start + bs;     // end of block
+          .    .    .          .         .         .          .       .       .          if (end > n) end = n; // last block could be smaller than bs!
+          .    .    .          .         .         .          .       .       .          q = bs;       // init q
+  3,333,340    1    1    333,334         0         0    666,668       0       0          p = bs-1;     // init p
+    666,668    0    0    333,334         0         0    333,334  20,833  20,833          type[i] = 0;  // init type (will be increased!)
+  2,333,338    0    0  1,666,670    41,668    40,741    333,334       0       0          rp[1] = a[z]; // init rightmost path
+          .    .    .          .         .         .          .       .       .  
+ 16,333,330    1    1 11,999,996         0         0    666,668       0       0          while (++z < end) {   // step through current block:
+  8,866,196    0    0  6,933,097    83,333    81,416    266,433       0       0              if (a[z] < a[min]) min = z;   // update minimum
+  3,333,332    0    0          0         0         0  1,666,666       0       0              p--;
+ 23,026,936    1    1  9,382,918         0         0    599,150       0       0              while (rp[q-p-1] > a[z]) {
+  3,711,072    0    0  2,783,304         5         5          0       0       0                  type[i] += Catalan[p][q]; // update type
+    927,768    0    0          0         0         0          0       0       0                  q--;
+          .    .    .          .         .         .          .       .       .              }
+  3,333,332    0    0  1,666,666         0         0  1,666,666       0       0              rp[q-p] = a[z]; // add last element to rightmost path
+          .    .    .          .         .         .          .       .       .          }
+  1,333,336    0    0  1,000,002         0         0    333,334  20,833  20,833          c[i] = min; // store index of minimum
+          .    .    .          .         .         .          .       .       .  
+          .    .    .          .         .         .          .       .       .          // precompute in-block-queries for this block (if necessary):
+  2,666,672    1    1  2,333,338     6,455        25          0       0       0          if (Prec[type[i]][0] == bs) {
+          .    .    .          .         .         .          .       .       .              p = 0; // now index in Prec[type[i]]
+      3,302    1    1        889         0         0        762       0       0              for (uint32 j = start; j < end; j++) {
+          .    .    .          .         .         .          .       .       .                  min = j;
+     11,430    0    0      6,096         0         0          0       0       0                  for (uint32 k = j; k < end; k++) {
+     11,397    0    0      8,001         0         0          0       0       0                      if (a[k] < a[min]) min = k;
+     29,337    0    0     18,669         0         0      2,667      54      33                      Prec[type[i]][p++] = min-start;
+          .    .    .          .         .         .          .       .       .                  }
+          .    .    .          .         .         .          .       .       .              }
+          .    .    .          .         .         .          .       .       .          }
+          .    .    .          .         .         .          .       .       .      }
+          3    0    0          1         0         0          2       1       1      delete[] rp;
+          .    .    .          .         .         .          .       .       .  
+      2,676    1    1        893         0         0        259       0       0      logpreproc(a, c, nb); // construct sparse table on block-minima
+          .    .    .          .         .         .          .       .       .      return true; // TODO check OOM
+          7    0    0          5         2         2          0       0       0  }
+          .    .    .          .         .         .          .       .       .  
+          .    .    .          .         .         .          .       .       .  /**
+          .    .    .          .         .         .          .       .       .   * Destructor. Deletes allocated space.
+          .    .    .          .         .         .          .       .       .   */
+          6    0    0          1         0         0          3       0       0  void AlgorithmRmq1::cleanup() {
+          .    .    .          .         .         .          .       .       .      logcleanup();
+          5    0    0          1         0         0          2       0       0      delete[] type;
+          5    1    1          1         0         0          2       0       0      delete[] c;
+        536    1    1        135         1         1          0       0       0      for (uint32 i = 0; i < Catalan[bs][bs]; i++)
+        924    0    0        396         0         0        264       0       0          delete[] Prec[i];
+          4    0    0          0         0         0          1       0       0      delete[] Prec;
+          4    0    0          3         0         0          0       0       0  }
+          .    .    .          .         .         .          .       .       .  
+          .    .    .          .         .         .          .       .       .  
+          .    .    .          .         .         .          .       .       .  
+          .    .    .          .         .         .          .       .       .  
+          .    .    .          .         .         .          .       .       .  
+          .    .    .          .         .         .          .       .       .  const char AlgorithmRmq1::LogTable256[256] = 
+          .    .    .          .         .         .          .       .       .  	{
+          .    .    .          .         .         .          .       .       .  		0, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3,
+-- line 202 ----------------------------------------
+-- line 212 ----------------------------------------
+          .    .    .          .         .         .          .       .       .  		7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+          .    .    .          .         .         .          .       .       .  		7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+          .    .    .          .         .         .          .       .       .  		7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+          .    .    .          .         .         .          .       .       .  		7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+          .    .    .          .         .         .          .       .       .  		7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+          .    .    .          .         .         .          .       .       .  		7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7
+          .    .    .          .         .         .          .       .       .  	};
+          .    .    .          .         .         .          .       .       .  
+  2,999,946    1    1    999,982         0         0    999,982       0       0  uint32 AlgorithmRmq1::log2fast(uint32 v) {
+          .    .    .          .         .         .          .       .       .  	uint32 c = 0;          // c will be lg(v)
+          .    .    .          .         .         .          .       .       .  	register uint32 t, tt; // temporaries
+          .    .    .          .         .         .          .       .       .  
+  3,999,928    0    0          0         0         0          0       0       0  	if (tt = v >> 16)
+  3,879,372    0    0    646,562         3         3          0       0       0  		c = (t = v >> 24) ? 24 + LogTable256[t] : 16 + LogTable256[tt & 0xFF];
+          .    .    .          .         .         .          .       .       .  	else 
+  2,118,938    1    1    353,420    10,841         3          0       0       0  		c = (t = v >> 8) ? 8 + LogTable256[t] : LogTable256[v];
+          .    .    .          .         .         .          .       .       .  	return c;
+  1,999,964    0    0  1,999,964         0         0          0       0       0  }
+          .    .    .          .         .         .          .       .       .  
+          .    .    .          .         .         .          .       .       .  /**
+          .    .    .          .         .         .          .       .       .   * Standard Constructor. a[c[0]],...,a[c[n-1]] is the array to be prepared for RMQ.
+          .    .    .          .         .         .          .       .       .   * n is the size of the index array c.
+          .    .    .          .         .         .          .       .       .   */
+          7    1    1          1         0         0          4       0       0  void AlgorithmRmq1::logpreproc(int32* a, uint32* c, uint32 n) {
+          .    .    .          .         .         .          .       .       .  
+          2    0    0          1         0         0          1       0       0  	this->loga = a;
+          2    0    0          1         0         0          1       0       0  	this->logc = c;
+          2    0    0          1         0         0          1       0       0  	this->logn = n;
+          5    1    1          2         1         1          4       0       0  	uint32 depth = log2fast(n); // table depth
+          1    0    0          0         0         0          1       0       0  	logdepth = depth;
+          .    .    .          .         .         .          .       .       .  
+          .    .    .          .         .         .          .       .       .  	// allocate space for table:
+          4    0    0          0         0         0          3       0       0  	uint32** M = new uint32*[depth];
+          1    0    0          0         0         0          1       0       0      logM = M;
+         60    1    1         20         0         0          0       0       0  	for (uint32 i = 0; i < depth; i++)
+         72    0    0         18         0         0         54       0       0  		M[i] = new uint32[n];
+          .    .    .          .         .         .          .       .       .  
+          .    .    .          .         .         .          .       .       .  	// fill table:
+    666,677    0    0    333,337         0         0          2       0       0  	for (uint32 i = 0; i < n-1; i++) // fill first row
+  3,999,996    1    1  2,333,331   145,835   145,835    333,333  20,834  20,833  		M[0][i] = a[c[i]] <= a[c[i+1]] ? i : i+1;
+          8    0    0          5         1         1          1       0       0  	if (depth > 0) M[0][n-1] = n-1;          // fill overhang in first row
+          .    .    .          .         .         .          .       .       .  
+          .    .    .          .         .         .          .       .       .  	uint32 dist = 1; // always 2^j
+         72    1    1         52         0         0          2       0       0  	for (uint32 j = 1; j < depth; j++) {
+         17    0    0         17         0         0          0       0       0  		dist *= 2;
+ 27,022,918    2    2 16,213,744        11         2         68       0       0  		for (uint32 i = 0; i < n - dist; i++) // fill jth row
+103,985,942    0    0 71,558,726   984,959   698,756 21,618,144 337,800 337,796  			M[j][i] = a[c[M[j-1][i]]] <= a[c[M[j-1][i+dist]]] ? M[j-1][i] : M[j-1][i+dist];
+  2,097,391    0    0    786,579    16,149        10    262,176  16,384  16,384  		for (uint32 i = n - dist; i < n; i++) M[j][i] = M[j-1][i]; // overhang
+          .    .    .          .         .         .          .       .       .  	}
+          6    0    0          5         0         0          0       0       0  }
+          .    .    .          .         .         .          .       .       .  
+          .    .    .          .         .         .          .       .       .  /**
+          .    .    .          .         .         .          .       .       .   * Destructor. Deletes allocated space.
+          .    .    .          .         .         .          .       .       .   */
+          .    .    .          .         .         .          .       .       .  void AlgorithmRmq1::logcleanup() {
+         61    0    0         20         0         0          0       0       0  	for (uint32 i = 0; i < logdepth; i++)
+        108    1    1         36         0         0         36       0       0  		delete[] logM[i];
+          4    0    0          0         0         0          2       0       0  	delete[] logM;
+          .    .    .          .         .         .          .       .       .  }
+          .    .    .          .         .         .          .       .       .  
+
+--------------------------------------------------------------------------------
+-- Auto-annotated source: /xbar/nas2/home4/s06/s062397/thesis/src/str.cpp
+--------------------------------------------------------------------------------
+        Ir I1mr ILmr        Dr D1mr DLmr        Dw   D1mw   DLmw 
+
+-- line 11 ----------------------------------------
+         .    .    .         .    .    .         .      .      .      if (sa)
+         .    .    .         .    .    .         .      .      .          delete[] sa;
+         .    .    .         .    .    .         .      .      .      if (sa)
+         .    .    .         .    .    .         .      .      .          delete[] sainv;
+         .    .    .         .    .    .         .      .      .      if (lcp)
+         .    .    .         .    .    .         .      .      .          delete[] lcp;
+         .    .    .         .    .    .         .      .      .  }
+         .    .    .         .    .    .         .      .      .  
+         3    1    1         1    0    0         1      0      0  const char* nameStr(enum string_type type) {
+         4    0    0         1    1    1         0      0      0      switch (type) {
+         .    .    .         .    .    .         .      .      .      case RANDOM4_STRING:
+         1    0    0         0    0    0         0      0      0          return "Random-4";
+         .    .    .         .    .    .         .      .      .      case RANDOM10_STRING:
+         .    .    .         .    .    .         .      .      .          return "Random-10";
+         .    .    .         .    .    .         .      .      .      case RANDOM255_STRING:
+         .    .    .         .    .    .         .      .      .          return "Random-255";
+         .    .    .         .    .    .         .      .      .      case ALL_A_STRING:
+         .    .    .         .    .    .         .      .      .          return "All ´a´";
+         .    .    .         .    .    .         .      .      .      case RANDOM10_REPEAT10_STRING:
+         .    .    .         .    .    .         .      .      .          return "Random-10-Repeat-10";
+         .    .    .         .    .    .         .      .      .      default:
+         .    .    .         .    .    .         .      .      .          return "UNKNOWN";
+         .    .    .         .    .    .         .      .      .      }
+         2    0    0         2    0    0         0      0      0  }
+         .    .    .         .    .    .         .      .      .  
+         .    .    .         .    .    .         .      .      .  /**
+         .    .    .         .    .    .         .      .      .   * Initializes a pre-allocated buffer s->s of size n+1 with a string of
+         .    .    .         .    .    .         .      .      .   * length s->n with characters from the alphabet [1..mod], where each character
+         .    .    .         .    .    .         .      .      .   * is chosen uniformly at random.
+         .    .    .         .    .    .         .      .      .   */
+         9    1    1         2    0    0         5      0      0  void strRandom(TestString* s, uint8 mod, bool print) {
+         .    .    .         .    .    .         .      .      .      uint32 i;
+         2    0    0         0    0    0         0      0      0      if (print) std::cout << "String: ";
+10,000,009    2    2 4,000,003    0    0         0      0      0      for (i = 0; i < s->n; i++) {
+18,000,000    0    0 4,000,000    0    0 4,000,000 31,250 31,250          s->s[i] = rand() % mod + 1;
+         .    .    .         .    .    .         .      .      .          if (print) std::cout << std::hex << s->s[i];
+         .    .    .         .    .    .         .      .      .      }
+         2    0    0         1    0    0         1      0      0      s->s[s->n] = 0;
+         2    0    0         1    0    0         0      0      0      if (print) std::cout << ", n=" << s->n << "\n";
+        10    1    1         2    0    0         6      0      0      snprintf(s->name, 20, "random n=%i c=%i", s->n, mod);
+         6    0    0         5    0    0         0      0      0  }
+         .    .    .         .    .    .         .      .      .  
+         .    .    .         .    .    .         .      .      .  void strAllA(TestString* s) {
+         .    .    .         .    .    .         .      .      .      uint32 i;
+         .    .    .         .    .    .         .      .      .      for (i = 0; i < s->n; i++) s->s[i] = 'a';
+         .    .    .         .    .    .         .      .      .      s->s[s->n] = 0;
+         .    .    .         .    .    .         .      .      .      snprintf(s->name, 20, "all a n=%i", s->n);
+         .    .    .         .    .    .         .      .      .  }
+         .    .    .         .    .    .         .      .      .  
+         9    1    1         3    0    0         4      0      0  TestString::TestString(uint32 n, enum string_type type) {
+         1    0    0         0    0    0         1      0      0      this->n = n;
+         5    0    0         0    0    0         4      0      0      this->s = new (std::nothrow) uint8[n+1];
+         2    0    0         0    0    0         0      0      0      if (!this->s)
+         .    .    .         .    .    .         .      .      .          return;
+         3    1    1         1    1    1         0      0      0      switch (type) {
+         .    .    .         .    .    .         .      .      .      case RANDOM4_STRING:
+         .    .    .         .    .    .         .      .      .          strRandom(this, 4, false);
+         .    .    .         .    .    .         .      .      .          break;
+         .    .    .         .    .    .         .      .      .      case RANDOM10_STRING:
+         5    1    1         0    0    0         4      0      0          strRandom(this, 10, false);
+         .    .    .         .    .    .         .      .      .          break;
+         .    .    .         .    .    .         .      .      .      case RANDOM255_STRING:
+         .    .    .         .    .    .         .      .      .          strRandom(this, 255, false);
+         .    .    .         .    .    .         .      .      .          break;
+         .    .    .         .    .    .         .      .      .      case ALL_A_STRING:
+         .    .    .         .    .    .         .      .      .          strAllA(this);
+         .    .    .         .    .    .         .      .      .          break;
+         .    .    .         .    .    .         .      .      .      case RANDOM10_REPEAT10_STRING:
+-- line 78 ----------------------------------------
+-- line 79 ----------------------------------------
+         .    .    .         .    .    .         .      .      .          this->n = n/10;
+         .    .    .         .    .    .         .      .      .          strRandom(this, 10, false);
+         .    .    .         .    .    .         .      .      .          for (uint32 i = 0; i < n; i++)
+         .    .    .         .    .    .         .      .      .              this->s[i] = this->s[i % this->n];
+         .    .    .         .    .    .         .      .      .          this->s[n] = 0;
+         .    .    .         .    .    .         .      .      .          this->n = n;
+         .    .    .         .    .    .         .      .      .          break;
+         .    .    .         .    .    .         .      .      .      }
+         2    0    0         0    0    0         1      1      1      buildSa();
+         5    0    0         4    0    0         0      0      0  }
+         .    .    .         .    .    .         .      .      .  
+         .    .    .         .    .    .         .      .      .  TestString::TestString(const char* fileName) {
+         .    .    .         .    .    .         .      .      .      FILE* file = fopen(fileName, "rb");
+         .    .    .         .    .    .         .      .      .      if (!file) {
+         .    .    .         .    .    .         .      .      .          std::cout << "There is an error opening the file.\n";
+         .    .    .         .    .    .         .      .      .          // if( errno == EOVERFLOW ) std::cout << "TRUE" << "\n";
+         .    .    .         .    .    .         .      .      .          return;
+         .    .    .         .    .    .         .      .      .      }
+-- line 96 ----------------------------------------
+-- line 110 ----------------------------------------
+         .    .    .         .    .    .         .      .      .      s[n] = 0;
+         .    .    .         .    .    .         .      .      .      //cout << "Errno: " << errno << endl;
+         .    .    .         .    .    .         .      .      .  
+         .    .    .         .    .    .         .      .      .      fclose(file);
+         .    .    .         .    .    .         .      .      .  
+         .    .    .         .    .    .         .      .      .      buildSa();
+         .    .    .         .    .    .         .      .      .  }
+         .    .    .         .    .    .         .      .      .  
+         5    1    1         1    0    0         2      0      0  bool checkStr(TestString* s) {
+         3    0    0         0    0    0         0      0      0      if (!s)
+         .    .    .         .    .    .         .      .      .          return false;
+         4    0    0         1    0    0         0      0      0      if (!s->lcp) {
+         .    .    .         .    .    .         .      .      .          delete s;
+         .    .    .         .    .    .         .      .      .          return false;
+         .    .    .         .    .    .         .      .      .      }
+         .    .    .         .    .    .         .      .      .      return true;
+        13    1    1         5    0    0         1      0      0  }
+         6    1    1         1    0    0         1      0      0  <bogus line 127>
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@ WARNING @@ WARNING @@ WARNING @@ WARNING @@ WARNING @@ WARNING @@ WARNING @@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@
+@@ Information recorded about lines past the end of '/xbar/nas2/home4/s06/s062397/thesis/src/str.cpp'.
+@@
+@@ Probable cause and solution:
+@@ cause:    not sure, sorry
+@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+--------------------------------------------------------------------------------
+-- Auto-annotated source: /xbar/nas2/home4/s06/s062397/thesis/src/cacheTest.cpp
+--------------------------------------------------------------------------------
+       Ir I1mr ILmr Dr D1mr DLmr        Dw    D1mw    DLmw 
+
+        .    .    .  .    .    .         .       .       .  #include "cacheTest.h"
+        .    .    .  .    .    .         .       .       .  #include "algorithm.h"
+        .    .    .  .    .    .         .       .       .  #include "algRmq1.h"
+        .    .    .  .    .    .         .       .       .  #include "testRandom.h"
+        .    .    .  .    .    .         .       .       .  #include <iostream>
+        .    .    .  .    .    .         .       .       .  
+        9    1    1  2    0    0         5       0       0  void cacheTest(uint32 n, enum string_type type) {
+       18    1    1  0    0    0        17       0       0      std::cout << "Cachegrind test for string " << nameStr(type) << " length " << n << "\n";
+        5    0    0  0    0    0         5       0       0      Algorithm* rmq1 = new AlgorithmRmq1;
+        .    .    .  .    .    .         .       .       .  
+        .    .    .  .    .    .         .       .       .      uint32 paircount = 1000000;
+        5    1    1  0    0    0         3       0       0      uint32* pairs = new (std::nothrow) uint32[paircount*2];
+        3    0    0  0    0    0         0       0       0      if (!pairs) {
+        .    .    .  .    .    .         .       .       .          delete rmq1;
+        .    .    .  .    .    .         .       .       .          std::cout << "Cannot allocate pairs\n";
+        .    .    .  .    .    .         .       .       .          return;
+        .    .    .  .    .    .         .       .       .      }
+        .    .    .  .    .    .         .       .       .  
+3,000,000    0    0  0    0    0         0       0       0      for (uint32 i = 0; i < paircount*2; i += 2) {
+4,000,000    0    0  0    0    0 2,000,000 125,000 125,000          pairs[i] = rand() % n;
+4,000,000    0    0  0    0    0 2,000,000       0       0          pairs[i + 1] = rand() % n;
+        .    .    .  .    .    .         .       .       .      }
+        .    .    .  .    .    .         .       .       .  
+       11    1    1  1    0    0         7       0       0      TestString* s = new (std::nothrow) TestString(n, type);
+        4    0    0  0    0    0         2       0       0      if (!checkStr(s)) {
+        .    .    .  .    .    .         .       .       .          delete rmq1;
+        .    .    .  .    .    .         .       .       .          delete pairs;
+        1    0    0  0    0    0         0       0       0          std::cout << "Cannot allocate string\n";
+        .    .    .  .    .    .         .       .       .          return;
+        .    .    .  .    .    .         .       .       .      }
+        .    .    .  .    .    .         .       .       .      
+       10    2    2  1    0    0         9       1       1      double time = testRandom(s, pairs, paircount, rmq1, false, 10000);
+        9    0    0  1    0    0         8       0       0      std::cout << "Time was " << time << ".\n";
+       14    2    2  6    0    0         1       0       0  }
+        6    1    1  1    0    0         1       0       0  <bogus line 35>
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@ WARNING @@ WARNING @@ WARNING @@ WARNING @@ WARNING @@ WARNING @@ WARNING @@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@
+@@ Information recorded about lines past the end of '/xbar/nas2/home4/s06/s062397/thesis/src/cacheTest.cpp'.
+@@
+@@ Probable cause and solution:
+@@ cause:    not sure, sorry
+@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+--------------------------------------------------------------------------------
+-- Auto-annotated source: /xbar/nas2/home4/s06/s062397/thesis/src/testRandom.cpp
+--------------------------------------------------------------------------------
+       Ir I1mr ILmr        Dr    D1mr    DLmr        Dw D1mw DLmw 
+
+        .    .    .         .       .       .         .    .    .  #include "testRandom.h"
+        .    .    .         .       .       .         .    .    .  #include <stdlib.h>
+        .    .    .         .       .       .         .    .    .  #include <stdio.h>
+        .    .    .         .       .       .         .    .    .  #include "timer.h"
+        .    .    .         .       .       .         .    .    .  
+        .    .    .         .       .       .         .    .    .  /**
+        .    .    .         .       .       .         .    .    .   * Tests a given agorithm on a given string using random query pairs.
+        .    .    .         .       .       .         .    .    .   */
+       11    1    1         3       0       0         6    1    1  double testRandom(TestString* s, uint32* pairs, uint32 paircount, Algorithm* a, bool print, double preproc_time_limit) {
+        .    .    .         .       .       .         .    .    .      uint32 x;
+        .    .    .         .       .       .         .    .    .      double start;
+        .    .    .         .       .       .         .    .    .      double end;
+        .    .    .         .       .       .         .    .    .      char algName[ALGORITHM_NAME_SIZE];
+        6    0    0         2       2       2         4    1    1      a->getName(algName, ALGORITHM_NAME_SIZE);
+       20    1    1         7       1       1         6    0    0      if (a->spaceUsage(s->n) > 1e9) {
+        .    .    .         .       .       .         .    .    .          if (print) printf("\ntestRandom,%s,too much memory,%s\n", algName, s->name);
+        .    .    .         .       .       .         .    .    .          return -1;
+        .    .    .         .       .       .         .    .    .      }
+        2    1    1         0       0       0         2    0    0      start = gettime();
+        6    0    0         3       0       0         3    0    0      bool success = a->preproc(s);
+        1    0    0         0       0       0         1    0    0      end = gettime();
+        2    0    0         0       0       0         0    0    0      if (!success) {
+        .    .    .         .       .       .         .    .    .          if (print) printf("\ntestRandom,%s,out of memory,%s\n", algName, s->name);
+        .    .    .         .       .       .         .    .    .          return -1;
+        .    .    .         .       .       .         .    .    .      }
+        7    0    0         2       1       1         0    0    0      if (end - start > preproc_time_limit) {
+        .    .    .         .       .       .         .    .    .          a->cleanup();
+        .    .    .         .       .       .         .    .    .          if (print) printf("\ntestRandom,%s,preprocessing timed out,%s\n", algName, s->name);
+        .    .    .         .       .       .         .    .    .          return -1;
+        .    .    .         .       .       .         .    .    .      }
+        2    1    1         0       0       0         2    0    0      start = gettime();
+3,000,005    0    0         1       1       1         0    0    0      for (x = 0; x < paircount*2; x += 2) {
+        .    .    .         .       .       .         .    .    .          uint32 i = pairs[x];
+        .    .    .         .       .       .         .    .    .          uint32 j = pairs[x + 1];
+8,000,000    0    0 5,000,000 125,003 125,003 4,000,000    0    0          uint32 lce = a->query(i, j);
+        .    .    .         .       .       .         .    .    .          //printf("i=%i, j=%i, lce=%i\n", i, j, lce);
+        .    .    .         .       .       .         .    .    .      }
+        1    0    0         0       0       0         1    0    0      end = gettime();
+       11    1    1         4       1       1         2    0    0      if (print) printf("\ntestRandom,%s,%e,%s\n", algName, (end - start) / (double) paircount, s->name);
+        5    0    0         3       0       0         3    0    0      a->cleanup();
+        .    .    .         .       .       .         .    .    .      return (end - start) / (double) paircount;
+        6    0    0         5       1       1         0    0    0  }
+
+--------------------------------------------------------------------------------
+Ir I1mr ILmr Dr D1mr DLmr Dw D1mw DLmw 
+--------------------------------------------------------------------------------
+76    7    7 79  100  100 62  100  100  percentage of events annotated
+

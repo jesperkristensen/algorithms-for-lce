@@ -1,0 +1,4 @@
+Cachegrind test for string All ´a´ length 2000000
+Time was 6.86936e-06.
+
+The end

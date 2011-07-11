@@ -1,0 +1,13 @@
+* konstruer suffixtræ og suffixarray er begge O(sort(n,sigma))
+* noter hvorfor RMQ er bedre i all-a til rapport
+  - I det nederste niveau bruges tabulering af størrelsen
+    X = 1/2 log n + O(log log n) bits
+    (log n bits til dataen, og O(log log n) bits til de to indexer)
+  - dataen er ens for hver, og derfor bruges kun meget få af indexerne.
+    Så selvom datan er for stor til cachen kan den del der bruges godt være i cachek i all-a.
+* eksperimenter med cache layout af hashing
+* Prøv at lave et ordentligt graph-by-value eksperiment
+
+* karp-miller-rosenberg:
+  - O(n*(log n)^2) oprindeligt
+  - Er den også O(n*log n)? Den beskrives som "næsten O(n*log n)".

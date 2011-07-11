@@ -1,0 +1,523 @@
+diff -ru code_LiviuTinta-orig//LCE/Makefile code_LiviuTinta//LCE/Makefile
+--- code_LiviuTinta-orig//LCE/Makefile	2009-10-20 00:26:46 +0200
++++ code_LiviuTinta//LCE/Makefile	2011-02-08 10:12:00 +0100
+@@ -2,10 +2,11 @@
+ GCC=g++
+ BONNIE_NTL=/csd/grad/ltinta/ntl
+ SILKY_NTL=/work/ltinta/NTL
+-NTL_HOME=$(BONNIE_NTL)
++WIN_NTL=../../WinNTL-5_5_2
++NTL_HOME=$(WIN_NTL)
+ 
+ INCLUDE_FILES_PATHS=-I`pwd`/manzini_ds -I`pwd`/RMQ_n_logn -I`pwd`/qsufsort -I`pwd`/SA_Bentley\&Sedgewick 
+-CCFLAGS= -DDEBUG=0 -DNDEBUG=1 -Wall -O3 -fexceptions -fomit-frame-pointer -D_FILE_OFFSET_BITS=64 $(INCLUDE_FILES_PATHS)
++CCFLAGS= -DDEBUG=0 -DNDEBUG=1 -Wall -O3 -fexceptions -fomit-frame-pointer -D_FILE_OFFSET_BITS=64 $(INCLUDE_FILES_PATHS) -DWINDOWS
+ 
+ #-D_LARGEFILE_SOURCE
+ 
+diff -ru code_LiviuTinta-orig//LCE/RMQ_n_logn/RMQ.hpp code_LiviuTinta//LCE/RMQ_n_logn/RMQ.hpp
+--- code_LiviuTinta-orig//LCE/RMQ_n_logn/RMQ.hpp	2007-02-01 13:06:26 +0100
++++ code_LiviuTinta//LCE/RMQ_n_logn/RMQ.hpp	2011-05-19 15:02:27 +0200
+@@ -12,6 +12,7 @@
+ public:
+ 	// returns index of RMQ[i,j]
+ 	virtual DTidx query(DTidx, DTidx) = 0;
++	virtual ~RMQ() = 0;
+ };
+ 
+ #endif
+diff -ru code_LiviuTinta-orig//LCE/RMQ_n_logn/RMQ_1_n.cpp code_LiviuTinta//LCE/RMQ_n_logn/RMQ_1_n.cpp
+--- code_LiviuTinta-orig//LCE/RMQ_n_logn/RMQ_1_n.cpp	2006-06-27 11:50:36 +0200
++++ code_LiviuTinta//LCE/RMQ_n_logn/RMQ_1_n.cpp	2011-05-19 15:17:23 +0200
+@@ -22,3 +22,5 @@
+ RMQ_1_n::~RMQ_1_n() {
+ 	
+ }
++
++RMQ::~RMQ() {} // TODO this is not the prettiest place
+diff -ru code_LiviuTinta-orig//LCE/RMQ_n_logn/RMQ_1_n.hpp code_LiviuTinta//LCE/RMQ_n_logn/RMQ_1_n.hpp
+--- code_LiviuTinta-orig//LCE/RMQ_n_logn/RMQ_1_n.hpp	2006-06-27 11:57:36 +0200
++++ code_LiviuTinta//LCE/RMQ_n_logn/RMQ_1_n.hpp	2011-05-19 15:06:40 +0200
+@@ -16,7 +16,7 @@
+ 
+ 	RMQ_1_n(DT* a, DTidx n);
+ 
+-	~RMQ_1_n();
++	virtual ~RMQ_1_n();
+ 
+ protected:
+ 	// array
+diff -ru code_LiviuTinta-orig//LCE/RMQ_n_logn/RMQ_n_1_improved.hpp code_LiviuTinta//LCE/RMQ_n_logn/RMQ_n_1_improved.hpp
+--- code_LiviuTinta-orig//LCE/RMQ_n_logn/RMQ_n_1_improved.hpp	2007-02-01 13:06:18 +0100
++++ code_LiviuTinta//LCE/RMQ_n_logn/RMQ_n_1_improved.hpp	2011-05-19 15:06:59 +0200
+@@ -14,7 +14,7 @@
+ 
+ 	RMQ_n_1_improved(DT* a, DTidx n);
+ 
+-	~RMQ_n_1_improved();
++	virtual ~RMQ_n_1_improved();
+ 
+ protected:
+ 	// array
+diff -ru code_LiviuTinta-orig//LCE/RMQ_n_logn/RMQ_n_logn_2.hpp code_LiviuTinta//LCE/RMQ_n_logn/RMQ_n_logn_2.hpp
+--- code_LiviuTinta-orig//LCE/RMQ_n_logn/RMQ_n_logn_2.hpp	2008-12-06 15:22:36 +0100
++++ code_LiviuTinta//LCE/RMQ_n_logn/RMQ_n_logn_2.hpp	2011-05-19 15:06:37 +0200
+@@ -14,7 +14,7 @@
+ 
+ 	RMQ_n_logn_2(DT* a, DTidx n);
+ 
+-	~RMQ_n_logn_2();
++	virtual ~RMQ_n_logn_2();
+ 
+ protected:
+ 	// array
+diff -ru code_LiviuTinta-orig//LCE/RMQ_n_logn/RMQ_n_logn_4.hpp code_LiviuTinta//LCE/RMQ_n_logn/RMQ_n_logn_4.hpp
+--- code_LiviuTinta-orig//LCE/RMQ_n_logn/RMQ_n_logn_4.hpp	2008-12-06 15:18:40 +0100
++++ code_LiviuTinta//LCE/RMQ_n_logn/RMQ_n_logn_4.hpp	2011-05-19 15:06:33 +0200
+@@ -14,7 +14,7 @@
+ 
+ 	RMQ_n_logn_4(DT* a, DTidx n);
+ 
+-	~RMQ_n_logn_4();
++	virtual ~RMQ_n_logn_4();
+ 
+ protected:
+ 	// array
+diff -ru code_LiviuTinta-orig//LCE/RMQ_n_logn/RMQ_nlogn_1.hpp code_LiviuTinta//LCE/RMQ_n_logn/RMQ_nlogn_1.hpp
+--- code_LiviuTinta-orig//LCE/RMQ_n_logn/RMQ_nlogn_1.hpp	2007-02-01 13:07:18 +0100
++++ code_LiviuTinta//LCE/RMQ_n_logn/RMQ_nlogn_1.hpp	2011-05-19 15:06:28 +0200
+@@ -17,7 +17,7 @@
+ 
+ 	RMQ_nlogn_1(DT* a, DTidx* c, DTidx n);
+ 
+-	~RMQ_nlogn_1();
++	virtual ~RMQ_nlogn_1();
+ 
+ 	// the following stuff is for fast base 2 logarithms:
+ 	// (currently only implemented for 32 bit numbers)
+diff -ru code_LiviuTinta-orig//LCE/RMQ_n_logn/makefile code_LiviuTinta//LCE/RMQ_n_logn/makefile
+--- code_LiviuTinta-orig//LCE/RMQ_n_logn/makefile	2008-12-10 23:42:02 +0100
++++ code_LiviuTinta//LCE/RMQ_n_logn/makefile	2011-03-09 09:46:00 +0100
+@@ -2,7 +2,7 @@
+ 
+ all: testRMQ RMQ.a
+ 
+-OBJECTS=RMQ_n_1_improved.o RMQ_nlogn_1.o RMQ_n_logn_2.o RMQ_n_logn_4.o RMQ_1_n.o
++OBJECTS=RMQ_n_1_improved.o RMQ_nlogn_1.o RMQ_n_logn_2.o RMQ_n_logn_4.o RMQ_1_n.o RMQ_succinct.o RMQ_n_logn.o
+ 
+ 
+ 
+@@ -15,6 +15,9 @@
+ RMQ_nlogn_1.o: RMQ_nlogn_1.cpp RMQ_nlogn_1.hpp RMQ.hpp
+ 	g++ $(FLAG) -c RMQ_nlogn_1.cpp
+ 
++RMQ_n_logn.o: RMQ_n_logn.cpp RMQ_n_logn.hpp RMQ.hpp RMQ_nlogn_1.hpp
++	g++ $(FLAG) -c RMQ_n_logn.cpp
++
+ RMQ_n_logn_2.o: RMQ_n_logn_2.cpp RMQ_n_logn_2.hpp RMQ.hpp
+ 	g++ $(FLAG) -c RMQ_n_logn_2.cpp
+ 								 								                                                      
+@@ -24,6 +27,9 @@
+ RMQ_1_n.o: RMQ_1_n.cpp RMQ_1_n.hpp
+ 	g++ $(FLAG) -c RMQ_1_n.cpp	
+ 	
++RMQ_succinct.o: RMQ_succinct.cpp RMQ_succinct.hpp RMQ.hpp
++	g++ $(FLAG) -c RMQ_succinct.cpp
++	
+ RMQ.a: $(OBJECTS)
+ 	ar rcs RMQ.a $(OBJECTS)	
+ 	
+diff -ru code_LiviuTinta-orig//LCE/SA_Bentley&Sedgewick/Makefile code_LiviuTinta//LCE/SA_Bentley&Sedgewick/Makefile
+--- code_LiviuTinta-orig//LCE/SA_Bentley&Sedgewick/Makefile	2009-04-24 05:52:04 +0200
++++ code_LiviuTinta//LCE/SA_Bentley&Sedgewick/Makefile	2011-02-08 09:53:13 +0100
+@@ -10,7 +10,7 @@
+ 
+ SABentleySedgewick.o:SABentleySedgewick.cc SABentleySedgewick.hh
+ 	$(GCC) $(CCFLAGS) -c SABentleySedgewick.cc
+-	strip SABentleySedgewick.o   
++#	strip SABentleySedgewick.o   
+  
+ clean:
+ 	rm *.a *.o
+diff -ru code_LiviuTinta-orig//LCE/avglce_at_k.cc code_LiviuTinta//LCE/avglce_at_k.cc
+--- code_LiviuTinta-orig//LCE/avglce_at_k.cc	2009-04-24 00:22:38 +0200
++++ code_LiviuTinta//LCE/avglce_at_k.cc	2011-02-08 10:20:41 +0100
+@@ -3,8 +3,10 @@
+ #include <unistd.h>
+ #include <time.h>
+ #include <sys/time.h>
++#ifndef WINDOWS
+ #include <sys/times.h>
+ #include <sys/resource.h>
++#endif
+ 
+ 
+ #include <iostream>
+@@ -154,6 +156,7 @@
+ 
+ my_time_t getTime ( void )
+ {
++#ifndef WINDOWS
+    double usertime,systime;
+    struct rusage usage;
+ 
+@@ -172,6 +175,9 @@
+    
+ 
+    return(usertime+systime);
++#else
++   return 0;
++#endif
+ }
+ 
+ 
+diff -ru code_LiviuTinta-orig//LCE/compute_lcp.cc code_LiviuTinta//LCE/compute_lcp.cc
+--- code_LiviuTinta-orig//LCE/compute_lcp.cc	2009-04-27 06:48:56 +0200
++++ code_LiviuTinta//LCE/compute_lcp.cc	2011-02-08 10:05:43 +0100
+@@ -1,3 +1,4 @@
++#include <stdlib.h>
+ #include "save_restore_suffix_array.hh"
+ #include <string>
+ #include <iostream>
+diff -ru code_LiviuTinta-orig//LCE/construct_suffix_array.cc code_LiviuTinta//LCE/construct_suffix_array.cc
+--- code_LiviuTinta-orig//LCE/construct_suffix_array.cc	2009-04-27 07:36:46 +0200
++++ code_LiviuTinta//LCE/construct_suffix_array.cc	2011-02-08 10:06:01 +0100
+@@ -1,3 +1,4 @@
++#include <limits.h>
+ #include "save_restore_suffix_array.hh"
+ #include "qsufsort.h"
+ #include <iostream>
+diff -ru code_LiviuTinta-orig//LCE/manzini_ds/Makefile code_LiviuTinta//LCE/manzini_ds/Makefile
+--- code_LiviuTinta-orig//LCE/manzini_ds/Makefile	2009-04-26 20:43:58 +0200
++++ code_LiviuTinta//LCE/manzini_ds/Makefile	2011-02-07 15:15:54 +0100
+@@ -7,7 +7,7 @@
+ 
+ #these are for maximum speed
+ CFLAGS=-g -O3 -fomit-frame-pointer -W -Wall -Winline \
+-       -DDEBUG=0 -DNDEBUG=1 
++       -DDEBUG=0 -DNDEBUG=1 -DWINDOWS=1 
+ 
+ 
+ .PHONY: all
+@@ -41,7 +41,7 @@
+ # pattern rule for all objects files
+ %.o: %.c *.h
+ 	$(CC) -c $(CFLAGS) $< -o $@
+-	strip $@
++#	strip $@
+ 
+ clean: 
+ 	rm -f *.o *.a
+diff -ru code_LiviuTinta-orig//LCE/manzini_ds/blind2.c code_LiviuTinta//LCE/manzini_ds/blind2.c
+--- code_LiviuTinta-orig//LCE/manzini_ds/blind2.c	2005-12-12 13:25:44 +0100
++++ code_LiviuTinta//LCE/manzini_ds/blind2.c	2011-02-07 11:22:57 +0100
+@@ -176,7 +176,7 @@
+    ***************************************************** */
+ static void insert_suffix(node *h, Int32 suf, int n, UChar mmchar)
+ {
+-   __inline__ node *new_node__blind_ssort(void);
++//   __inline__ node *new_node__blind_ssort(void);
+   Int32 t;
+   UChar c, *s;
+   node *p, **pp;
+@@ -397,7 +397,7 @@
+    ************************************************************************ */
+ static Int32 compare_suffixes(Int32 suf1, Int32 suf2, Int32 depth)
+ {
+-  __inline__ Int32 get_lcp_unrolled(UChar *, UChar *, Int32);  
++//  __inline__ Int32 get_lcp_unrolled(UChar *, UChar *, Int32);  
+   int limit;
+   UChar *s1, *s2;
+ 
+diff -ru code_LiviuTinta-orig//LCE/manzini_ds/deep2.c code_LiviuTinta//LCE/manzini_ds/deep2.c
+--- code_LiviuTinta-orig//LCE/manzini_ds/deep2.c	2002-11-28 16:30:02 +0100
++++ code_LiviuTinta//LCE/manzini_ds/deep2.c	2011-02-07 11:18:58 +0100
+@@ -134,7 +134,7 @@
+ void qs_unrolled_lcp(Int32 *a, int n, int depth, int blind_limit)
+ { 
+   void blind_ssort(Int32 *a, Int32 n, Int32 depth);
+-  __inline__ Int32 cmp_unrolled_lcp( UChar *b1, UChar *b2 );
++//  __inline__ Int32 cmp_unrolled_lcp( UChar *b1, UChar *b2 );
+   UChar *text_depth, *text_pos_pivot;
+   Int32 stack_lo[STACK_SIZE];
+   Int32 stack_hi[STACK_SIZE];
+diff -ru code_LiviuTinta-orig//LCE/manzini_ds/shallow.c code_LiviuTinta//LCE/manzini_ds/shallow.c
+--- code_LiviuTinta-orig//LCE/manzini_ds/shallow.c	2005-12-12 13:29:42 +0100
++++ code_LiviuTinta//LCE/manzini_ds/shallow.c	2011-02-07 11:18:25 +0100
+@@ -89,7 +89,7 @@
+    ******************************************************** */
+ static void shallow_mkq(Int32 *a, int n, UChar *text_depth)
+ {
+-  __inline__ void vecswap2(Int32 *a, Int32 *b, int n);
++//  __inline__ void vecswap2(Int32 *a, Int32 *b, int n);
+   int d, r, partval;
+   Int32 *pa, *pb, *pc, *pd, *pl, *pm, *pn, t;
+   UChar *next_depth;
+@@ -183,7 +183,7 @@
+ 
+ static void shallow_mkq16(Int32 *a, int n, UChar *text_depth)
+ {
+-  __inline__ void vecswap2(Int32 *a, Int32 *b, int n);
++//  __inline__ void vecswap2(Int32 *a, Int32 *b, int n);
+   int d, r, partval;
+   Int32 *pa, *pb, *pc, *pd, *pl, *pm, *pn, t;
+   UChar *next_depth;
+@@ -261,7 +261,7 @@
+                                   | ((*((s)+2)) << 8) | (*((s)+3)) ))
+ static void shallow_mkq32(Int32 *a, int n, UChar *text_depth)
+ {
+-  __inline__ void vecswap2(Int32 *a, Int32 *b, int n);
++//  __inline__ void vecswap2(Int32 *a, Int32 *b, int n);
+   UInt32 partval, val;
+   Int32 *pa, *pb, *pc, *pd, *pl, *pm, *pn, t, d, r;
+   UChar *next_depth;
+@@ -495,7 +495,7 @@
+ static int *lcp=lcp_aux+1; 
+ static void shallow_inssort_lcp(Int32 *a, Int32 n, UChar *text_depth)
+ {   
+-  __inline__ Int32 cmp_unrolled_shallow_lcp(UChar *, UChar *);
++//  __inline__ Int32 cmp_unrolled_shallow_lcp(UChar *, UChar *);
+   Int32 i, j, j1, lcp_new, r, ai,lcpi;
+   Int32 cmp_from_limit;
+   UChar *text_depth_ai;
+diff -ru code_LiviuTinta-orig//LCE/manzini_ds/suftest2.c code_LiviuTinta//LCE/manzini_ds/suftest2.c
+--- code_LiviuTinta-orig//LCE/manzini_ds/suftest2.c	2008-12-11 00:11:08 +0100
++++ code_LiviuTinta//LCE/manzini_ds/suftest2.c	2011-02-08 09:59:53 +0100
+@@ -25,7 +25,9 @@
+ #include <limits.h>
+ #include <time.h>
+ #include <unistd.h>
++#ifndef WINDOWS
+ #include <sys/times.h>
++#endif
+ #include "common.h"
+ #define CLK_TCK CLOCKS_PER_SEC
+ 
+@@ -51,7 +53,9 @@
+ 
+ /* --------- prototypes ----------------- */ 
+ void ds_ssort(UChar *x, int *p, int n);
++#ifndef WINDOWS
+ clock_t times(struct tms *buffer);
++#endif
+ int check_global_variables(void);
+ void set_global_variables(void);
+ int compute_overshoot(void);
+@@ -67,9 +71,11 @@
+   int c, *p, n;
+   int print_sa, check_sa, num_opt,overshoot;
+   UChar *x;
++#ifndef WINDOWS
+   clock_t end,start, end_real, start_real;
+   struct tms r;
+   double tot_time, tot_time_real;
++#endif
+   extern char *optarg;
+   extern int optind, opterr, optopt;
+   char *fnam, *sa_filename;
+@@ -203,15 +209,21 @@
+   /* ---------  start measuring time ------------- */
+   if(_ds_Verbose)
+     fprintf(stderr,"Starting sa construction ... \n");
++#ifndef WINDOWS
+   start_real = times(&r);
+   start  = (r.tms_utime+r.tms_stime);     /* user + system */
++#endif
+   ds_ssort(x, p, n);
++#ifdef WINDOWS
++  printf("Elapsed time: NOT IMPLEMENTED.\n");
++#else
+   end_real = times(&r);
+   end  = (r.tms_utime+r.tms_stime);     /* user + system */
+   tot_time =  ((double) (end-start))/CLK_TCK;
+   tot_time_real =  ((double) (end_real-start_real))/CLK_TCK;
+   printf("Elapsed time: %.2f seconds (user+sys). Total real time: %.2f.\n", 
+ 	 tot_time, tot_time_real);
++#endif
+ 
+   // --------------- write bwt to a file 
+   if(bwt_filename!=NULL) 
+diff -ru code_LiviuTinta-orig//LCE/qsufsort/qsufsort.h code_LiviuTinta//LCE/qsufsort/qsufsort.h
+--- code_LiviuTinta-orig//LCE/qsufsort/qsufsort.h	2009-04-26 14:20:14 +0200
++++ code_LiviuTinta//LCE/qsufsort/qsufsort.h	2011-02-15 12:17:43 +0100
+@@ -17,8 +17,8 @@
+ //#define MY_INT_MAX INT_MAX 
+ 
+ // Values to handle huge files when memory is not an issue
+-typedef long long MY_INT;
+-#define MY_INT_MAX LLONG_MAX
++typedef long MY_INT;
++#define MY_INT_MAX LONG_MAX
+ 
+ // End modification
+ 
+diff -ru code_LiviuTinta-orig//LCE/random_test_lce.cc code_LiviuTinta//LCE/random_test_lce.cc
+--- code_LiviuTinta-orig//LCE/random_test_lce.cc	2009-10-20 00:15:48 +0200
++++ code_LiviuTinta//LCE/random_test_lce.cc	2011-02-08 10:48:07 +0100
+@@ -2,8 +2,12 @@
+ #include <time.h>
+ #include <math.h>
+ #include <sys/time.h>
++#ifdef WINDOWS
++#include <windows.h>
++#else
+ #include <sys/times.h>
+ #include <sys/resource.h>
++#endif
+ #include <errno.h>
+ 
+ #include <iostream>
+@@ -106,29 +110,24 @@
+ 	
+ }
+ 
+-typedef double my_time_t;
++typedef unsigned long long my_time_t;
+ 
+ 
+ my_time_t getTime ( void )
+ {
+-   double usertime,systime;
+-   struct rusage usage;
+-
+-   int ret = getrusage ( RUSAGE_SELF, &usage );
+-   if( ret == -1 ){
+-   	cout << "Time error !" << endl;
+-   	exit(1);
+-   }
+-
+-   usertime = (double)usage.ru_utime.tv_sec +
+-     (double)usage.ru_utime.tv_usec / 1000000.0;
+-
+-   systime = (double)usage.ru_stime.tv_sec +
+-     (double)usage.ru_stime.tv_usec / 1000000.0;
+-
+-   
+-
+-   return(usertime+systime);
++#ifdef WINDOWS
++    FILETIME ft;
++    LARGE_INTEGER li;
++
++    GetSystemTimeAsFileTime(&ft);
++    li.LowPart = ft.dwLowDateTime;
++    li.HighPart = ft.dwHighDateTime;
++    return (my_time_t) (li.QuadPart / 10000);
++#else
++    struct timeval tv;
++    gettimeofday(&tv, 0);
++    return (1000 * tv.tv_sec) + (tv.tv_usec / 1000);
++#endif
+ }
+ 
+ 
+diff -ru code_LiviuTinta-orig//LCE/save_restore_suffix_array.cc code_LiviuTinta//LCE/save_restore_suffix_array.cc
+--- code_LiviuTinta-orig//LCE/save_restore_suffix_array.cc	2009-04-27 07:51:28 +0200
++++ code_LiviuTinta//LCE/save_restore_suffix_array.cc	2011-02-08 10:01:45 +0100
+@@ -8,6 +8,7 @@
+ #include <fcntl.h>
+ 
+ 
++#include <stdlib.h>
+ #include <stdio.h>
+ #include <errno.h>
+ 
+@@ -19,12 +20,12 @@
+ off_t getfilesize(FILE *f)
+ {
+     off_t result = -1;
+-    off_t p=ftello(f);//get the current position
++    off_t p=ftell(f);//get the current position
+ 
+-    if(fseeko(f, 0, SEEK_END)==0)//go on the end
++    if(fseek(f, 0, SEEK_END)==0)//go on the end
+     {
+-        result=ftello(f);//get current position=file size!
+-        fseeko(f, p, SEEK_SET);//set back old position
++        result=ftell(f);//get current position=file size!
++        fseek(f, p, SEEK_SET);//set back old position
+     }
+     return result;
+ }
+@@ -43,7 +44,7 @@
+ 		filesize = -1;
+ 		std::cout << "There is an error opening the file !" << "\n";
+ 		std::cout << errno << endl;
+-		if( errno == EOVERFLOW ) std::cout << "TRUE" << endl;
++//		if( errno == EOVERFLOW ) std::cout << "TRUE" << endl;
+ 		exit(1);	
+ 	}
+ 
+diff -ru code_LiviuTinta-orig//LCE/save_restore_suffix_array.hh code_LiviuTinta//LCE/save_restore_suffix_array.hh
+--- code_LiviuTinta-orig//LCE/save_restore_suffix_array.hh	2009-04-24 00:25:10 +0200
++++ code_LiviuTinta//LCE/save_restore_suffix_array.hh	2011-02-07 13:50:38 +0100
+@@ -19,7 +19,7 @@
+   
+   Caller is responsible to free memory using delete[]
+ */
+-unsigned int * load_suffix_array(off64_t *length, const char *const filename);
++unsigned int * load_suffix_array(off_t *length, const char *const filename);
+ 
+ 
+ /*
+diff -ru code_LiviuTinta-orig//LCE/test_lce_speed_one_by_one.cc code_LiviuTinta//LCE/test_lce_speed_one_by_one.cc
+--- code_LiviuTinta-orig//LCE/test_lce_speed_one_by_one.cc	2009-04-24 00:31:10 +0200
++++ code_LiviuTinta//LCE/test_lce_speed_one_by_one.cc	2011-02-15 13:20:25 +0100
+@@ -2,9 +2,11 @@
+ 
+ #include <unistd.h>
+ #include <time.h>
++#ifdef _WIN32
++#include <windows.h>
++#else
+ #include <sys/time.h>
+-#include <sys/times.h>
+-#include <sys/resource.h>
++#endif
+ 
+ 
+ #include <iostream>
+@@ -153,24 +155,16 @@
+ 
+ my_time_t getTime ( void )
+ {
+-   double usertime,systime;
+-   struct rusage usage;
+-
+-   int ret = getrusage ( RUSAGE_SELF, &usage );
+-   if( ret == -1 ){
+-   	cout << "Time error !" << endl;
+-   	exit(1);
+-   }
+-
+-   usertime = (double)usage.ru_utime.tv_sec +
+-     (double)usage.ru_utime.tv_usec / 1000000.0;
+-
+-   systime = (double)usage.ru_stime.tv_sec +
+-     (double)usage.ru_stime.tv_usec / 1000000.0;
+-
+-   
+-
+-   return(usertime+systime);
++#ifdef _WIN32
++    __int64 t, f;
++    QueryPerformanceFrequency((LARGE_INTEGER *)&f);
++    QueryPerformanceCounter((LARGE_INTEGER *)&t);
++    return (double)t / (double)f;
++#else
++    struct timeval s;
++    gettimeofday(&s, 0);
++    return (long long)s.tv_sec * 1000 + (long long)s.tv_usec / 1000;
++#endif
+ }
+ 
+ 
+@@ -243,7 +237,7 @@
+ 	}
+ 	
+ 	// load text from disk
+-	off64_t length;
++	off_t length;
+ 	unsigned char *str = (unsigned char*)read_file_in_memory(argv[1], &length);
+ 	
+ 	contains_zero = test_if_string_contains_zero((char*)str, length);
