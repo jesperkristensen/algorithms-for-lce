@@ -151,7 +151,7 @@ Our algorithm is fairly simple. Though it is slightly more complicated than \pro
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Our Table Lookup Algorithm}
 
-\fixme{Our Table Lookup Algorithm}
+\fixme{Introduction: Our Table Lookup Algorithm}
 
 \fi % report
 
@@ -454,9 +454,15 @@ We first construct the SA and LCP arrays, which takes $O(\sortt)$ time~\cite{sor
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Cache Optimization\label{sec:fingerprint-cache}}
 
+\paragraph{Horizontal, intra-level optimization}
+
 The amount if I/O's used by \fprintk\ is $O(k\cdot n^{1/k})$. However if we structure our tables of fingerprints differently, we can improve ths number of I/O's to $O(k(n^{1/k}/B+1))$ in the cache-oblivious model. Instead of storing the fingerprint of $s[i\twodots i+t_\ell]$ at $H_\ell[i]$, we can store it at $H_\ell[((i-1)\mod t_\ell)\cdot\lceil n/t_\ell\rceil+\lfloor (i-1)/t_\ell\rfloor+1]$. This will group all used fingerprints at level $\ell$ next to each other in memory, such that the amount of I/O's at each level is reduced from $O(n^{1/k})$ to $O(n^{1/k}/B)$.
 
 The size of each fingerprint table will grow from $|H_\ell| = n$ to $|H_\ell| = n+t_\ell$, because the rounding operations may introduce one-element gaps in the table after every $n/t_\ell$ elements. We achieve the greatest I/O improvement when $k$ is small. When $k=\logceil$, this cache optimization gives no difference in the amount of I/O's.
+
+\paragraph{Vertical, inter-level optimization}
+
+For larger values of $k$, we can attempt to optimize memory access accros different levels. When we move down through the levels for $k=\logceil$, we can continue in two directions after reading $H_\ell[i]$: $H_{\ell-1}[i]$ or $H_{\ell-1}[i+t_\ell]$. Neither of these positions are next to $H_\ell[i]$ in memory. We can optimize for the case where we reach $H_{\ell-1}[i]$ by flipping the direction in which we store the fingerprints, such that all fingerprints $H_\ell[i]$ for all $\ell$ and a specific $i$ are stored next to each other. This will not improve the asymptotic I/O bound, but could impove practical query times.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Space Usage}
@@ -515,7 +521,7 @@ We implemented different variants \proc{DirectComp}, \proc{LcpRmq}, \proc{Direct
 \item[\proc{RMQ}\textless$n$, $1$\textgreater] is the \proc{LcpRmq} algorithm using constant time RMQ.
 \item[\proc{RMQ}\textless$p$, $q$\textgreater$_{\textrm{virtual}}$] is the \proc{LcpRmq} algorithm using different RMQ algorithms. They all contain an additional virtual method call to make implementation simpler, but their results cannot be directly compared to other algorithms, which do not have this extra virtual method call.
 \item[\proc{DirectComp}\textless$c$\textgreater\proc{RMQ}\textless$n$, $1$\textgreater] is the \proc{DirectComp+LcpRmq} algorithm, where the cutoff from \proc{DirectComp} to \proc{LcpRmq} is after $c$ iterations.
-
+\item[\fprintk\textless$t_{k-1}$, ..., $t_1$\textgreater ac$_{\textrm{cache-horizontal-}\textit{op}}$] is a cache optimized variant of our \fprintk\ algorithm, where \textit{op} describes which of the shift or multiplication arithmetic operations are used.
 \end{description}
 
 \fi % report
@@ -603,10 +609,7 @@ In the worst case, the \proc{DirectCompLookup} variants which use more space are
 \fi % report
 
 \ifarticle
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Results}
-
 \fi % article
 
 \begin{figure}[tp]
@@ -636,7 +639,8 @@ We conclude that our new \fprintk\ algorithm acieves a tradeoff between worst ca
 
 \fi % article
 
-\fixme{Investigate if we can explaing the jump in Fingerprint-log}
+\fixme{Results: Add some results on real world files, in a table like Navarro. STATUS: Pizza\&Chili-teksterne er for store. Brug nogle andre?}
+\fixme{Results: Investigate if we can explain the jump in Fingerprint-log}
 % \paragraph{\fprint[\log n] cache limit.}
 % \proc{LcpRmq} uses more space than all of \proc{DirectComp}, \fprint[2] and \fprint[3], so it is expected that it reaches the cache limit before these. However \fprint[\log n] uses more space than \proc{LcpRmq} at the input sizes we measure, since \proc{LcpRmq} uses the same amount of memory as \fprint[6], and $\lceil\log(10.000.000)\rceil = 24$. However, the \fprintk\ algorithms only access the lowest levels of their data structure whenever the LCE values are small, and there is therefore no visible jump due to cache limits for \fprint[\log n] on the plot with average case strings. On the plot with worst case strings however, we see a jump in \fprint[\log n] between $n=20.000$ and $n=50.000$, since it uses all its $\logceil$ levels when the LCE values are large.
 
@@ -698,20 +702,32 @@ We conclude that using average case optimization yields a query time improvement
     \caption{\label{fig:plot-fingerprint-cache-horiz}Query times of \fprint[2] with and without cache optimization.}
 \end{figure}
 
-\pref{fig:plot-fingerprint-cache-horiz} shows results of the cache optimization described in \pref{sec:fingerprint-cache}. We have implemented two cache optimized variants. One as described in \pref{sec:fingerprint-cache}, and one where multiplication and division is replaced with shift operations. To use shift operations, $t_\ell$ and $\lceil n/t_\ell\rceil$ must both be powers of two. This may double the size of the used address space.
+\paragraph{Horizontal, intra-level optimization}
+
+\pref{fig:plot-fingerprint-cache-horiz} shows results of the intra-level cache optimization described in \pref{sec:fingerprint-cache}. We have implemented two intra-level cache optimized variants. One as described in \pref{sec:fingerprint-cache}, and one where multiplication and division is replaced with shift operations. To use shift operations, $t_\ell$ and $\lceil n/t_\ell\rceil$ must both be powers of two. This may double the size of the used address space.
 
 On average case strings the cache optimization does not change the query times, while on worst case strings and strings with medium size LCE values, cache optimization gives a noticable improvement for large inputs. The cache optimized \fprint[3] variant with shift operations shows an increase in query times for large inputs, which we cannot explain.
 
 The last plot on \pref{fig:plot-fingerprint-cache-horiz} shows a variant of average case where the alphabet size is changed to two. This plot attempts to show the worst case for cache optimized \fprint[3]. LCE values in this plot are large enough to ensure that $H_1$ is used often, which should make the extra complexity of calculating indexes into $H_1$ visible. At the same time the LCE values are small enough to ensure, that the cache optimization has no effect. In this plot we see that the cache optimized variant of \fprint[3] has only slightly worse query time compared to the variant, which is not cache optimized.
 
-We conclude that cache optimization does not visibly affect average case query times, while it improves worst case query times. However, due to late timing of this discovery, the cache optimized variant of \fprintk\ is not the main focus of our analysis.
+We conclude that this cache optimization does not visibly affect average case query times, while it improves worst case query times. However, due to late timing of this discovery, the cache optimized variant of \fprintk\ is not the main focus of our analysis.
 
-\fixme{List these algorithms in the section on tested algorithms?}
+\begin{figure}[tp]
+    \begin{center}
+        \includegraphics[width=0.49\textwidth,type=pdf,ext=.pdf,read=.pdf]{../src/results/length-fingerprint-log-cache-rand10.plt}
+        \includegraphics[width=0.49\textwidth,type=pdf,ext=.pdf,read=.pdf]{../src/results/length-fingerprint-log-cache-alla.plt}
+    \end{center}
+    \caption{\label{fig:plot-fingerprint-cache-vert}Query times of \fprint[2] with and without cache optimization.}
+\end{figure}
+
+\paragraph{Vertical, inter-level optimization}
+
+\pref{fig:plot-fingerprint-cache-vert} shows results of our inter-level cache optimization. We see no improvement on worst case strings, and we see increased query times on average case strings. We conclude that this attempt at cache optimization does not improve practical query times, which could be expected, since it does not improve the asymptotic I/O bund either.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Conclutions on Experimental Results}
+\subsection{Conclusions on Experimental Results}
 
-\fixme{Conclutions on Experimental Results}
+\fixme{Results: Conclusions on Experimental Results}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Test Code}
@@ -743,11 +759,15 @@ query pattern & uniformly at random & test \\ \hline
 \caption{List of performance veriables tested.}\label{tab:test-variables}
 \end{table}
 
+("Cache set count is not a power of two.")
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Also tell about c++ bug hunting in tinta, cachegrind code}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Also tell about attempting by-LCE-value plot and why it fails}
+
+Plot results using LCE value as x-axis: Results looks wrong, why? Likely because of queries in a given pattern, v=max(i,j)
 
 \begin{algorithm}
 \caption{Algorithm for plotting query time as a function of string length\label{alg:graph-length}}
@@ -914,7 +934,7 @@ Through this technique can improve query time in some cases, it does not improve
     \caption{\label{fig:lz-no-jumps}Reversed compressed \proc{DirectComp} for $LCE(1,2)$ on the string $s=aaaaaaaaaa\$$. None of the steps can be skipped, since $x_i$ and $x_j$ are never the same.}
 \end{figure}
 
-\fixme{But can we cache some results as we go even if pointers are not the same? No, that is Theta(n**2) = Omega(N) space. But do we really need it all?}
+\fixme{Compression: But can we cache some results as we go even if pointers are not the same? No, that is Theta(n**2) = Omega(N) space. But do we really need it all?}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Compression with Other Algorithms\label{sec:lz-other}}
@@ -938,7 +958,7 @@ In \pref{sec:tree-lce} we describe how to perform LCE queries on a tree of $n$ n
 
 We have looked into the cache performance of compressed \proc{DirectComp}. If the string does not compress at all, i.e. the compressed string is $z=(0,a)(0,b)(0,c)...$, \proc{DirectComp} reads from the string in the best way possible using $O(N/B)$ I/O's in worst case. When the string is LZ-compressable, the I/O pattern becomes much worse. After reading compression element $x_1$ with $\zreference(x_1) = x_2 > 0$, the code will read from position $x_2$, where all we know is that $1 \leq x_2 < x_1$. This gives $O(N)$ I/O's in worst case.
 
-We could lay out the tree of compression elements in memory as a B-tree\fixme{hvad hedder dette layout? B-tree??} to optimize the number of I/O's within each phrase, but each node may have more than $B$ children, and in this case it would not improve the number of I/O's.\fixme{Er det klart?}
+We could lay out the tree of compression elements in memory as a B-tree\fixme{Compression: hvad hedder dette layout? B-tree??} to optimize the number of I/O's within each phrase, but each node may have more than $B$ children, and in this case it would not improve the number of I/O's.\fixme{Compression: Er det klart?}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1041,7 +1061,7 @@ Vi kan lave træ-LCE i O(hn) plads, O(1) tid ved at lave strenge for hver sti ti
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{THE END}
 
-\section{Tinta tests}
+\subsection{Tinta tests}
 The two tests of LCE query performance used in the Tinta paper are shown in \pref{alg:tinta-testlceonebyone} and \pref{alg:tinta-randomtestlce}.
 
 % http://www.cs.dartmouth.edu/~thc/clrscode/clrscode.sty
@@ -1097,29 +1117,13 @@ The two tests of LCE query performance used in the Tinta paper are shown in \pre
 \end{codebox}
 \end{algorithm}
 
-\section{DONE}
-\begin{enumerate}
-\item CODE:  test cache hops med cachegrind. STATUS: Samme instruction count, forskellige cache misses, men ser ud til at være modsat forventet.
-("Cache set count is not a power of two.")
-\item CODE: Undersøg præcis hvad der giver cache i kun average case i RMQ kode. STATUS: ikke cache, uopklaret
-\item DOC: Mere diskussion af og konklusion på resultaterne, beskriv dem som Navarro gør.
-\end{enumerate}
+\ifarticle
+\fxfatal{Opskriv funktioner for plads.}
+\fi % article
 
-\section{TODO Article}
+\subsection{Dropped}
 \begin{enumerate}
-\item CODE: Test på real world tekster, i tabel som Navarro. STATUS: Pizza\&Chili-teksterne er for store. Brug nogle andre?
-\item DOC: Opskriv funktioner for plads.
-\end{enumerate}
-
-\section{DONE Not for article}
-\begin{enumerate}
-\item DOC: Test on another machine. STATUS: Dropped
-\item CODE: Cache optimized memory layout for fingerprinting: Initial results bad, maybe test for other $k$, and test vertical for $k=2$.
-\item CODE: Plot results using LCE value as x-axis: Results looks wrong, why? Likely because of queries in a given pattern, v=max(i,j)
-\end{enumerate}
-
-\section{TODO Not for article}
-\begin{enumerate}
+\item DOC: Test on another machine.
 \item CODE: Improve cache-vertical and make shift variant.
 \item CODE: Non-random strings? Non-random queries? Different t-values for Hash-3L?
 \item DOC: Explain why Karp-Miller-Rosenberg is $O(n\log n)$.
