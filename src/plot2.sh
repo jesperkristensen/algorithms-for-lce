@@ -41,20 +41,20 @@ ymc="set logscale y\nset yrange [7e-9:1e-5]\nset title 'Medium LCE-size strings'
 style="lines"
 
 # x-axis = LCE value
-xtra="unset logscale x\nset yrange [1e-8:1e-7]\nset xrange [0:10]"
+xtra="unset logscale x\nset yrange [1e-8:1e-7]\nset xrange [0:10]\nset title 'Average case strings, alphabet = 4'"
 datafile="results/value-rand4.txt"
 plotfile="results/value-article-rand4.plt"
-oneplot "DirectComp," "Fingerprint_2<sqrt n>wc," "Fingerprint_3<n^{2/3};n^{1/3}>ac," "Fingerprint_{log n}wc," "Fingerprint_{log n}ac," "RMQ<n;1>," "DirectComp<1>RMQ<n;1>,"
+oneplot "DirectComp," "Fingerprint_2<sqrt n>ac," "Fingerprint_3<n^{2/3};n^{1/3}>ac," "Fingerprint_{log n}ac," "RMQ<n;1>,"
 
-xtra="unset logscale x\nset yrange [1e-8:1e-7]\nset xrange [0:1000]"
+xtra="unset logscale x\nset yrange [1e-8:1e-7]\nset xrange [0:1000]\nset title 'Worst case strings'"
 datafile="results/value-alla.txt"
 plotfile="results/value-article-alla.plt"
-oneplot "DirectComp," "Fingerprint_2<sqrt n>wc," "Fingerprint_3<n^{2/3};n^{1/3}>ac," "Fingerprint_{log n}wc," "Fingerprint_{log n}ac," "RMQ<n;1>," "DirectComp<1>RMQ<n;1>,"
+oneplot "DirectComp," "Fingerprint_2<sqrt n>ac," "Fingerprint_3<n^{2/3};n^{1/3}>ac," "Fingerprint_{log n}ac," "RMQ<n;1>,"
 
-xtra="unset logscale x\nset yrange [1e-8:1e-7]\nset xrange [0:1000]"
+xtra="unset logscale x\nset yrange [1e-8:1e-7]\nset xrange [0:1000]\nset title 'String of 10 characters repeated 100 times'"
 datafile="results/value-repeat10-10.txt"
 plotfile="results/value-article-repeat10-10.plt"
-oneplot "DirectComp," "Fingerprint_2<sqrt n>wc," "Fingerprint_3<n^{2/3};n^{1/3}>ac," "Fingerprint_{log n}wc," "Fingerprint_{log n}ac," "RMQ<n;1>," "DirectComp<1>RMQ<n;1>,"
+oneplot "DirectComp," "Fingerprint_2<sqrt n>ac," "Fingerprint_3<n^{2/3};n^{1/3}>ac," "Fingerprint_{log n}ac," "RMQ<n;1>,"
 
 style="linespoints"
 

@@ -67,15 +67,19 @@
 \vspace{1cm}
 % stuff on toc page
 
-\listoffixmes
-
 \newpage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Introduction}
+\section{Introduction\label{sec:intro}}
 
-Blah blah blah\fixme{Introduction}
+The Longest Common Extension problem can be used in many algorithms for solving other algorithmic problems, e.g.\ the Landau-Vishkin algorithm for approximate string searching~\cite{approx-search}. Optimal solutions exists for the problem, with constant query time and linear space. These teoretically optimal solutions are however not the best in practice, since they have large constant factors for both time and space usage. In average cases, a much simpler solution with worst case linear time, average case constant time, and no preprocessing has significantly better practical performance. This algorithm is ideal when only average case performance is relevant. In situations where we need both average case and worst case performance to be good, none of the existing solutions are ideal.
+
+We have found two new algortihms. They both have better than linear worst case query times, and achieves significantly better average case practical query times compared to the theoretically best algorithms. The best of these two uses string fingerprinting to achieve a time/space-tradeoff with $O(k\cdot n^{1/k})$ worst case query time, constant average case query time, and $O(kn)$ space for $k$ between one and $\log n$.
+
+In \pref{sec:algorithms} we theorectically describe and analyze the LCE algorithms introduced here in \pref{sec:intro}, and in \pref{sec:results} we analyze results from practical C++ implementations of these algorithms.
+
+We also look at how to apply the LCE problem to Ziv-Lempel compressed strings, such that we can answer LCE queries fast while only using space, which is a function of the compressed size of the string. In \pref{sec:lz-compress} we describe LZ compression, and how we can convert the simple linear time LCE algorithm to work on compressed strings with space linear to the size of the compressed string, worst case query time linear to the size of the uncompressed string, and average case query time $O(\log\log N)$. In \pref{sec:tree-lce} we look at how we can use the tree structure of LZ compression to get better query times on compressed strings.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{The LCE Problem}
@@ -142,7 +146,7 @@ To preprocess the $O(k\cdot n)$ fingerprints used by our algorithm, we can use K
     \caption{\label{fig:wc-avg}Graphical comparison of query times for different LCE algorithms.}
 \end{figure}
 
-Existing state of the art solutions are either good in worst case, while poor in average case (\proc{LcpRmq}), or good in average case while poor in worst case (\proc{DirectComp}). Our \fprintk\ solution targets a worst case vs. average case query time tradeoff between these two extremes. \pref{fig:wc-avg} illustrates the relative query time performances of these solutions. Our solution is almost as fast as \proc{DirectComp} on an average case input, and it is a lot faster than \proc{DirectComp} on a worst case input. Compared to \proc{LcpRmq}, our solution has a significantly better performance on an average case input, but its worst case performance is not as good as \proc{LcpRmq}. The space usage for \proc{LcpRmq} and \fprintk\ are approximately the same when $k=6$.
+Existing state of the art solutions are either good in worst case, while poor in average case (\proc{LcpRmq}), or good in average case while poor in worst case (\proc{DirectComp}). Our \fprintk\ solution targets a worst case vs. average case query time tradeoff between these two extremes. \pref{fig:wc-avg} illustrates the relative query time performances of these solutions. Our solution is almost as fast as \proc{DirectComp} on an average case input, and it is a lot faster than \proc{DirectComp} on a worst case input. Compared to \proc{LcpRmq}, our solution has a significantly better performance on an average case input, but its worst case performance is not as good as that of \proc{LcpRmq}. The space usage for \proc{LcpRmq} and \fprintk\ are approximately the same when $k=6$.
 
 Our algorithm is fairly simple. Though it is slightly more complicated than \proc{DirectComp}, it does not use any of the advanced algorithmic techniques required by \proc{LcpRmq} and \proc{SuffixNca}.
 
@@ -151,7 +155,13 @@ Our algorithm is fairly simple. Though it is slightly more complicated than \pro
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Our Table Lookup Algorithm}
 
-\fixme{Introduction: Our Table Lookup Algorithm}
+We also present another new LCE algorithm, which we call \proc{DirectCompLookup}.
+
+\begin{theorem}
+For a string $s$ of length $n$, the \proc{DirectCompLookup} algorithm can solve the LCE problem in $O(t)$ worst case query time and $O(1)$ average case query time using $O(n^2/t)$ space and $O(n^2)$ preprocessing time, where $t$ is a parameter $1 \leq t \leq n$.
+\end{theorem}
+
+The algorithm stores LCE values for some of the $n^2$ possible query inputs on a given string. It uses \proc{DirectComp} to move towards one of these stored values, and stops when it reaches one. The \proc{DirectCompLookup} algorithm is very simple, but the tradoff between worst case query time and space is not very favorable, and preprocessing the data structure takes $O(n^2)$ time unless we use another LCE algorithm in the preprocessing.
 
 \fi % report
 
@@ -160,6 +170,9 @@ Our algorithm is fairly simple. Though it is slightly more complicated than \pro
 \section{Preliminaries}
 
 \paragraph{String notation.} Let $s$ be a string of length $n$. Then $s[i]$ is the $i$'th character of $s$, and $s[i\twodots j]$ is a substring of $s$ containing characters $s[i]$ to $s[j]$, both inclusive. That is, $s[1]$ is the first character of $s$, $s[n]$ is the last character, and $s[1\twodots n]$ is the entire string. The suffix of $s$ starting at index $i$ is written $\suff_i = s[i\twodots n]$.
+
+\paragraph{Tree notation.}
+The ancestors of a node $u$ is $u$ itself as well as any node, which is a parent of an ancestor of $u$. The depth of a node $u$ is one greather than the depth of $u$'s parent, and the depth of the root is zero.
 
 \paragraph{Sorting complexity.} The time it takes to sort $n$ numbers of $\sigma$ distinct values is written as $\sortt$.
 
@@ -178,9 +191,9 @@ The Longest Common Prefix Array, LCP, describes the length of longest common pre
 
 Building the SA, \SAi and LCP arrays takes $O(\sortt)$ time~\cite{sort-complexity}.
 
-\paragraph{NCA.} The ancestors of a node $u$ is $u$ itself and any node, which is a parent of an ancestor of $u$. The common ancestors of two nodes $u$ and $v$ is the intersection between the ancestors of $u$ and the ancestors of $v$. The Nearest Common Ancestor of two nodes $u$ and $v$ is the common ancestor of $u$ and $v$ of greatest depth. An NCA query can be answered in $O(1)$ time with $O(n)$ space and preprocessing time in a static tree with $n$ nodes~\cite{nca}.
+\paragraph{NCA.} The common ancestors of two nodes $u$ and $v$ is the intersection between the ancestors of $u$ and the ancestors of $v$. The Nearest Common Ancestor of two nodes $u$ and $v$ is the common ancestor of $u$ and $v$ of greatest depth. An NCA query can be answered in $O(1)$ time with $O(n)$ space and preprocessing time in a static tree with $n$ nodes~\cite{nca}.
 
-\paragraph{RMQ.} The range minimum of $i$ and $j$ on an array $A$ is the index of a minimum element in $A[i,j]$, or $\RMQ_A(i,j) = \arg \min_{k\in\{i,...,j\}}\{A[k]\}$. A Range Minimum Query on a static array of $n$ elements can be answered in $O(1)$ time with $O(n)$ space and preprocessing time~\cite{jf-rmq}.
+\paragraph{RMQ.} The range minimum of $i$ and $j$ on an array $A$ is the index of a minimum element in $A[i,j]$, i.e.\ $\RMQ_A(i,j) = \arg \min_{k\in\{i,...,j\}}\{A[k]\}$. A Range Minimum Query on a static array of $n$ elements can be answered in $O(1)$ time with $O(n)$ space and preprocessing time~\cite{jf-rmq}.
 
 \ifreport
 
@@ -188,18 +201,14 @@ Building the SA, \SAi and LCP arrays takes $O(\sortt)$ time~\cite{sort-complexit
 The I/O model describes the number of memory blocks an algorithm moves between two layers of a layered memory architecture, where the size of the internal memory layer is $M$ words, and data is moved between internal and external memory in blocks of $B$ words. In the cache-oblivious model, the algorithm has no knowledge of the values of $M$ and $B$.
 
 \paragraph{Predecessor.}
-\fixme{Preliminaries: Predecessor}
+Given a set of $n$ objects, where the key of each object is a natural number between one and $U$, the predecessor of a natual number $x$ is an object with maximal key less than or equal to $x$. We can solve the static Predecessor problem in $O(\log\log U)$ time using $O(n)$ space~\cite{predecessor}.
 
 \paragraph{Level Ancestor.}
-\fixme{Preliminaries: Level Ancestor}
-
-\paragraph{Trees.}
-\fixme{Preliminaries: Trees}
-depth root = 0
+The Level Ancestor at level $\ell$ of node $u$ is the ancestor of $u$, whoes depth is $\ell$. We can preprocess a static tree in $O(n)$ time and space to answer Level Ancestor queries in $O(1)$ time~\cite{level-ancestor}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{LCE Algorithms}
+\section{LCE Algorithms\label{sec:algorithms}}
 This section describes existing and new algorithms for solving the LCE problem. It contains a theoretical analysis of their asymptotic query times and space requirements, shown in summary in \pref{tab:algorithms}. \pref{sec:results} describes the results from experiments on practical implementations of these algorithms.
 
 \begin{table}[tp]
@@ -227,12 +236,12 @@ In this section we look at the existing LCE algorithms described in \pref{sec:ex
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{\proc{DirectComp}}
 
-\proc{DirectComp} solves the LCE problem without any preprocessing in $O(|\LCE(i,j)|)$ query time. For a query $\LCE(i,j)$, the algorithm compares $s[i+v]$ with $s[j+v]$ in a loop, for $v$ starting at zero and incrementing, until the two characters differ, or the end of the string is reached. \proc{DirectComp} does not need to check if the end of the string is reached, i.e. $i+v>n$ or $j+v>n$. Instead we can preprocess the string by adding a special character \$ to the end of the string, which does not occur anywhere else in the string. When the algorithm compares $s[n] = \$$ to any other character, it will stop, as the characters differ. This can give better practical performance compared to checking $i+v>n$ and $j+v>n$ in each iteration of the algorithm. The query time is $O(|\LCE(i,j)|)$, which in worst case is $O(n)$ on a string of length $n$, and in average case is $O(1)$.
+\proc{DirectComp} solves the LCE problem without any preprocessing in $O(|\LCE(i,j)|)$ query time. For a query $\LCE(i,j)$, the algorithm compares $s[i+v]$ to $s[j+v]$ in a loop, for $v$ starting at zero and incrementing, until the two characters differ, or the end of the string is reached, at which point the LCE value is $v$. \proc{DirectComp} does not need to check if the end of the string is reached, i.e. $i+v>n$ or $j+v>n$. Instead we can preprocess the string by adding a special character \$ to the end of the string, which does not occur anywhere else in the string. When the algorithm compares $s[n] = \$$ to any other character, it will stop, as the characters differ. This can give better practical performance compared to checking $i+v>n$ and $j+v>n$ in each iteration of the algorithm. The query time is $O(|\LCE(i,j)|)$, which in worst case is $O(n)$ on a string of length $n$, and in average case is $O(1)$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{\proc{SuffixNca}: NCA on a Suffix Tree}
 
-LCE of two indexes $i$ and $j$ is defined as the length of the longest common prefix of $\suff_i$ and $\suff_j$. In a suffix tree, the path from the root to $L_i$ has label $\suff_i$ (likewise for $j$). The path label from the root to the nearest common ancestor of $L_i$ and $L_j$ is therefore a common prefix of the two suffixes. Since two child edges of the same node never have the same first character on their edge labels, the path label from the root to the $\NCA_\mathcal{T}(L_i,L_j)$ is not only a common prefix, but longest common prefix of $\suff_i$ and $\suff_j$. We can therefore find the LCE value as $\LCE_s(i,j) = D[\NCA_\mathcal{T}(L_i,L_j)]$, where $\mathcal{T}$ is the suffix tree for $s$, and $D[v]$ is the label depth of node $v$ in the tree.
+LCE of two indexes $i$ and $j$ is defined as the length of the longest common prefix of $\suff_i$ and $\suff_j$. In a suffix tree, the path from the root to $L_i$ has label $\suff_i$ (likewise for $j$). The path label from the root to the nearest common ancestor of $L_i$ and $L_j$ is therefore a common prefix of the two suffixes. Since two child edges of the same node never have the same first character on their edge labels, the path label from the root to $\NCA_\mathcal{T}(L_i,L_j)$ is not only a common prefix, but longest common prefix of $\suff_i$ and $\suff_j$. We can therefore find the LCE value as $\LCE_s(i,j) = D[\NCA_\mathcal{T}(L_i,L_j)]$, where $\mathcal{T}$ is the suffix tree for $s$, and $D[v]$ is the label depth of node $v$ in the tree.
 
 For a string of length $n$ with aplhabet size $\sigma$, we can preprocess \proc{SuffixNca} in $O(\sortt)$ time by building the suffix tree, preprocessing it for NCA and building the array of label depths. The query time is $O(1)$, since looking up $L_i$ and $L_j$, doing an NCA query, and looking up the label depth in $D$ all takes constant time.
 
@@ -274,7 +283,7 @@ We can instead combine \proc{DirectComp} and \RMQq, which we call \proc{DirectCo
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{The \proc{DirectCompLookup} Algorithm}
 
-The input to the $LCE$ problem is two numbers $1 \leq i < j \leq n$ \footnote{We can assume that $i< j$ without loss of generality, since $\LCE(i,j)=\LCE(j,i)$}, so there are $n*(n-1)/2 = O(n^2)$ different input possibilities in total. Because of this limited space of possible query inputs, we can tabulate a number of LCE values, and use those to speed up queries.
+The input to the $LCE$ problem is two numbers $1 \leq i < j \leq n$ \footnote{We can assume that $i< j$ without loss of generality, since $\LCE(i,j)=\LCE(j,i)$}, so there are $n\cdot(n-1)/2 = O(n^2)$ different input possibilities in total. Because of this limited space of possible query inputs, we can tabulate a number of LCE values, and use those to speed up queries.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{\proc{DirectLookup}}
@@ -308,7 +317,7 @@ LCE(i,j) &=
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{\proc{DirectComp} and \proc{DirectLookup} Combined}
 
-\proc{DirectComp} and \proc{DirectLookup} preprocesses and stores no results and all results respectively. By only storing some results, we can use \proc{DirectComp} until we reach a stored result, and then retrieve this result using \proc{DirectLookup}. If we store every $t$'th row, as shown in \pref{fig:resultspace-t-row}, the space usage will be $O(n^2/t)$ and the worst case query time will be $O(t)$. We call this algorithm \proc{DirectCompLookup}.
+\proc{DirectComp} and \proc{DirectLookup} preprocesses and stores no results and all results respectively. If we only store some results, we can use \proc{DirectComp} until we reach a stored result, and then retrieve this result using \proc{DirectLookup}. If we store every $t$'th row, as shown in \pref{fig:resultspace-t-row}, the space usage will be $O(n^2/t)$ and the worst case query time will be $O(t)$. We call this algorithm \proc{DirectCompLookup}.
 
 \begin{figure}[tp]
     \begin{center}
@@ -476,7 +485,7 @@ For larger values of $k$, we can attempt to optimize memory access accros differ
 \begin{tabular}{l|l}
 \hline\hline
 Algorithm & Space \\ [0.5ex] \hline
-\proc{DirectComp} & $1$ words \\ \hline
+\proc{DirectComp} & $0$ words \\ \hline
 \proc{DirectLookup} & $2n^2$ words \footnote{The factor two comes from using shift instead of multiplication, which may double the size depending on $n$.} \\ \hline
 \proc{DirectCompLookup} & $2n^2/t+n$ words \\ \hline
 \proc{LcpRmq} & ca. $5.6n$ words \footnote{Space use for \proc{LcpRmq} is $2n + 2nb + (bs \cdot (bs+1) / 2 + 1)\cdot C_{bs} + (nb+1)\cdot \lfloor\log nb\rfloor \approx 5.6n$, where $bs = \lceil\log n / 4\rceil$, $nb = (n-1)/bs+1$ and $C_i$ is the $i$'t Catalan Number.} \\ \hline
@@ -485,7 +494,7 @@ Algorithm & Space \\ [0.5ex] \hline
 \fprint[\logceil] & $n\cdot\logceil$ words \\ \hline
 \end{tabular}
 \end{minipage}
-\caption{Space requirements for the LCE algorithms, where $n$ is the number of characters, one character is byte and one word is four bytes.}\label{tab:algorithms-space}
+\caption{Space requirements for the LCE algorithms, where $n$ is the number of characters, a character is one byte and a word is four bytes.}\label{tab:algorithms-space}
 \end{table}
 
 \fi % report
@@ -512,16 +521,16 @@ We implemented different variants of the \fprintk\ algorithm in C++ and compared
 
 \ifreport
 
-We implemented different variants \proc{DirectComp}, \proc{LcpRmq}, \proc{DirectCompLookup} and \fprintk\ in C++ and compared them to each other. We have not implemented \proc{SuffixNca}, since others have shown that \proc{LcpRmq} is better than \proc{SuffixNca} in practice~\cite{ilie-navarro-tinta}. The algorithms we compared are the following:
+We implemented different variants of \proc{DirectComp}, \proc{LcpRmq}, \proc{DirectCompLookup} and \fprintk\ in C++ and compared them to each other. We have not implemented \proc{SuffixNca}, since others have shown that \proc{LcpRmq} is better than \proc{SuffixNca} in practice~\cite{ilie-navarro-tinta}. The algorithms we compared are the following:
 \begin{description}
 \item[\proc{DirectComp}] is the simple \proc{DirectComp} algorithm with no preprocessing and worst case $O(n)$ query time.
-\item[\fprintk\textless$t_{k-1}$, ..., $t_1$\textgreater ac] is our new \fprintk\ algorithm using $k$ levels, where $k$ is $2$, $3$ and $\logceil$. The numbers \textless$t_{k-1}$, ..., $t_1$\textgreater describe the exact size of fingerprinted substrings at each level.
+\item[\fprintk\textless$t_{k-1}$, ..., $t_1$\textgreater ac] is our new \fprintk\ algorithm using $k$ levels, where $k$ is $2$, $3$ and $\logceil$. The numbers \textless$t_{k-1}$, ..., $t_1$\textgreater\ describe the exact size of fingerprinted substrings at each level.
 \item[\fprintk\textless$t_{k-1}$, ..., $t_1$\textgreater bc] is a variant of our new \fprintk\ algorithm, which starts at level $\ell=k-1$ instead of $\ell=0$, as discussed in \pref{sec:improved-avg}.
-\item[\fprintk\textless$t_{k-1}$, ..., $t_1$\textgreater ac\textless$u_1$, ..., $u_{k-1}$\textgreater] is a variant of our new \fprintk\ algorithm, which stays at level $\ell$ until $v\geq u_\ell$, as discussed in \pref{sec:improved-avg}, instead of doing one comparison at each level in step 1 of the query in \pref{sec:fingerprint-query}.
+\item[\fprintk\textless$t_{k-1}$, ..., $t_1$\textgreater ac\textless$u_0$, ..., $u_{k-2}$\textgreater] is a variant of our new \fprintk\ algorithm, which stays at level $\ell$ until $v\geq u_\ell$, as discussed in \pref{sec:improved-avg}, instead of doing one comparison at each level in step 1 of the query in \pref{sec:fingerprint-query}.
 \item[\proc{RMQ}\textless$n$, $1$\textgreater] is the \proc{LcpRmq} algorithm using constant time RMQ.
 \item[\proc{RMQ}\textless$p$, $q$\textgreater$_{\textrm{virtual}}$] is the \proc{LcpRmq} algorithm using different RMQ algorithms. They all contain an additional virtual method call to make implementation simpler, but their results cannot be directly compared to other algorithms, which do not have this extra virtual method call.
 \item[\proc{DirectComp}\textless$c$\textgreater\proc{RMQ}\textless$n$, $1$\textgreater] is the \proc{DirectComp+LcpRmq} algorithm, where the cutoff from \proc{DirectComp} to \proc{LcpRmq} is after $c$ iterations.
-\item[\fprintk\textless$t_{k-1}$, ..., $t_1$\textgreater ac$_{\textrm{cache-horizontal-}\textit{op}}$] is a cache optimized variant of our \fprintk\ algorithm, where \textit{op} describes which of the shift or multiplication arithmetic operations are used.
+\item[\fprintk\textless$t_{k-1}$, ..., $t_1$\textgreater ac$_{\textrm{cache-horizontal-}\textit{op}}$] is a cache optimized variant of our \fprintk\ algorithm, where \textit{op} describes which of the shift or multiplication arithmetic operations it uses.
 \end{description}
 
 \fi % report
@@ -548,7 +557,7 @@ For each kind of strings, we tested the algorithms using the following pattern:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\proc{LcpRmq} Results\label{sec:test-rmq}}
 
-We want to compare our new algortithms against the algortihm which is the best in practice of the asymptotically best $O(1)$ algorithms. The \proc{LcpRmq} algorithm is better than \proc{SuffixNca}~\cite{ilie-navarro-tinta}, so we only look at that one. We have looked at a number of RMQ algorithms to find out which works best for the LCE problem. The results are shown in \pref{fig:plot-rmq}. \RMQq\ is the best in practice, and we therefore use that when we test against other LCE algorithms. This result is different from that of Ilie~et~al.~\cite{ilie-navarro-tinta}, where \RMQpq{n}{4\log n} is the best. This could be due to hardware or compiler differences.
+We want to compare our new algortithms against the algortihm which is the best in practice of the asymptotically best $O(1)$ algorithms. The \proc{LcpRmq} algorithm is better than \proc{SuffixNca}~\cite{ilie-navarro-tinta}, so we only look at \proc{LcpRmq}. We have looked at a number of RMQ algorithms to find out which works best for the LCE problem. The results are shown in \pref{fig:plot-rmq}. \RMQq\ is the best in practice, and we therefore use that when we test against other LCE algorithms. This result is different from that of Ilie~et~al.~\cite{ilie-navarro-tinta}, where \RMQpq{n}{4\log n} is the best. This could be due to hardware or compiler differences.
 
 The performance of the implementations shown in \pref{fig:plot-rmq} cannot be compared with those shown on other figures, because they all contain an additional, slow virtual method call, which gives them an unfair disadvantage. We have optimized the best variant of \proc{LcpRmq} to avoid the virtual method call, when we compare it against other algorithms. We compare this optimized version to \proc{DirectComp} in \pref{fig:plot-rmq-directcomp}, which shows that \proc{DirectComp} is significantly better in average case, though both have constant asymptotic average case query times.
 
@@ -575,7 +584,7 @@ The RMQ algorithms show a significant jump in query times around $n=1.000.000$ o
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{\proc{DirectComp+LcpRmq} Results}
 
-\pref{fig:plot-rmq-directcomp} also shows \proc{DirectComp+LcpRmq}, where we first try \proc{DirectComp}, and if we have not found the LCE value after one iteration, we use \proc{LcpRmq} instead. We could increase the cutoff from one iteration to something bigger, which might improve average case performance. That would however decrease worst case performance. None of the two plots we measure represents a good worst case for \proc{DirectComp+LcpRmq} compared to the other algorithms we test. The worst case for \proc{DirectComp+LcpRmq} relative to other the other algorithms would be when the average LCE value is slightly larger than the cutoff, such that \proc{DirectComp+LcpRmq} reaches \proc{LcpRmq} in most queries, while other algorithm still work on LCE values as small as possible. As described in \pref{sec:dc-lcprmq}, \proc{DirectComp+LcpRmq} also uses a lot of space.
+\pref{fig:plot-rmq-directcomp} also shows \proc{DirectComp+LcpRmq}, where we first try \proc{DirectComp}, and if we have not found the LCE value after one iteration, we use \proc{LcpRmq} instead. We see that \proc{DirectComp+LcpRmq} is worse than \proc{DirectComp} on average case strings. We could increase the cutoff from one iteration to something bigger, which might improve average case performance. That would however increase worst case time. None of the two plots we measure represents a good worst case for \proc{DirectComp+LcpRmq} compared to the other algorithms we test. The worst case for \proc{DirectComp+LcpRmq} relative to other the other algorithms would be when the average LCE value is slightly larger than the cutoff, such that \proc{DirectComp+LcpRmq} reaches \proc{LcpRmq} in most queries, while other algorithms still work on LCE values as small as possible. As described in \pref{sec:dc-lcprmq}, \proc{DirectComp+LcpRmq} also uses a lot of space.
 
 \begin{figure}[tp]
     \begin{center}
@@ -589,7 +598,7 @@ The RMQ algorithms show a significant jump in query times around $n=1.000.000$ o
 \subsection{\proc{DirectCompLookup} Results}
 
 
-Figure \pref{fig:plot-complookup} shows \proc{DirectCompLookup} with different time/space-tradeoffs $t$ together with \proc{LcpRmq}. In average case, \proc{DirectCompLookup} is slower than \proc{DirectComp}, most likely because it needs to do an extra ckeck to find out if it has reached a position for which a result is stored. For short strings, \proc{DirectLookup} is faster than \proc{DirectCompLookup}, since it does not need to check if the value it needs is stored. However, it quickly grows to be as slow as \proc{LcpRmq}, while \proc{DirectCompLookup} does not experience this slowdown. We explain this with that \proc{DirectLookup} reads from its $O(n^2)$ table of results in every query, whereas \proc{DirectCompLookup} only reads from the $O(n)$ string in average case, and thus has a significantly smaller working set.
+\pref{fig:plot-complookup} shows \proc{DirectCompLookup} with different time/space-tradeoffs together with \proc{LcpRmq}. In average case, \proc{DirectCompLookup} is slower than \proc{DirectComp}, most likely because it needs to do an extra ckeck to find out if it has reached a position for which a result is stored. For short strings, \proc{DirectLookup} is faster than \proc{DirectCompLookup}, since it does not need to check if the value it needs is stored. However, it quickly grows to be as slow as \proc{LcpRmq}, while \proc{DirectCompLookup} does not experience this slowdown. We explain this with that \proc{DirectLookup} reads from its $O(n^2)$ table of results in every query, whereas \proc{DirectCompLookup} only reads from the $O(n)$ string in average case, and thus has a significantly smaller working set.
 
 In the worst case, the \proc{DirectCompLookup} variants which use more space are faster in practice, just like in theory. If we are willing to use $O(n\log n)$ space, \proc{DirectCompLookup}\textless$n/\log n$\textgreater\ will only halve the worst case query time compared to \proc{DirectComp}. This makes \proc{DirectCompLookup} better than \proc{DirectComp}, but still not a very good candidate when worst case query time is important.
 
@@ -736,14 +745,14 @@ We conclude that this cache optimization does not visibly affect average case qu
 
 \paragraph{Vertical, inter-level optimization}
 
-\pref{fig:plot-fingerprint-cache-vert} shows results of our inter-level cache optimization. We see no improvement on worst case strings, and we see increased query times on average case strings. We conclude that this attempt at cache optimization does not improve practical query times, which could be expected, since it does not improve the asymptotic I/O bund either.
+\pref{fig:plot-fingerprint-cache-vert} shows results of our inter-level cache optimization. We see no improvement on worst case strings, and we see increased query times on average case strings. We conclude that this attempt at cache optimization does not improve practical query times, which could be expected, since it does not improve the asymptotic I/O bound either.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Conclusions on Experimental Results}
 
 Of the existing best \proc{DirectComp} and \proc{LcpRmq} algorithms, we have seen that \proc{DirectComp} is best on average case strings, while \proc{LcpRmq} is best on worst case strings.
 
-We have found that our new \proc{DirectCompLookup} algorithm can improve the worst case query time performance of \proc{DirectComp}, while it does not degrade the average case query time to the level of \proc{LcpRmq}. However it is not not as interesting as our new \fprintk\ algorithm, because it uses too much space.
+We have found that our new \proc{DirectCompLookup} algorithm can improve the worst case query time performance of \proc{DirectComp}, while it does not degrade the average case query time to the level of \proc{LcpRmq}. However it is not as interesting as our new \fprintk\ algorithm, because it uses too much space.
 
 Our new \fprintk\ algorithm is able to achieve a balance between worst case and average case query times. It has almost as good average case query times as \proc{DirectComp}, its worst case query times are significantly better than those of \proc{DirectComp}, and we have found cases between average and worst case where \fprintk\ is better than both \proc{DirectComp} and \proc{LcpRmq}. \fprintk\ gives a good time space tradeoff, and it uses less space than \proc{LcpRmq} when $k$ is small. The perfprmance of \fprintk\ can be tweaked on many parameters, and we have found that optimizing for average case queries and for memory caches improve practical query time performance.
 
@@ -770,19 +779,33 @@ In our implementation, we have made the following assumptions about the LCE prob
 \begin{itemize}
 \item A character in a string is always eight bits.
 \item A string always ends with a special null character, which does not occur anywehere else in the string. This does not affect our results, since we do not measure practical preprocessing time. If an algorithm has faster query times when the string ends in a special character, it could just add that character to the end of the string in its preprocessing.
-\item We make no assumptions on the order of $i$ and $j$. In some applications of the LCE problem, for example approximate string matching, we know that $i<j$, and some algorithms might be able to take advantage of this knowledge to get faster query times. We do not measure this case.
+\item We make no assumptions on the order of $i$ and $j$. In some applications of the LCE problem, for example approximate string searching, we know that $i<j$, and some algorithms might be able to take advantage of this knowledge to get faster query times. We do not measure this case.
 \item Wehenever we use random characters or query pairs, we use the \texttt{rand()} function from C. This gives repeatable pseudo-random numbers, which makes it easier for us to compare test runs.
 \end{itemize}
 
-\fixme{Results: Test Code: tell about c++ bug hunting in tinta, cachegrind code "Cache set count is not a power of two."}
+% TODO \fixme{Results: Test Code: tell about c++ bug hunting in tinta, cachegrind code "Cache set count is not a power of two."}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Query time by LCE value}
 
-\fixme{Results: Test Code: tell about attempting by-LCE-value plot and why it fails}
+\begin{figure}[tp]
+    \begin{center}
+        %\includegraphics[width=0.49\textwidth,type=pdf,ext=.pdf,read=.pdf]{../src/results/value-article-rand4.plt}
+        \includegraphics[width=0.49\textwidth,type=pdf,ext=.pdf,read=.pdf]{../src/results/value-article-alla.plt}
+        \includegraphics[width=0.49\textwidth,type=pdf,ext=.pdf,read=.pdf]{../src/results/value-article-repeat10-10.plt}
+    \end{center}
+    \caption{\label{fig:plot-by-value}Query times of some of our tested algorithms as a function of the returned LCE value.}
+\end{figure}
 
-Plot results using LCE value as x-axis: Results looks wrong, why? Likely because of queries in a given pattern, v=max(i,j)
+As an alternative way of testing our alorithms, we have looked at how long a query takes in relation to the LCE value it returns, since most of our algorithms have query times, which depend on the returned LCE value. \pref{fig:plot-by-value} shows query times for a fixed string of 1000 characters. We can see how the query times of \fprint[2] and \fprint[3] increases as the LCE value increases, and drops when the LCE value becomes long enough to make one more step at the higher level with fingerprints of longer substrings. We also see that the query time of \fprint[\log n] increases whenever the LCE value becomes long enough to reach a higher level of the data structure.
 
+The plots in \pref{fig:plot-by-value} contains a lot of noise compared to our other plots. The number of measurements we make on these plots is many times bigger than the number of measurements we make on other plots. Therefore each measurement is an average over only 10000 queries instead of a million queries, which gives less accurate results.
+
+We need to measure a sum of many queries to get an accurate timing, since each individual query is too fast to measure. While measureing a sequence of randomly generated queries is a very artificial test, which is unlikely to occur in practice, we think that it is even more artificial to measure a sequence of queries for which we already know that the LCE value is the same each time. On our worst case string $s=aaaaaaa...$, the queries we measure in each point in \pref{fig:plot-by-value} have the pattern $\max(i,j)=v$, which may give very different performance characteristics compared to random queries due to cache effects. We cannot meaningfully measure performance by LCE value on average case strings, as these strings do not contain large LCE values. The second plot in \pref{fig:plot-by-value} is on a string, which attempts to avoid a strong pattern like $\max(i,j)=v$ while it still has large LCE values.
+
+Because of the amount of noise in the plots and the strong pattern of $\max(i,j)=v$, we have not focused on this way of measuring query time performance in our analysis.
+
+\begin{comment}
 \begin{algorithm}
 \caption{Algorithm for plotting query time as a function of string length\label{alg:graph-length}}
 \begin{codebox}
@@ -840,10 +863,11 @@ Plot results using LCE value as x-axis: Results looks wrong, why? Likely because
 \end{algorithm}
 
 Where $\proc{Plot}(f,x,y)$ adds point $(x,y)$ to series $f$.
+\end{comment}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Ziv-Lempel compression}
+\section{Ziv-Lempel Compression\label{sec:lz-compress}}
 
 \newcommand{\zreference}{\textit{reference}}
 \newcommand{\zlabel}{\textit{label}}
@@ -935,11 +959,11 @@ But the question is how big $n_2$ is relative to $n_1$. From knowing how much co
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Using Compression to Speed Up \proc{DirectComp}}
 
-Our original goal of looking into compression was to see if using the techniques used in compression could improve the worst case query time of \proc{DirectComp} to something better than $O(N)$. Our idea is that whenever you have a long LCE value, you have a repetition within the string, and repetitions would typically mean good compression. If the compressed string can be searched over similarly to how \proc{DirectComp} searches the uncompressed string, it might be possible to establish a better worst case query time.
+Our original goal of looking into compression was to see if using the techniques used in compression could improve the worst case query time of \proc{DirectComp} to something better than $O(N)$. Our idea is that whenever you have a long LCE value, you have a repetition within the string, and repetitions would typically give good compression. If the compressed string can be searched over similarly to how \proc{DirectComp} searches the uncompressed string, it might be possible to establish a better worst case query time.
 
-We have found one case where compressed \proc{DirectComp} is faster than \proc{DirectComp} on uncompressed strings, but our finding does not improve worst case query time. We explain this in terms of the reversed compressed \proc{DirectComp}, as it is simpler, but it also works without the string reversal. Reversed compressed \proc{DirectComp} starts with two positions $(x_i,y_i)$ and $(x_j,y_j)$ corresponding to the two positions $i$ and $j$ in $\LCE(i,j)$. At each iteration, it then updates $(x_i,y_i)$ and $(x_j,y_j)$ to find the previous two positions. If $x_i = x_j$ we know that we can add $\textit{depth}[x_i]$ to the LCE value, where \textit{depth} is the depth of a node in the tree of compression elements. \proc{DirectComp} can then compare $\textit{depth}[x_i]$ characters in constant time.
+We have found one case where we can make compressed \proc{DirectComp} faster than \proc{DirectComp} on uncompressed strings, but our finding does not improve worst case query time. We explain this in terms of the reversed compressed \proc{DirectComp}, as it is simpler, but it also works without the string reversal. Reversed compressed \proc{DirectComp} starts with two positions $(x_i,y_i)$ and $(x_j,y_j)$ corresponding to the two positions $i$ and $j$ in $\LCE(i,j)$. At each iteration, it then updates $(x_i,y_i)$ and $(x_j,y_j)$ to find the previous two positions. If $x_i = x_j$ we know that we can add $\textit{depth}[x_i]$ to the LCE value, where \textit{depth} is the depth of a node in the tree of compression elements. Compressed \proc{DirectComp} can then compare $\textit{depth}[x_i]$ characters in constant time.
 
-Through this technique can improve query time in some cases, it does not improve the worst case time of $\Theta(N)$. This is because we cannot be sure to hit the condition allowing us to compare many characters in constant time, even for long LCE values. As an example, $LCE(1,2)$ on a string where all $N$ characters are the same, takes $\Omega(N)$ time. For such a string, the tree representing the compressed string is always a path, and $x_i$ and $x_j$ will always be either a node and its parent or the root and some other node. They will therefore never end up being the same node at the same time, as shown in the example in \pref{fig:lz-no-jumps}.
+Through this technique can improve query time in some cases, it does not improve the worst case time of $\Theta(N)$. This is because we cannot be sure to hit the condition allowing us to compare many characters in constant time, even for long LCE values. As an example, $LCE(1,2)$ on a string where all $N$ characters are the same takes $\Omega(N)$ time. For such a string, the tree representing the compressed string is always a path, and $x_i$ and $x_j$ will always be either a node and its parent or the root and some other node. They will therefore never end up being the same node at the same time, as shown in \pref{fig:lz-no-jumps}.
 
 \begin{figure}[tp]
     \begin{center}
@@ -948,7 +972,7 @@ Through this technique can improve query time in some cases, it does not improve
     \caption{\label{fig:lz-no-jumps}Reversed compressed \proc{DirectComp} for $LCE(1,2)$ on the string $s=aaaaaaaaaa\$$. None of the steps can be skipped, since $x_i$ and $x_j$ are never the same.}
 \end{figure}
 
-\fixme{Compression: But can we cache some results as we go even if pointers are not the same? No, that is Theta(n**2) = Omega(N) space. But do we really need it all?}
+% \fixme{Compression: But can we cache some results as we go even if pointers are not the same? No, that is Theta(n**2) = Omega(N) space. But do we really need it all?}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Compression with Other Algorithms\label{sec:lz-other}}
@@ -970,9 +994,9 @@ In \pref{sec:tree-lce} we describe how to perform LCE queries on a tree of $n$ n
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Cache Performance}
 
-We have looked into the cache performance of compressed \proc{DirectComp}. If the string does not compress at all, i.e. the compressed string is $z=(0,a)(0,b)(0,c)...$, \proc{DirectComp} reads from the string in the best way possible using $O(N/B)$ I/O's in worst case. When the string is LZ-compressable, the I/O pattern becomes much worse. After reading compression element $x_1$ with $\zreference(x_1) = x_2 > 0$, the code will read from position $x_2$, where all we know is that $1 \leq x_2 < x_1$. This gives $O(N)$ I/O's in worst case.
+We have looked into the cache performance of compressed \proc{DirectComp}. If the string does not compress at all, i.e.\ the compressed string is $z=(0,a)(0,b)(0,c)...$, \proc{DirectComp} reads from the string in the best way possible using $O(N/B)$ I/O's in worst case. When the string is LZ-compressable, the I/O pattern becomes much worse. If $\zreference(x_1) = x_2 > 0$, the algorithm will read from position $x_1$ and then $x_2$, and these two may not be next to each other in memory. This can happen many times, which gives $O(N)$ I/O's in worst case.
 
-We could lay out the tree of compression elements in memory as a B-tree\fixme{Compression: hvad hedder dette layout? B-tree??} to optimize the number of I/O's within each phrase, but each node may have more than $B$ children, and in this case it would not improve the number of I/O's.\fixme{Compression: Er det klart?}
+We could lay out the tree of compression elements in memory as a B-tree, where we store groups of adjacant nodes next to eachother in memory, to optimize the number of I/O's within each phrase, but each node may have more than $B$ children, and in this case it would not improve the worst case number of I/O's, as each node visited may be in a new group.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1067,15 +1091,21 @@ Vi kan lave træ-LCE i O(hn) plads, O(1) tid ved at lave strenge for hver sti ti
 
 \bibitem{jf-rmq} Johannes Fischer, and Volker Heun. Theoretical and Practical Improvements on the RMQ-Problem, with Applications to LCA and LCE. Proceedings of the 17th Annual Symposium on Combinatorial Pattern Matching (CPM'06), Lecture Notes in Computer Science 4009, 36-48, Springer-Verlag, 2006.
 
+\bibitem{predecessor} Dan E. Willard. Log-logarithmic worst-case range queries are possible in space $\Theta$(N). Information Processing Letters, Volume 17, Issue 2, 24 August 1983, pages 81-84.
+
+\bibitem{level-ancestor} Michael A. Bendera, Martín Farach-Colton. The Level Ancestor Problem simplified. Theoretical Computer Science 321, 2004, pages 5-12.
+
+\bibitem{approx-search} Gad M. Landau and Uzi Vishkin. Introducing efficient parallelism into approximate string matching and a new serial algorithm. 18th ACM STOC, pages 220–230, 1986.
+
 \end{thebibliography}
 
 \ifreport
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{THE END}
+\section*{THE END}
 
-\subsection{Tinta tests}
+\subsection*{Tinta tests}
 The two tests of LCE query performance used in the Tinta paper are shown in \pref{alg:tinta-testlceonebyone} and \pref{alg:tinta-randomtestlce}.
 
 % http://www.cs.dartmouth.edu/~thc/clrscode/clrscode.sty
@@ -1135,13 +1165,15 @@ The two tests of LCE query performance used in the Tinta paper are shown in \pre
 \fxfatal{Opskriv funktioner for plads.}
 \fi % article
 
-\subsection{Dropped}
+\subsection*{Dropped}
 \begin{enumerate}
 \item DOC: Test on another machine.
 \item CODE: Improve cache-vertical and make shift variant.
 \item CODE: Non-random strings? Non-random queries? Different t-values for Hash-3L?
-\item DOC: Explain why Karp-Miller-Rosenberg is $O(n\log n)$.
+\item DOC: Why is Karp-Miller-Rosenberg $O(n\log n)$?.
 \end{enumerate}
+
+\listoffixmes
 
 \begin{comment}
 \section{What is the time for KMR?}
