@@ -53,6 +53,7 @@
 \newcommand{\SAinv}{\textit{SA}^{-1}} % math
 \newcommand{\SAi}{SA$^{-1}$} % no math
 \newcommand{\LCP}{\textit{LCP}}
+\newcommand{\LA}{\textit{LA}}
 \newcommand{\suff}{\textit{suff}}
 \newcommand{\logceil}{\lceil\log n\rceil}
 \newcommand{\fprint}[1][k]{\ensuremath{\proc{Fingerprint}_{#1}}}
@@ -61,6 +62,8 @@
 \newcommand{\RMQn}{\RMQpq{1}{n}}
 \newcommand{\RMQq}{\RMQpq{n}{1}}
 \newcommand{\RMQlog}{\RMQpq{n}{\log n}}
+
+\hyphenation{Di-rect-Comp Di-rect-Look-up Di-rect-Comp-Look-up Fin-ger-print}
 
 \tableofcontents
 
@@ -204,7 +207,7 @@ The I/O model describes the number of memory blocks an algorithm moves between t
 Given a set of $n$ objects, where the key of each object is a natural number between one and $U$, the predecessor of a natual number $x$ is an object with maximal key less than or equal to $x$. We can solve the static Predecessor problem in $O(\log\log U)$ time using $O(n)$ space~\cite{predecessor}.
 
 \paragraph{Level Ancestor.}
-The Level Ancestor at level $\ell$ of node $u$ is the ancestor of $u$, whoes depth is $\ell$. We can preprocess a static tree in $O(n)$ time and space to answer Level Ancestor queries in $O(1)$ time~\cite{level-ancestor}.
+The Level Ancestor at level $\ell$ of node $u$, $\LA(\ell,u)$, is the ancestor of $u$, whoes depth is $\ell$. We can preprocess a static tree in $O(n)$ time and space to answer Level Ancestor queries in $O(1)$ time~\cite{level-ancestor}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -984,6 +987,7 @@ Fingerprinting does not compress well either. We could LC-compress each level of
 Since we have not been able to find improvements to the $O(N)$ worst case query time in $O(n)$ space using existing algorithms, we have looked into new algorithms. The compression elements of a compressed string $z$ forms a tree, and each phrase in $z$ is a path in the tree. The LCE value is the length of a substring occuring at two positions $i$ and $j$ in the input string. This substring spans a number of phrases, where each phrase is a path in the tree of compression elements. If we can make fast LCE queries on such a tree, we can make fast LCE queries on highly compressable strings.
 
 \begin{theorem}
+\label{thm:lz-tree}
 Let $s$ be a string of length $N$ and let $z$ of length $n$ be the LZ-compression of $s$. We can preprocess $z$ using $O(n)$ space to answer LCE queries $v=\LCE(i,j)$ in $O(\log\log N + \log n \cdot \textit{\#phrases})$ time, where \textit{\#phrases} is the number of phrases of $z$ used to store $s[i\twodots i+v]$ and $s[j\twodots j+v]$.
 \end{theorem}
 
@@ -1002,35 +1006,107 @@ We could lay out the tree of compression elements in memory as a B-tree, where w
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{LCE on Trees\label{sec:tree-lce}}
 
-\begin{verbatim}
-* LCE on trees
-  * Definition
-  * Heavy paths
-  * Hashing
-  * Ladder attempt
-\end{verbatim}
-
-TREE-LCE: Vi kan finde LCE på et træ i $O(\log n)$ tid ved at lave tung/let-vej og lave streng-LCE på de tunge veje.
-
-TREE-LCE: Vi kan lave hashing på et træ, ved at hver knude gemmer hash-værdien for de sidste t led af stien fra roden til knuden.
+To achieve the result of \pref{thm:lz-tree}, we need to do LCE on a tree in $O(\log n)$ query time and $O(n)$ space. In this section we analyze ways to achieve this.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Definition}
+\subsection{Definition\label{sec:tree-def}}
 
-Let $T$ be a rooted tree with $n$ nodes where each edge from parent node $p$ to child node $c$ is labeled with a character $\zlabel(c)$. Let $x_i$ and $x_j$ be two nodes in T. Let $y_i$ be a decendent of $x_i$, and let $y_j$ be a decendent of $x_j$. Let $s_i$ be the string obtained from characters on the path from $x_i$ to $y_i$, and let $s_j$ be the string obtained from characters on the path from $x_j$ to $y_j$. Then $\LCE_T(x_i, y_i, x_j, y_j)$ is the length of the longest common prefix of $s_i$ and $s_j$.
+Let $T$ be a rooted tree with $n$ nodes where each edge from parent node $p$ to child node $c$ is labeled with a character $\zlabel(c)$. Let $u_i$, $w_i$, $u_j$ and $w_j$ be nodes in T, such that $w_i$ is a decendent of $u_i$, and $w_j$ is a decendent of $u_j$. Then $\LCE_T(u_i, w_i, u_j, w_j)$ is the length of the longest common prefix of $s_i$ and $s_j$, where $s_i$ is the string obtained from characters on the path from $u_i$ to $w_i$, and $s_j$ is the string obtained from characters on the path from $u_j$ to $w_j$.
 
 This definition of LCE on a tree is chosen to match the tree of LZ compression elements and the nessecary LCE queries on it described in \pref{sec:lz-other}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Walking the Paths with Level Ancestor}
 
+We can find $\LCE(i,j)$ in $O(|\LCE(i,j)|)$ query time using Level Ancestor. If $u_i$ has depth $d_i$ and $u_j$ has depth $d_j$, then first compare $\textit{label}(\LA(d_i+1,w_i))$ to $\textit{label}(\LA(d_j+1,w_j))$, then compare $\textit{label}(\LA(d_i+2,w_i))$ to $\textit{label}(\LA(d_j+2,w_j))$ and so on until the two characters differ or either $w_i$ or $w_j$ is reached.
+
+Each Level Ancestor query takes constant time, and we do $2|\LCE(i,j)| + 2$ of them, giving us $O(|\LCE(i,j)|)$ query time.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Using Fingerprinting}
 
-Gem fingerprint for hver knude for forfæder sti. Samme princip som hash-LCE for strenge
+\newcommand{\tfprint}[1][k]{\ensuremath{\proc{TreeFingerprint}_{#1}}}
+\newcommand{\tfprintk}{\tfprint[k]}
+
+We can adapt our \fprintk\ algorithm on strings to work on trees, which we call \tfprintk. If we store the fingerprint of $s[i\twodots i+t_\ell]$ in $H_\ell[i+t_\ell]$ instead of $H_\ell[i]$, then the \fprintk\ query directly adapts to \tfprintk. If we wanted to use the same preprocessing as we use for \fprintk\ on strings, we would have to adapt the suffix array to apply to trees, and find a way to construct it in $\sortt$ time, which we have not looked at. Instead we can preprocess the fingerprints of the tree with Karp-Miller-Rosenberg~\cite{karp-miller-rosenberg}.
+
+\begin{theorem}
+\tfprintk, where $k$ is a parameter $1\leq k\leq\logceil$, can preprocess a tree of $n$ nodes to answer LCE queries as defined in \pref{sec:tree-def} using $O(k\cdot n^{1/k})$ worst case query time, $O(1)$ average case query time, $O(k\cdot n)$ space, and $O(n\log n)$ preprocessing time.
+\end{theorem}
+
+\subsubsection{Data Structure}
+
+We define a natural number $F_t[u]$ to be the fingerprint for node $u$ of length $t$. For two nodes $u$ and $w$ in a tree $T$, their fingerprints $F_t[u]$ and $F_t[w]$ of the same length $t$ are the same if and only if the last $t$ characters on the path from the root of $T$ to $u$ is the same as the last $t$ characters on the path from the root of $T$ to $w$.
+
+For a given parameter $k$, where $1\leq k \leq \logceil$, we define the \tfprintk\ data structure as follows: For each number $\ell$ between $0$ and $k-1$, let $t_\ell=\Theta(n^{\ell/k})$, and let $t_0 = 1$. For each number $\ell$ between $0$ and $k-1$ and each node $u$ in $T$, whoes depth is at least $t_\ell$, let $H_\ell[u] = F_{t_\ell}[u]$
+
+\begin{lemma}
+The \tfprintk\ data structure takes $O(n)$ space.
+\end{lemma}
+\begin{proof}
+The data structure contains $k$ numbers $t_\ell$ and $k$ tables of fingerprints $H_\ell$, and each table contains fingerprints for at most all of the $n$ nodes in the tree.
+\end{proof}
+
+\subsubsection{Query}
+
+The quey for \tfprintk\ is nearly the same as the query for \fprintk\ on strings, except we replace $H_\ell[i+v]$ and $H_\ell[j+v]$ with $H_\ell[\LA(d(u_i)+v+t_\ell,w_i)]$ and $H_\ell[\LA(d(u_j)+v+t_\ell,w_j)]$, where $d(u)$ is the depth of node $u$. We also stop the algorithm, when $d(u_i)+v+t_\ell$ is greater than the depth of $w_i$, or $d(u_j)+v+t_\ell$ is greater than the depth of $w_j$.
+
+\begin{lemma}
+The \tfprintk\ query finds the correct tree LCE value in $O(\log n)$ time.
+\end{lemma}
+\begin{proof}
+We have changed nothing from the \fprintk\ query on strings, which negatively affects the query time, so the query time is the same.
+
+% The combination of Level Ancestor and the definition that a fingerprint relates to a substring from a given node to an ancestor that node, ensures that the fingerprints we choose to compare are the fingerprints, which represents the strings on the paths from $u_i$ to $w_i$ and from $u_j$ to $w_j$.
+
+\begin{figure}[tp]
+    \begin{center}
+        \includegraphics[width=0.7\textwidth]{tree-fingerprint.pdf}
+    \end{center}
+    \caption{\label{fig:tree-query}Finging the right fingerprint to look at for a \tfprintk\ query.}
+\end{figure}
+
+The fingerprints we choose to compare are the fingerprints, which represents the strings on the paths from $u_i$ to $w_i$ and from $u_j$ to $w_j$. Let $x_i$ and $y_i$ be two nodes on the path from $u_i$ to $w_i$, such that the distance between $u_i$ and $x_i$ is $v$, the distance between $x_i$ and $y_i$ is $t_\ell$ and $y_i$ is a decendent of $x_i$, like in \pref{fig:tree-query}. At any given iteration at level $\ell$, the query algorithm has already looked at the string on the path from $u_i$ to $x_i$, and we now need to look at the string on the path from $x_i$ to $y_i$. From our definition of fingerprints in a tree, this string has fingerprint $H_\ell[y_i]$. We have $y_i = \LA(d(u_i)+v+t_\ell,w_i)$, and the LCE query is therefore correct when we use $H_\ell[\LA(d(u_i)+v+t_\ell,w_i)]$ (and similar for $j$ instead of $i$).
+\end{proof}
+
+\subsubsection{Preprocessing}
+
+We use Karp-Miller-Rosenberg~\cite{karp-miller-rosenberg} to preprocess the \tfprintk\ data structure. When $t_\ell$ is $t_{\ell-1} < t_\ell \leq 2t_{\ell-1}$, we preprocess level $\ell$ like this:
+\begin{enumerate}
+\item Make pairs of fingerprints $H_\ell[u] = (H_{\ell-1}[LA(d(u)-t_\ell+t_{\ell-1},u)], H_{\ell-1}[u])$ for all $u$ where $d(u) \geq t_\ell$.
+\item Sort the pairs lexicographically.
+\item Replace each pair with a new fingerprint, by going throug them in lexichographical order, while updating the fingerprint whenever the pair changes.
+\end{enumerate}
+
+Repeat the steps above for each level, starting with $\ell = 1$ and ending with $\ell = k-1$. When $k < \logceil$, the condition that $t_\ell \leq 2t_{\ell-1}$ is not satisfied. In this case we need to add extra levels in the preprocessing, which we will only store temporarely. We therefore always need to preprocess $O(\log n)$ levels, even if we only store some of them.
+
+\begin{lemma}
+The KMR algorithm for preprocessing \tfprintk\ gives the correct data structure.
+\end{lemma}
+\begin{proof}
+Two strings $S$ and $T$ of length $a$ are the same if and only if we can split each of them into two smaller substrings $S = S_1\cdot S_2$ and $T=T_1\cdot T_2$ such that $S_1=T_1$ and $S_2=T_2$, where "$\cdot$" is string concatenation. Therefore we can assign fingerprints $F_a[S]=F_b[S_1]\cdot F_c[S_2]$ and $F_a[T]=F_b[T_1]\cdot F_c[T_2]$ in step one of the preprocessing algorithm. The same also holds when the two smaller substrings overlap.
+
+The fingerprints from level $\ell-1$ are natural numbers, less than $n$. Step one of the preprocessing algorithm makes each fingerprint at level $\ell$ a natural number less than $n^2$. Step two and three of the preprocessing algorithm reduceses that universe of fingerprints back to $n$ without changing the equality of the fingerprints.
+\end{proof}
+
+\begin{lemma}
+The KMR algorithm for preprocessing \tfprintk\ takes $O(n\log n)$ time.
+\end{lemma}
+\begin{proof}
+Step one and three use linear time. In step two we can use radix sort, which uses linear time, because our universe of elements to sort is $n^2$. The total preprocessing time becomes $O(n\log n)$ for preprocessing $\log n$ levels in $O(n)$ time each.
+\end{proof}
+
+HOW TO PREPROCESS?
+
+SA: ved ikke
+
+KMR: Ja!
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Using Constant Time String LCE in Heavy Paths}
+
+Vi kan finde LCE på et træ i $O(\log n)$ tid ved at lave tung/let-vej og lave streng-LCE på de tunge veje.
+
 
 Vi kan lave Træ-LCE i O(n) plads, O(log n) tid ved at lave streng-LCE på tunge stier + Level-Ancestor.
 
@@ -1077,6 +1153,8 @@ Vi kan lave træ-LCE i O(hn) plads, O(1) tid ved at lave strenge for hver sti ti
 
 \fi % report
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{thebibliography}{9}
 
 \bibitem{ilie-navarro-tinta} Lucian Ilie, Gonzalo Navarro, and Liviu Tinta. The longest common extension problem revisited and applications to approximate string searching. Journal of Discrete Algorithms, Volume 8, Issue 4, December 2010, pages 418-428.
