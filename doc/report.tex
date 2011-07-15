@@ -176,7 +176,7 @@ The algorithm stores LCE values for some of the $n^2$ possible query inputs on a
 \paragraph{String notation.} Let $s$ be a string of length $n$. Then $s[i]$ is the $i$'th character of $s$, and $s[i\twodots j]$ is a substring of $s$ containing characters $s[i]$ to $s[j]$, both inclusive. That is, $s[1]$ is the first character of $s$, $s[n]$ is the last character, and $s[1\twodots n]$ is the entire string. The suffix of $s$ starting at index $i$ is written $\suff_i = s[i\twodots n]$.
 
 \paragraph{Tree notation.}
-The ancestors of a node $u$ is $u$ itself as well as any node, which is a parent of an ancestor of $u$. The depth of a node $u$ is one greather than the depth of $u$'s parent, and the depth of the root is zero.
+The ancestors of a node $u$ is $u$ itself as well as any node, which is a parent of an ancestor of $u$. The depth of a node $u$ is one greather than the depth of $u$'s parent, and the depth of the root is zero. A path in a tree begins at node $u$ and ends at node $v$, where $u$ is an ancestor of $v$.
 
 \paragraph{Sorting complexity.} The time it takes to sort $n$ numbers of $\sigma$ distinct values is written as $\sortt$.
 
@@ -209,6 +209,9 @@ Given a set of $n$ objects, where the key of each object is a natural number bet
 
 \paragraph{Level Ancestor.}
 The Level Ancestor at level $\ell$ of node $u$, $\LA(\ell,u)$, is the ancestor of $u$, whoes depth is $\ell$. We can preprocess a static tree in $O(n)$ time and space to answer Level Ancestor queries in $O(1)$ time~\cite{level-ancestor}.
+
+\paragraph{Heavy Path Decomposition}
+The weight of a node $u$ is the size of the subtree rooted at $u$. For a given node $u$, a child of greatest weight is marked heavy, and all other children are marked light. The root is always marked light. An edge going from a node to a heavy child node is heavy, and an edge going from a node to a light child node is light. A path of only heavy edges is a heavy path, and the combined length of all heavy paths in a tree of $n$ nodes is less than $n$. The markings of heavy and light edges and nodes in a tree is a Heavy Path Decomposition. Every simple path in a tree of size $n$ contains at most $O(\log n)$ light edges, and we can construct a Heavy Path Decomposition in $O(n)$ time~\cite{nca}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1032,7 +1035,7 @@ Each Level Ancestor query takes constant time, and we do $2|\LCE(i,j)| + 2$ of t
 We can adapt our \fprintk\ algorithm on strings to work on trees, which we call \tfprintk. If we store the fingerprint of $s[i\twodots i+t_\ell]$ in $H_\ell[i+t_\ell]$ instead of $H_\ell[i]$, then the \fprintk\ query directly adapts to \tfprintk. If we wanted to use the same preprocessing as we use for \fprintk\ on strings, we would have to adapt the suffix array to apply to trees, and find a way to construct it in $\sortt$ time, which we have not looked at. Instead we can preprocess the fingerprints of the tree with Karp-Miller-Rosenberg~\cite{karp-miller-rosenberg}.
 
 \begin{theorem}
-\tfprintk, where $k$ is a parameter $1\leq k\leq\logceil$, can preprocess a tree of $n$ nodes to answer LCE queries as defined in \pref{sec:tree-def} using $O(k\cdot n^{1/k})$ worst case query time, $O(1)$ average case query time, $O(k\cdot n)$ space, and $O(n\log n)$ preprocessing time.
+\tfprintk, where $k$ is a parameter $1\leq k\leq\logceil$, can preprocess a tree of $n$ nodes to answer LCE queries as defined in \pref{sec:tree-def} using $O(k\cdot n^{1/k})$ query time, $O(k\cdot n)$ space, and $O(n\log n)$ preprocessing time.
 \end{theorem}
 
 \subsubsection{Data Structure}
@@ -1100,15 +1103,10 @@ Step one and three use linear time. In step two we can use radix sort, which use
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Using Constant Time String LCE in Heavy Paths}
 
-\paragraph{Heavy Path Decomposition}
-The weight of a node $u$ is the size of the subtree rooted at $u$. For a given node $u$, its child of greatest weight is marked heavy, and all other children are marked light. The root is always marked light. An edge going from a node to a heavy child node is heavy, and an edge going from a node to a light child node is light. A path of only heavy edges is a heavy path, and the combined length of all heavy paths in a tree of $n$ nodes is less than $n$. The markings of heavy and light edges and nodes in a tree is a Heavy Path Decomposition. Every simple path in a tree $T$ of size $n$ contains at most $O(\log n)$ light edges. We can construct a Heavy Path Decomposition in WHAT??\fixme{heavy tree time} time.
-%% end of preliminary
-
-To answer LCE queries on a tree, we can create a heavy path decomposition\fixme{define heavy path decomposition} of the tree and create a string of the labels of all the heavy paths concatenated. We can then use constant time string LCE on this string. We call this algorithm \proc{HeavyTreeLce}.
+To answer LCE queries on a tree, we can create a heavy path decomposition of the tree and create a string of the labels of all the heavy paths concatenated. We can then use constant time string LCE on this string. We call this algorithm \proc{HeavyPathLce}.
 
 \begin{theorem}
-\proc{HeavyTreeLce} can preprocess a tree of $n$ nodes to answer LCE queries as defined in \pref{sec:tree-def} using $O(\log n)$ worst case query time, $O(1)$ average case query time, and $O(n)$ space.
-\fixme{preproc time}
+\proc{HeavyPathLce} can preprocess a tree of $n$ nodes to answer LCE queries as defined in \pref{sec:tree-def} using $O(\log n)$ query time, $O(n)$ space, and $O(\sortt)$ preprocessing time.
 \end{theorem}
 
 \subsubsection{Data Structure}
@@ -1116,24 +1114,24 @@ To answer LCE queries on a tree, we can create a heavy path decomposition\fixme{
 Let $T$ be a tree with a heavy path decomposition. A path label for a path in $T$ is a concatenation of all edge labels on the path starting at smallest depth and ending at greatest depth. The string $s$ is a concatenation of path labels of all heavy paths in $T$. For a node $u$, $\textit{end}(u)$ points to the node of greatest depth in $u$'s heavy path, $d(u)$ us the depth of $u$, and if $u$ is heavy, $\textit{index}(u)$ is the index in $s$, which stores $\zlabel(u)$. The tree must be preprocessed for constant time NCA and LA, and the string $s$ must be preprocessed for LCE.
 
 \begin{lemma}
-The \proc{HeavyTreeLce} data structure takes $O(n)$ space.
+The \proc{HeavyPathLce} data structure takes $O(n)$ space.
 \end{lemma}
 \begin{proof}
 The string $s$ contains less than $n$ characters, since the combined length of all heavy paths in a tree of $n$ nodes is less than $n$. The space usage for NCA, LA, LCE, and the extra information about each node (\textit{end}, \textit{index}, \textit{d}, and heavy markings) is all $O(n)$
 \end{proof}
 
 \begin{lemma}
-We can preprocess \proc{HeavyTreeLce} data structure in $\sortt$ time.
+We can preprocess \proc{HeavyPathLce} data structure in $O(\sortt)$ time.
 \end{lemma}
 \begin{proof}
-Preprocessing LCE using \proc{SuffixNca} or \proc{LcpRmq} takes $O(\sortt)$ time. If we walk through the tree and for each leaf append the heavy path ending in that leaf to $s$, we can construct $s$ in $O(n)$ time. The rest of the data structures can be preprocessed in $O(n)$ time.
+Preprocessing LCE on $s$ using \proc{SuffixNca} or \proc{LcpRmq} takes $O(\sortt)$ time. If we walk through the tree and for each leaf append the heavy path ending in that leaf to $s$, we can construct $s$ in $O(n)$ time. The rest of the data structures can be preprocessed in $O(n)$ time.
 \end{proof}
 
 \subsubsection{Query}
 
 When we directly walk the paths as described in \pref{sec:tree-dc}, we start with $v=0$ and increment $v$ by one as long as $\zlabel(\LA(d(u_i)+v+1,w_i))=\zlabel(\LA(d(u_j)+v+1,w_j))$, and we have not yet reached either $w_i$ or $w_j$.
 
-In a \proc{HeavyTreeLce} query $\LCE_T(u_i,w_i,u_j,w_j)$ we also start with $v=0$ and do the following repeatedly as long as we have not reached either $w_i$ or $w_j$:
+In a \proc{HeavyPathLce} query $\LCE_T(u_i,w_i,u_j,w_j)$ we also start with $v=0$ and do the following repeatedly as long as we have not reached either $w_i$ or $w_j$:
 \begin{enumerate}[~~~a.~]
   \item When either $\LA(d(u_i)+v+1,w_i)$ or $\LA(d(u_j)+v+1,w_j)$ is a light node:
   \begin{enumerate}[~1.~]
@@ -1152,7 +1150,7 @@ In a \proc{HeavyTreeLce} query $\LCE_T(u_i,w_i,u_j,w_j)$ we also start with $v=0
 When we resch either $\LA(d(u_i)+v,w_i)=w_i$ or $\LA(d(u_j)+v,w_j)=w_j$, we stop and return $v$.
 
 \begin{lemma}
-The \proc{HeavyTreeLce} query finds the correct LCE value.
+The \proc{HeavyPathLce} query finds the correct LCE value.
 \end{lemma}
 \begin{proof}
 The query algorithm maintains the invariant $v\leq\LCE_T(u_i,w_i,u_j,w_j)$. Part $a$ simply checks an extra character and increments $v$ if it finds a match. In part $b$, $m_i$ is the number of heavy edges at the beginning of the path from $\LA(d(u_i)+v,w_i)$ to $w_i$, and similar for $m_j$, like illustrated in \pref{fig:tree-heavy-query}. If $v'<\min(m_i,m_j)$ it means that the LCE query found the longest common prefix to be within both of the two paths we are searching, and we have therefore found the LCE value and stop. If $v'\geq\min(m_i,m_j)$, we had a matching prefix which was as long or longer than the part of the heavy path we are interested in, and we therefore need to continue looking outside that heavy path to find the LCE value.
@@ -1161,12 +1159,12 @@ The query algorithm maintains the invariant $v\leq\LCE_T(u_i,w_i,u_j,w_j)$. Part
     \begin{center}
         \includegraphics[width=0.7\textwidth,page=2]{tree-fingerprint.pdf}
     \end{center}
-    \caption{\label{fig:tree-heavy-query}How we find $m_i$ and $m_j$ in a \proc{HeavyTreeLce} query.}
+    \caption{\label{fig:tree-heavy-query}How we find $m_i$ and $m_j$ in a \proc{HeavyPathLce} query.}
 \end{figure}
 \end{proof}
 
 \begin{lemma}
-The \proc{HeavyTreeLce} query takes $O(\log n)$ time.
+The \proc{HeavyPathLce} query takes $O(\log n)$ time.
 \end{lemma}
 \begin{proof}
 Since there is at most $O(\log n)$ light edges in any simple path in $T$, the two paths we look at contains at most $O(\log n)$ light edges, and part $a$ of the algoritmh is chosen at most $O(\log n)$ times. Part $b$ is never chosen two times without part $a$ being chosen in between, so part $b$ is also chosen at most $O(\log n)$ times. Both part $a$ and $b$ take $O(1)$ time. In step $b.1$ we can use either \proc{SuffixNca} or \proc{LcpRmq} to achieve $O(1)$ time.
@@ -1199,22 +1197,99 @@ LCE(u_i,w_i,u_j,w_j)
 \end{comment}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Directly Mapping Other Algorithms}
+\subsection{Directly Mapping \proc{SuffixNca} and \proc{LcpRmq}}
 
-\begin{verbatim}
-Directly apply SuffixNca or LcpRmq. Not possible.
-A suffix tree would take too much space. Each leaf would have d suffixes, where d is the deapth of the leaf. That is more than n. (Only leafs, since for internal nodes we can choose a decendant leaf and cut off the excess later)
-The input is bigger, on strings we had i (n possibilities) and j (n possibilities), and on trees we have (i_c,i_d) (>n possibilities) and (j_c,j_d) (n> possibilities). So directly using suffix trees or SA-LCP-RMQ would be >n space.
-\end{verbatim}
+\begin{figure}[tp]
+    \begin{center}
+        \includegraphics[width=0.25\textwidth]{quadratic-tree.pdf}
+    \end{center}
+    \caption{\label{fig:quadratic-tree}A tree with $\Omega(n^2)$ ways to choose a leaf and an ancestor of that leaf.}
+\end{figure}
+
+We have looked at applying \proc{SuffixNca} and \proc{LcpRmq} directly to trees like we did with \proc{DirectComp} and \fprintk, such that we can get $O(1)$ query time.
+
+\begin{theorem}
+\proc{TreeLcpRmq} and \proc{TreeSuffixNca} can preprocess a tree of $n$ nodes to answer LCE queries as defined in \pref{sec:tree-def} using $O(1)$ query time and $O(n^2)$ space.
+\end{theorem}
+\begin{proof}
+\proc{LcpRmq} relies on accessing two suffixes in SA, $i$ and $j$. In \proc{TreeLcpRmq} the two suffixes are pairs $(u_i,w_i)$ and $(u_j,w_j)$, and each of these can be chosen in $O(n^2)$ ways. We can restrict $w_i$ and $w_j$ to be leafs and still be able to answer the tree original LCE query in $O(1)$ time, but with this modification a tree like the one shown in \pref{fig:quadratic-tree} still has $\Omega(n^2)$ ways to choose each pair. The SA and LCP arrays would therefore be of length $O(n^2)$. When we look at \proc{TreeSuffixNca}, the same argument holds for the nessesary number of leafs in the suffix tree.
+\end{proof}
+
+Because of the quadratic space requirement, this result is not interesting when we use LCE on a tree to answer LCE queries on a compressed string in \pref{sec:lz-other}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Level Ancestor way?}
+\subsection{Looking at Level Ancestor}
 
-\begin{verbatim}
-Kan vi lige som i Level Ancestor smække to O(log n) sammen til en O(1)?
+The constant time solution for the Level Ancestor problem by Bendera~et~al.~\cite{level-ancestor} combines two $O(\log n)$ time solutions to get constant query times in linear space. We have looked at this algorithm to see if we can use similar techniques to achieve constant time LCE on trees in linear space. The two solutions used by the Level Ancestors algorithm are Jump Pointers and Ladder Decomposition. For the query $v=\LA(\ell,u)$, first use jump pointers to jump from $u$ half way to $v$ in constant time, and then use ladder decomposition to jump from the half way node to $v$.
 
-Vi kan lave træ-LCE i O(hn) plads, O(1) tid ved at lave strenge for hver sti til et blad. Hver knude kender en sti den ligger på, og vi finder to stier for slut-knuderne og laver streng-LCE på dem.
-\end{verbatim}
+\proc{LadderLce}, whic we describe in the next section, finds the LCE value of the first half of the paths from $u_i$ to $w_i$ and from $u_j$ to $w_j$ in constant time, similar to how the ladder decomposition is used to jump from the half way node to $v$ in the Level Ancestor algorithm. We have not found a constant time solution to find the LCE value of the second half of these paths, in the samy way jump pointers is used to jump from $u$ node to the half way node node in the Level Ancestor algorithm. We have thus not found a constant time linear space solution for LCE on trees.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Using Constant Time String LCE in a Ladder Decomposition}
+
+%% BEGIN PRELIMINARY
+\fixme{preliminary}
+\paragraph{Ladder Decomposition}
+To make a ladder decomposition of a tree, we first create a ladder of nodes from the root of the tree to the leaf of greatest depth. We then remove the nodes in ladder from the tree and repeat this operation recursively for all remaining subtrees, until all nodes are part of a ladder. Node $u$'s ladder is the ladder which contains $u$ at this point. Finally, we double the length of each ladder by extending it towards the root of the tree. If we reach the root before we have doubled the length of the ladder, we stop at the root. Each node may thus be in multiple ladders.
+
+For any path in a tree of $n$ nodes, we can find $O(\log n)$ ladders, which contain all the nodes in the path. If a node $u$ is half way down a path, $u$'s ladder contains all ancestors of $u$, which are in that path. The combined size of the ladders is at most $2n$.~\cite{level-ancestor}
+%% END PRELIMINARY
+
+We can use the ladder decomposition in the same way we use the heavy tree decomposition to get an algorithm for LCE on trees, which we call \proc{LadderLce}, and which has the same properties as \proc{HeavyPathLce}.
+
+\begin{theorem}
+\proc{LadderLce} can preprocess a tree of $n$ nodes to answer LCE queries as defined in \pref{sec:tree-def} using $O(\log n)$ query time, $O(n)$ space, and $O(\sortt)$ preprocessing time.
+\end{theorem}
+
+\subsubsection{Data Structure}
+
+The input tree $T$ is preprocessed with a ladder decomposition, and for each ladder, the labels of nodes in the ladder forms a substring of a string $s$. The tree $T$ is preprocessed for constant time LA and NCA queries, and $s$ is preprocessed for constant time LCE queries. For a node $u$, $\textit{index}(u)$ is an index in $s$, where $\zlabel(u)$ is stored for $u$'s ladder.
+
+\fixme{INSERT FIGURE OF DS}
+\begin{lemma}
+The \proc{LadderLce} data structure takes $O(n)$ space.
+\end{lemma}
+\begin{proof}
+The string $s$ contains at most $2n$ characters. The rest of the data structures takes $O(n)$ space.
+\end{proof}
+
+\begin{lemma}
+We can preprocess the \proc{LadderLce} data structure in $O(\sortt)$ time.
+\end{lemma}
+\begin{proof}
+Constructing $s$ from the ladders takes $O(n)$ time, and preprocessing it for constant time LCE takes $O(\sortt)$ time. The rest of the data structures have $O(n)$ preprocessing times.
+\end{proof}
+
+\subsubsection{Query}
+
+The \proc{LadderLce} query is:
+\begin{enumerate}
+\item Start with $v_i = u_i$ and $v_j = u_j$
+\item Find $m_i = d(v_i')-d(v_i)$ and $i = \textit{index}(v_i') - m_i$, where $v_i'$ is the node half way from $v_i$ to $w_i$.
+\item Find $m_j$ and $j$ in the same way.
+\item Find $v' = LCE_s(i,j)$
+\item If $v' < \min(n_i,m_j)$ then stop and return $v'$ plus the distance between $u_i$ and $v_i$. Otherwise set $v_i = v_i'$ and $v_j = v_j'$ and continue from step two.
+\item Stop when $v_i = w_i$ or $v_j = w_j$.
+\end{enumerate}
+
+\begin{lemma}
+The \proc{LadderLce} query finds the correct LCE value.
+\end{lemma}
+\begin{proof}
+The algorithm maintains the invariant that the labels on the path from $u_i$ to $v_i$ is the same as the labels on the path from $u_j$ to $v_j$.
+
+In step two, $i$ refres to a position in $v_i'$'s ladder, and therefore $s[i]$ is the label of $v_i$.
+\end{proof}
+
+We split the tree into ladders and do constant time string LCE on each, just like \proc{HeavyPathLce} does. Since we need to look at at most $O(\log n)$ ladders
+ For any path in the tree, we need to look at at most $O(\log n)$ different ladders, which gives \proc{LadderLce} a query time of $O(\log n)$.
+
+\fixme{ARGH}
+
+The main ladder of the node at the middle of the path also contains the node at the beginning of the path.
+
+The ladder decomposition has an extra property, which heavy path decomposition does not have: If $\LCE(u_i,w_i,u_j,w_j)$ is less than half the length of the path from $u_i$ to $w_i$ and less than half the length of the path from $u_j$ to $w_j$, the LCE query takes constant time, since it only needs to look at one ladder.
+
 
 \fi % report
 
@@ -1230,7 +1305,8 @@ Vi kan lave træ-LCE i O(hn) plads, O(1) tid ved at lave strenge for hver sti ti
 
 \bibitem{karp-miller-rosenberg} Richard M. Karp, Raymond E. Miller, and Arnold L. Rosenberg. 1972. Rapid identification of repeated patterns in strings, trees and arrays. In Proceedings of the fourth annual ACM symposium on Theory of computing (STOC '72). ACM, New York, NY, USA, 125-136.
 
-\bibitem{nca} S. Alstrup, C. Gavoille, H. Kaplan, and T. Rauhe. Nearest Common Ancestors: A Survey and a New Algorithm for a Distributed Environment. Theory of Comput. Sys., 2004.
+\bibitem{nca} D. Harel, R. E. Tarjan. Fast Algorithms for Finding Nearest Common Ancestors. SIAM J. Comput., 1984.
+% S. Alstrup, C. Gavoille, H. Kaplan, and T. Rauhe. Nearest Common Ancestors: A Survey and a New Algorithm for a Distributed Environment. Theory of Comput. Sys., 2004.
 
 \bibitem{jf-rmq} Johannes Fischer, and Volker Heun. Theoretical and Practical Improvements on the RMQ-Problem, with Applications to LCA and LCE. Proceedings of the 17th Annual Symposium on Combinatorial Pattern Matching (CPM'06), Lecture Notes in Computer Science 4009, 36-48, Springer-Verlag, 2006.
 
@@ -1248,6 +1324,7 @@ Vi kan lave træ-LCE i O(hn) plads, O(1) tid ved at lave strenge for hver sti ti
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{THE END}
 
+\begin{comment}
 \subsection*{Tinta tests}
 The two tests of LCE query performance used in the Tinta paper are shown in \pref{alg:tinta-testlceonebyone} and \pref{alg:tinta-randomtestlce}.
 
@@ -1303,6 +1380,7 @@ The two tests of LCE query performance used in the Tinta paper are shown in \pre
     \End
 \end{codebox}
 \end{algorithm}
+\end{comment}
 
 \ifarticle
 \fxfatal{Opskriv funktioner for plads.}
@@ -1313,7 +1391,6 @@ The two tests of LCE query performance used in the Tinta paper are shown in \pre
 \item DOC: Test on another machine.
 \item CODE: Improve cache-vertical and make shift variant.
 \item CODE: Non-random strings? Non-random queries? Different t-values for Hash-3L?
-\item DOC: Why is Karp-Miller-Rosenberg $O(n\log n)$?.
 \end{enumerate}
 
 \listoffixmes
