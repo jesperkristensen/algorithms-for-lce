@@ -77,11 +77,11 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction\label{sec:intro}}
 
-The Longest Common Extension problem can be used in many algorithms for solving other algorithmic problems, e.g.\ the Landau-Vishkin algorithm for approximate string searching~\cite{approx-search}. Optimal solutions exists for the problem, with constant query time and linear space. These teoretically optimal solutions are however not the best in practice, since they have large constant factors for both time and space usage. In average cases, a much simpler solution with worst case linear time, average case constant time, and no preprocessing has significantly better practical performance. This algorithm is ideal when only average case performance is relevant. In situations where we need both average case and worst case performance to be good, none of the existing solutions are ideal.
+The Longest Common Extension problem can be used in many algorithms for solving other algorithmic problems, e.g.\ the Landau-Vishkin algorithm for approximate string searching~\cite{approx-search}. Optimal solutions exists for the problem, with constant query time and linear space. These theoretically optimal solutions are however not the best in practice, since they have large constant factors for both time and space usage. In average cases, a much simpler solution with worst case linear time, average case constant time, and no preprocessing has significantly better practical performance. This algorithm is ideal when only average case performance is relevant. In situations where we need both average case and worst case performance to be good, none of the existing solutions are ideal.
 
-We have found two new algortihms. They both have better than linear worst case query times, and achieves significantly better average case practical query times compared to the theoretically best algorithms. The best of these two uses string fingerprinting to achieve a time/space-tradeoff with $O(k\cdot n^{1/k})$ worst case query time, constant average case query time, and $O(kn)$ space for $k$ between one and $\log n$.
+We have found two new algorithms. They both have better than linear worst case query times, and achieves significantly better average case practical query times compared to the theoretically best algorithms. The best of these two uses string fingerprinting to achieve a time/space-tradeoff with $O(k\cdot n^{1/k})$ worst case query time, constant average case query time, and $O(kn)$ space for $k$ between one and $\log n$.
 
-In \pref{sec:algorithms} we theorectically describe and analyze the LCE algorithms introduced here in \pref{sec:intro}, and in \pref{sec:results} we analyze results from practical C++ implementations of these algorithms.
+In \pref{sec:algorithms} we theoretically describe and analyze the LCE algorithms introduced here in \pref{sec:intro}, and in \pref{sec:results} we analyze results from practical C++ implementations of these algorithms.
 
 We also look at how to apply the LCE problem to Ziv-Lempel compressed strings, such that we can answer LCE queries fast while only using space, which is a function of the compressed size of the string. In \pref{sec:lz-compress} we describe LZ compression, and how we can convert the simple linear time LCE algorithm to work on compressed strings with space linear to the size of the compressed string, worst case query time linear to the size of the uncompressed string, and average case query time $O(\log\log N)$. In \pref{sec:tree-lce} we look at how we can use the tree structure of LZ compression to get better query times on compressed strings.
 
@@ -165,7 +165,7 @@ We also present another new LCE algorithm, which we call \proc{DirectCompLookup}
 For a string $s$ of length $n$, the \proc{DirectCompLookup} algorithm can solve the LCE problem in $O(t)$ worst case query time and $O(1)$ average case query time using $O(n^2/t)$ space and $O(n^2)$ preprocessing time, where $t$ is a parameter $1 \leq t \leq n$.
 \end{theorem}
 
-The algorithm stores LCE values for some of the $n^2$ possible query inputs on a given string. It uses \proc{DirectComp} to move towards one of these stored values, and stops when it reaches one. The \proc{DirectCompLookup} algorithm is very simple, but the tradoff between worst case query time and space is not very favorable, and preprocessing the data structure takes $O(n^2)$ time unless we use another LCE algorithm in the preprocessing.
+The algorithm stores LCE values for some of the $n^2$ possible query inputs on a given string. It uses \proc{DirectComp} to move towards one of these stored values, and stops when it reaches one. The \proc{DirectCompLookup} algorithm is very simple, but the tradeoff between worst case query time and space is not very favorable, and preprocessing the data structure takes $O(n^2)$ time unless we use another LCE algorithm in the preprocessing.
 
 \fi % report
 
@@ -176,7 +176,7 @@ The algorithm stores LCE values for some of the $n^2$ possible query inputs on a
 \paragraph{String notation.} Let $s$ be a string of length $n$. Then $s[i]$ is the $i$'th character of $s$, and $s[i\twodots j]$ is a substring of $s$ containing characters $s[i]$ to $s[j]$, both inclusive. That is, $s[1]$ is the first character of $s$, $s[n]$ is the last character, and $s[1\twodots n]$ is the entire string. The suffix of $s$ starting at index $i$ is written $\suff_i = s[i\twodots n]$.
 
 \paragraph{Tree notation.}
-The ancestors of a node $u$ is $u$ itself as well as any node, which is a parent of an ancestor of $u$. The depth of a node $u$ is one greather than the depth of $u$'s parent, and the depth of the root is zero. A path in a tree begins at node $u$ and ends at node $v$, where $u$ is an ancestor of $v$.
+The ancestors of a node $u$ is $u$ itself as well as any node, which is a parent of an ancestor of $u$. The depth of a node $u$ is one greater than the depth of $u$'s parent, and the depth of the root is zero. A path in a tree begins at node $u$ and ends at node $v$, where $u$ is an ancestor of $v$.
 
 \paragraph{Sorting complexity.} The time it takes to sort $n$ numbers of $\sigma$ distinct values is written as $\sortt$.
 
@@ -185,7 +185,7 @@ The tree uses $O(n)$ space, and building it takes $O(\sortt)$ time~\cite{sort-co
 
 \ifreport
 
-There are $n$ leaves in a suffix tree, and since each internal node has at least two children, the tree has less than $2n$ nodes. Each edge uses $O(1)$ space, as the label is a substring of $s$ and it can therefore be reprecented by two indexes of $s$. The suffix tree therefore takes $O(n)$ space.
+There are $n$ leaves in a suffix tree, and since each internal node has at least two children, the tree has less than $2n$ nodes. Each edge uses $O(1)$ space, as the label is a substring of $s$ and it can therefore be represented by two indexes of $s$. The suffix tree therefore takes $O(n)$ space.
 
 \fi % report
 
@@ -205,13 +205,18 @@ Building the SA, \SAi and LCP arrays takes $O(\sortt)$ time~\cite{sort-complexit
 The I/O model describes the number of memory blocks an algorithm moves between two layers of a layered memory architecture, where the size of the internal memory layer is $M$ words, and data is moved between internal and external memory in blocks of $B$ words. In the cache-oblivious model, the algorithm has no knowledge of the values of $M$ and $B$.
 
 \paragraph{Predecessor.}
-Given a set of $n$ objects, where the key of each object is a natural number between one and $U$, the predecessor of a natual number $x$ is an object with maximal key less than or equal to $x$. We can solve the static Predecessor problem in $O(\log\log U)$ time using $O(n)$ space~\cite{predecessor}.
+Given a set of $n$ objects, where the key of each object is a natural number between one and $U$, the predecessor of a natural number $x$ is an object with maximal key less than or equal to $x$. We can solve the static Predecessor problem in $O(\log\log U)$ time using $O(n)$ space~\cite{predecessor}.
 
 \paragraph{Level Ancestor.}
-The Level Ancestor at level $\ell$ of node $u$, $\LA(\ell,u)$, is the ancestor of $u$, whoes depth is $\ell$. We can preprocess a static tree in $O(n)$ time and space to answer Level Ancestor queries in $O(1)$ time~\cite{level-ancestor}.
+The Level Ancestor at level $\ell$ of node $u$, $\LA(\ell,u)$, is the ancestor of $u$, whose depth is $\ell$. We can preprocess a static tree in $O(n)$ time and space to answer Level Ancestor queries in $O(1)$ time~\cite{level-ancestor}.
 
 \paragraph{Heavy Path Decomposition}
 The weight of a node $u$ is the size of the subtree rooted at $u$. For a given node $u$, a child of greatest weight is marked heavy, and all other children are marked light. The root is always marked light. An edge going from a node to a heavy child node is heavy, and an edge going from a node to a light child node is light. A path of only heavy edges is a heavy path, and the combined length of all heavy paths in a tree of $n$ nodes is less than $n$. The markings of heavy and light edges and nodes in a tree is a Heavy Path Decomposition. Every simple path in a tree of size $n$ contains at most $O(\log n)$ light edges, and we can construct a Heavy Path Decomposition in $O(n)$ time~\cite{nca}.
+
+\paragraph{Ladder Decomposition}
+To make a ladder decomposition of a tree, we first create a ladder of nodes from the root of the tree to the leaf of greatest depth. We then remove the nodes in the ladder from the tree and repeat this operation recursively for all remaining subtrees, until all nodes are part of a ladder. Node $u$'s ladder is the ladder which contains $u$ at this point. Finally, we double the number of nodes in each ladder by extending it towards the root of the tree. If we reach the root before we have doubled the number of nodes, we stop at the root. Each node may thus be in multiple ladders.
+
+For any path in a tree of $n$ nodes, we can find $O(\log n)$ ladders, which contain all the nodes in the path. If a node $u$ has height $h$, $u$'s ladder contains at least the last $h$ ancestors of $u$. The combined size of the ladders is at most $2n$.~\cite{level-ancestor}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -250,7 +255,7 @@ In this section we look at the existing LCE algorithms described in \pref{sec:ex
 
 LCE of two indexes $i$ and $j$ is defined as the length of the longest common prefix of $\suff_i$ and $\suff_j$. In a suffix tree, the path from the root to $L_i$ has label $\suff_i$ (likewise for $j$). The path label from the root to the nearest common ancestor of $L_i$ and $L_j$ is therefore a common prefix of the two suffixes. Since two child edges of the same node never have the same first character on their edge labels, the path label from the root to $\NCA_\mathcal{T}(L_i,L_j)$ is not only a common prefix, but longest common prefix of $\suff_i$ and $\suff_j$. We can therefore find the LCE value as $\LCE_s(i,j) = D[\NCA_\mathcal{T}(L_i,L_j)]$, where $\mathcal{T}$ is the suffix tree for $s$, and $D[v]$ is the label depth of node $v$ in the tree.
 
-For a string of length $n$ with aplhabet size $\sigma$, we can preprocess \proc{SuffixNca} in $O(\sortt)$ time by building the suffix tree, preprocessing it for NCA and building the array of label depths. The query time is $O(1)$, since looking up $L_i$ and $L_j$, doing an NCA query, and looking up the label depth in $D$ all takes constant time.
+For a string of length $n$ with alphabet size $\sigma$, we can preprocess \proc{SuffixNca} in $O(\sortt)$ time by building the suffix tree, preprocessing it for NCA and building the array of label depths. The query time is $O(1)$, since looking up $L_i$ and $L_j$, doing an NCA query, and looking up the label depth in $D$ all takes constant time.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{\proc{LcpRmq}: RMQs on a LCP Array}
@@ -269,7 +274,7 @@ Different algorithms exists for solving the RMQ problem, and we can solve it in 
 \begin{description}
 \item[\RMQn] walks through the array directly in $O(n)$ time and does not use any preprocessing (except for transforming LCE into RMQ).
 \item[\RMQq] preprocesses the array in $O(n)$ space in order to do queries in $O(1)$ time. This is a twolevel data structure as shown in \pref{fig:sa+lcp+min-twolevel}. The array is split into blocks of size $O(\log n)$. The top level is an array of length $O(n/\log n)$, where each element contains the minimum value one block. The top level uses a \RMQpq{n\log n}{1}-solution, and the lower level precomputes all answers for each block, which is done in $O(n)$ space, since there are only a limited number of different block types of size $O(\log n)$.
-\item[\RMQlog] is the same as \RMQq\ except that the lower level is replaced with a direct seach through a $O(\log n)$ length block.
+\item[\RMQlog] is the same as \RMQq\ except that the lower level is replaced with a direct search through a $O(\log n)$ length block.
 \end{description}
 \end{samepage}
 
@@ -472,13 +477,13 @@ We first construct the SA and LCP arrays, which takes $O(\sortt)$ time~\cite{sor
 
 \paragraph{Horizontal, intra-level optimization}
 
-The amount if I/O's used by \fprintk\ is $O(k\cdot n^{1/k})$. However if we structure our tables of fingerprints differently, we can improve ths number of I/O's to $O(k(n^{1/k}/B+1))$ in the cache-oblivious model. Instead of storing the fingerprint of $s[i\twodots i+t_\ell]$ at $H_\ell[i]$, we can store it at $H_\ell[((i-1)\mod t_\ell)\cdot\lceil n/t_\ell\rceil+\lfloor (i-1)/t_\ell\rfloor+1]$. This will group all used fingerprints at level $\ell$ next to each other in memory, such that the amount of I/O's at each level is reduced from $O(n^{1/k})$ to $O(n^{1/k}/B)$.
+The amount if I/O's used by \fprintk\ is $O(k\cdot n^{1/k})$. However if we structure our tables of fingerprints differently, we can improve the number of I/O's to $O(k(n^{1/k}/B+1))$ in the cache-oblivious model. Instead of storing the fingerprint of $s[i\twodots i+t_\ell]$ at $H_\ell[i]$, we can store it at $H_\ell[((i-1)\mod t_\ell)\cdot\lceil n/t_\ell\rceil+\lfloor (i-1)/t_\ell\rfloor+1]$. This will group all used fingerprints at level $\ell$ next to each other in memory, such that the amount of I/O's at each level is reduced from $O(n^{1/k})$ to $O(n^{1/k}/B)$.
 
 The size of each fingerprint table will grow from $|H_\ell| = n$ to $|H_\ell| = n+t_\ell$, because the rounding operations may introduce one-element gaps in the table after every $n/t_\ell$ elements. We achieve the greatest I/O improvement when $k$ is small. When $k=\logceil$, this cache optimization gives no difference in the amount of I/O's.
 
 \paragraph{Vertical, inter-level optimization}
 
-For larger values of $k$, we can attempt to optimize memory access accros different levels. When we move down through the levels for $k=\logceil$, we can continue in two directions after reading $H_\ell[i]$: $H_{\ell-1}[i]$ or $H_{\ell-1}[i+t_\ell]$. Neither of these positions are next to $H_\ell[i]$ in memory. We can optimize for the case where we reach $H_{\ell-1}[i]$ by flipping the direction in which we store the fingerprints, such that all fingerprints $H_\ell[i]$ for all $\ell$ and a specific $i$ are stored next to each other. This will not improve the asymptotic I/O bound, but could impove practical query times.
+For larger values of $k$, we can attempt to optimize memory access accross different levels. When we move down through the levels for $k=\logceil$, we can continue in two directions after reading $H_\ell[i]$: $H_{\ell-1}[i]$ or $H_{\ell-1}[i+t_\ell]$. Neither of these positions are next to $H_\ell[i]$ in memory. We can optimize for the case where we reach $H_{\ell-1}[i]$ by flipping the direction in which we store the fingerprints, such that all fingerprints $H_\ell[i]$ for all $\ell$ and a specific $i$ are stored next to each other. This will not improve the asymptotic I/O bound, but could improve practical query times.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Space Usage}
@@ -532,7 +537,7 @@ We implemented different variants of \proc{DirectComp}, \proc{LcpRmq}, \proc{Dir
 \begin{description}
 \item[\proc{DirectComp}] is the simple \proc{DirectComp} algorithm with no preprocessing and worst case $O(n)$ query time.
 \item[\fprintk\textless$t_{k-1}$, ..., $t_1$\textgreater ac] is our new \fprintk\ algorithm using $k$ levels, where $k$ is $2$, $3$ and $\logceil$. The numbers \textless$t_{k-1}$, ..., $t_1$\textgreater\ describe the exact size of fingerprinted substrings at each level.
-\item[\fprintk\textless$t_{k-1}$, ..., $t_1$\textgreater bc] is a variant of our new \fprintk\ algorithm, which starts at level $\ell=k-1$ instead of $\ell=0$, as discussed in \pref{sec:improved-avg}.
+\item[\fprintk\textless$t_{k-1}$, ..., $t_1$\textgreater wc] is a variant of our new \fprintk\ algorithm, which starts at level $\ell=k-1$ instead of $\ell=0$, as discussed in \pref{sec:improved-avg}.
 \item[\fprintk\textless$t_{k-1}$, ..., $t_1$\textgreater ac\textless$u_0$, ..., $u_{k-2}$\textgreater] is a variant of our new \fprintk\ algorithm, which stays at level $\ell$ until $v\geq u_\ell$, as discussed in \pref{sec:improved-avg}, instead of doing one comparison at each level in step 1 of the query in \pref{sec:fingerprint-query}.
 \item[\proc{RMQ}\textless$n$, $1$\textgreater] is the \proc{LcpRmq} algorithm using constant time RMQ.
 \item[\proc{RMQ}\textless$p$, $q$\textgreater$_{\textrm{virtual}}$] is the \proc{LcpRmq} algorithm using different RMQ algorithms. They all contain an additional virtual method call to make implementation simpler, but their results cannot be directly compared to other algorithms, which do not have this extra virtual method call.
@@ -564,7 +569,7 @@ For each kind of strings, we tested the algorithms using the following pattern:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\proc{LcpRmq} Results\label{sec:test-rmq}}
 
-We want to compare our new algortithms against the algortihm which is the best in practice of the asymptotically best $O(1)$ algorithms. The \proc{LcpRmq} algorithm is better than \proc{SuffixNca}~\cite{ilie-navarro-tinta}, so we only look at \proc{LcpRmq}. We have looked at a number of RMQ algorithms to find out which works best for the LCE problem. The results are shown in \pref{fig:plot-rmq}. \RMQq\ is the best in practice, and we therefore use that when we test against other LCE algorithms. This result is different from that of Ilie~et~al.~\cite{ilie-navarro-tinta}, where \RMQpq{n}{4\log n} is the best. This could be due to hardware or compiler differences.
+We want to compare our new algorithms against the algorithm which is the best in practice of the asymptotically best $O(1)$ algorithms. The \proc{LcpRmq} algorithm is better than \proc{SuffixNca}~\cite{ilie-navarro-tinta}, so we only look at \proc{LcpRmq}. We have looked at a number of RMQ algorithms to find out which works best for the LCE problem. The results are shown in \pref{fig:plot-rmq}. \RMQq\ is the best in practice, and we therefore use that when we test against other LCE algorithms. This result is different from that of Ilie~et~al.~\cite{ilie-navarro-tinta}, where \RMQpq{n}{4\log n} is the best. This could be due to hardware or compiler differences.
 
 The performance of the implementations shown in \pref{fig:plot-rmq} cannot be compared with those shown on other figures, because they all contain an additional, slow virtual method call, which gives them an unfair disadvantage. We have optimized the best variant of \proc{LcpRmq} to avoid the virtual method call, when we compare it against other algorithms. We compare this optimized version to \proc{DirectComp} in \pref{fig:plot-rmq-directcomp}, which shows that \proc{DirectComp} is significantly better in average case, though both have constant asymptotic average case query times.
 
@@ -605,7 +610,7 @@ The RMQ algorithms show a significant jump in query times around $n=1.000.000$ o
 \subsection{\proc{DirectCompLookup} Results}
 
 
-\pref{fig:plot-complookup} shows \proc{DirectCompLookup} with different time/space-tradeoffs together with \proc{LcpRmq}. In average case, \proc{DirectCompLookup} is slower than \proc{DirectComp}, most likely because it needs to do an extra ckeck to find out if it has reached a position for which a result is stored. For short strings, \proc{DirectLookup} is faster than \proc{DirectCompLookup}, since it does not need to check if the value it needs is stored. However, it quickly grows to be as slow as \proc{LcpRmq}, while \proc{DirectCompLookup} does not experience this slowdown. We explain this with that \proc{DirectLookup} reads from its $O(n^2)$ table of results in every query, whereas \proc{DirectCompLookup} only reads from the $O(n)$ string in average case, and thus has a significantly smaller working set.
+\pref{fig:plot-complookup} shows \proc{DirectCompLookup} with different time/space-tradeoffs together with \proc{LcpRmq}. In average case, \proc{DirectCompLookup} is slower than \proc{DirectComp}, most likely because it needs to do an extra check to find out if it has reached a position for which a result is stored. For short strings, \proc{DirectLookup} is faster than \proc{DirectCompLookup}, since it does not need to check if the value it needs is stored. However, it quickly grows to be as slow as \proc{LcpRmq}, while \proc{DirectCompLookup} does not experience this slowdown. We explain this with that \proc{DirectLookup} reads from its $O(n^2)$ table of results in every query, whereas \proc{DirectCompLookup} only reads from the $O(n)$ string in average case, and thus has a significantly smaller working set.
 
 In the worst case, the \proc{DirectCompLookup} variants which use more space are faster in practice, just like in theory. If we are willing to use $O(n\log n)$ space, \proc{DirectCompLookup}\textless$n/\log n$\textgreater\ will only halve the worst case query time compared to \proc{DirectComp}. This makes \proc{DirectCompLookup} better than \proc{DirectComp}, but still not a very good candidate when worst case query time is important.
 
@@ -656,11 +661,11 @@ world192.txt & $2.3\cdot 2^{20}$ & 93 & 7.9 & 10.5 & 9.8 & 12.7 & 291.7 \\ \hlin
 
 On average case strings, our new \fprintk\ algorithm is approximately 20\% slower than \proc{DirectComp}, and it is between than 5 and 25 times faster than \proc{LcpRmq}. We see the same results on some real world strings in \pref{tab:text-fprint-files}.
 
-On worst case strings, the \fprintk\ algorithms are signicicantly better than \proc{DirectComp} and somewhat worse than \proc{LcpRmq}. Up until $n=30.000$ the three measured \fprintk\ algorithms have nearly the same query times. Of the \fprintk\ algorithms, the $k=2$ variant has a slight advantage for small strings of length less than around $2.000$. For longer strings the $k=3$ variant performs the best up to strings of length $250.000$, at which point the $k=\logceil$ variant becomes the best. This indicates that for shorter strings, using fewer levels is better, and when the input size increases, the \fprintk\ variants with better asymptotic query times have better worst case times in practice.
+On worst case strings, the \fprintk\ algorithms are significantly better than \proc{DirectComp} and somewhat worse than \proc{LcpRmq}. Up until $n=30.000$ the three measured \fprintk\ algorithms have nearly the same query times. Of the \fprintk\ algorithms, the $k=2$ variant has a slight advantage for small strings of length less than around $2.000$. For longer strings the $k=3$ variant performs the best up to strings of length $250.000$, at which point the $k=\logceil$ variant becomes the best. This indicates that for shorter strings, using fewer levels is better, and when the input size increases, the \fprintk\ variants with better asymptotic query times have better worst case times in practice.
 
-On strings with medium aveage LCE values, we see that our \fprintk\ algorithms are faster than both \proc{DirectComp} and \proc{LcpRmq}
+On strings with medium average LCE values, we see that our \fprintk\ algorithms are faster than both \proc{DirectComp} and \proc{LcpRmq}
 
-We conclude that our new \fprintk\ algorithm acieves a tradeoff between worst case times and average case times, which is better than the existing best \proc{DirectComp} and \proc{LcpRmq} algorithms, yet it is not strictly better than the existing algorithms on all inputs. \fprintk\ is therefore a good choice in cases where both average case and worst case performance is important.
+We conclude that our new \fprintk\ algorithm achieves a tradeoff between worst case times and average case times, which is better than the existing best \proc{DirectComp} and \proc{LcpRmq} algorithms, yet it is not strictly better than the existing algorithms on all inputs. \fprintk\ is therefore a good choice in cases where both average case and worst case performance is important.
 
 %  \fprint[3]\ also shows such a jump, but for greater input sizes, as it uses less memory.
 
@@ -705,7 +710,7 @@ In \pref{sec:improved-avg} we discussed how our \fprintk\ algorithm is optimized
     \caption{\label{fig:plot-fingerprint-avglog}Query times of \fprint[\logceil] with $O(1)$ versus $O(k)$ average case query time.}
 \end{figure}
 
-In \pref{fig:plot-fingerprint-avglog} we see that on worst case strings, the query time of \fprint[\logceil] degrade a small amount when using the aveage case optimization. Both variations of \fprint[\logceil] show query times, whic are $O(\log n)$ as expected. On average case strings, the query time of \fprint[\logceil] improves significantly when using average case optimization, and both variants show their expected $O(1)$ and $O(\log n)$ average case query times.
+In \pref{fig:plot-fingerprint-avglog} we see that on worst case strings, the query time of \fprint[\logceil] degrade a small amount when using the average case optimization. Both variations of \fprint[\logceil] show query times, which are $O(\log n)$ as expected. On average case strings, the query time of \fprint[\logceil] improves significantly when using average case optimization, and both variants show their expected $O(1)$ and $O(\log n)$ average case query times.
 
 \begin{figure}[tp]
     \begin{center}
@@ -717,7 +722,7 @@ In \pref{fig:plot-fingerprint-avglog} we see that on worst case strings, the que
 
 In \pref{fig:plot-fingerprint-avg3l} we see that doing one comparison at each level on the way up is better than doing $n^{1/k}$ comparisons. This is most visible on worst case strings, where the algorithm doing one comparison at each level uses less time to reach level $\ell=k-1$, which it will reach anyway. On average case strings, the code specialized in handling only one comparison at each level is simpler. On the question of doing average case optimization or not, we see the same results for \fprint[3], as we saw for \fprint[\logceil], but at a smaller scale.
 
-We conclude that using average case optimization yields a query time improvement on average case strings, which is significantly greater than the query time degration on worst case strings, and that \fprintk\ therefore should use the average case optimization.
+We conclude that using average case optimization yields a query time improvement on average case strings, which is significantly greater than the query time increase on worst case strings, and that \fprintk\ therefore should use the average case optimization.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Cache Optimization}
@@ -736,7 +741,7 @@ We conclude that using average case optimization yields a query time improvement
 
 \pref{fig:plot-fingerprint-cache-horiz} shows results of the intra-level cache optimization described in \pref{sec:fingerprint-cache}. We have implemented two intra-level cache optimized variants. One as described in \pref{sec:fingerprint-cache}, and one where multiplication and division is replaced with shift operations. To use shift operations, $t_\ell$ and $\lceil n/t_\ell\rceil$ must both be powers of two. This may double the size of the used address space.
 
-On average case strings the cache optimization does not change the query times, while on worst case strings and strings with medium size LCE values, cache optimization gives a noticable improvement for large inputs. The cache optimized \fprint[3] variant with shift operations shows an increase in query times for large inputs, which we cannot explain.
+On average case strings the cache optimization does not change the query times, while on worst case strings and strings with medium size LCE values, cache optimization gives a noticeable improvement for large inputs. The cache optimized \fprint[3] variant with shift operations shows an increase in query times for large inputs, which we cannot explain.
 
 The last plot on \pref{fig:plot-fingerprint-cache-horiz} shows a variant of average case where the alphabet size is changed to two. This plot attempts to show the worst case for cache optimized \fprint[3]. LCE values in this plot are large enough to ensure that $H_1$ is used often, which should make the extra complexity of calculating indexes into $H_1$ visible. At the same time the LCE values are small enough to ensure, that the cache optimization has no effect. In this plot we see that the cache optimized variant of \fprint[3] has only slightly worse query time compared to the variant, which is not cache optimized.
 
@@ -761,12 +766,12 @@ Of the existing best \proc{DirectComp} and \proc{LcpRmq} algorithms, we have see
 
 We have found that our new \proc{DirectCompLookup} algorithm can improve the worst case query time performance of \proc{DirectComp}, while it does not degrade the average case query time to the level of \proc{LcpRmq}. However it is not as interesting as our new \fprintk\ algorithm, because it uses too much space.
 
-Our new \fprintk\ algorithm is able to achieve a balance between worst case and average case query times. It has almost as good average case query times as \proc{DirectComp}, its worst case query times are significantly better than those of \proc{DirectComp}, and we have found cases between average and worst case where \fprintk\ is better than both \proc{DirectComp} and \proc{LcpRmq}. \fprintk\ gives a good time space tradeoff, and it uses less space than \proc{LcpRmq} when $k$ is small. The perfprmance of \fprintk\ can be tweaked on many parameters, and we have found that optimizing for average case queries and for memory caches improve practical query time performance.
+Our new \fprintk\ algorithm is able to achieve a balance between worst case and average case query times. It has almost as good average case query times as \proc{DirectComp}, its worst case query times are significantly better than those of \proc{DirectComp}, and we have found cases between average and worst case where \fprintk\ is better than both \proc{DirectComp} and \proc{LcpRmq}. \fprintk\ gives a good time space tradeoff, and it uses less space than \proc{LcpRmq} when $k$ is small. The performance of \fprintk\ can be tweaked on many parameters, and we have found that optimizing for average case queries and for memory caches improve practical query time performance.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Test Code}
 
-To test practical performance, we have implemented the algorithms in C++. The implementation is based on that of Ilie~et~al.~\cite{ilie-navarro-tinta}, which we have heavily modified. We have made it compile on a 32-bit Windows archictecture, and generalized it to allow more algorithms and tests to be implemented. \pref{tab:test-variables} summarizes the structure of the code and the parameters we can vary.
+To test practical performance, we have implemented the algorithms in C++. The implementation is based on that of Ilie~et~al.~\cite{ilie-navarro-tinta}, which we have heavily modified. We have made it compile on a 32-bit Windows architecture, and generalized it to allow more algorithms and tests to be implemented. \pref{tab:test-variables} summarizes the structure of the code and the parameters we can vary.
 
 \begin{table}[tp]
 \centering
@@ -779,15 +784,15 @@ alg. parameter & $t = 2\sqrt n$ & algorithm \\ \hline
 string length & exponentially increasing from $1$ to $100.000$ & test \\
 query pattern & uniformly at random & test \\ \hline
 \end{tabular}
-\caption{List of performance veriables tested.}\label{tab:test-variables}
+\caption{List of performance variables tested.}\label{tab:test-variables}
 \end{table}
 
 In our implementation, we have made the following assumptions about the LCE problem:
 \begin{itemize}
 \item A character in a string is always eight bits.
-\item A string always ends with a special null character, which does not occur anywehere else in the string. This does not affect our results, since we do not measure practical preprocessing time. If an algorithm has faster query times when the string ends in a special character, it could just add that character to the end of the string in its preprocessing.
+\item A string always ends with a special null character, which does not occur anywhere else in the string. This does not affect our results, since we do not measure practical preprocessing time. If an algorithm has faster query times when the string ends in a special character, it could just add that character to the end of the string in its preprocessing.
 \item We make no assumptions on the order of $i$ and $j$. In some applications of the LCE problem, for example approximate string searching, we know that $i<j$, and some algorithms might be able to take advantage of this knowledge to get faster query times. We do not measure this case.
-\item Wehenever we use random characters or query pairs, we use the \texttt{rand()} function from C. This gives repeatable pseudo-random numbers, which makes it easier for us to compare test runs.
+\item Whenever we use random characters or query pairs, we use the \texttt{rand()} function from C. This gives repeatable pseudo-random numbers, which makes it easier for us to compare test runs.
 \end{itemize}
 
 % TODO \fixme{Results: Test Code: tell about c++ bug hunting in tinta, cachegrind code "Cache set count is not a power of two."}
@@ -804,11 +809,11 @@ In our implementation, we have made the following assumptions about the LCE prob
     \caption{\label{fig:plot-by-value}Query times of some of our tested algorithms as a function of the returned LCE value.}
 \end{figure}
 
-As an alternative way of testing our alorithms, we have looked at how long a query takes in relation to the LCE value it returns, since most of our algorithms have query times, which depend on the returned LCE value. \pref{fig:plot-by-value} shows query times for a fixed string of 1000 characters. We can see how the query times of \fprint[2] and \fprint[3] increases as the LCE value increases, and drops when the LCE value becomes long enough to make one more step at the higher level with fingerprints of longer substrings. We also see that the query time of \fprint[\log n] increases whenever the LCE value becomes long enough to reach a higher level of the data structure.
+As an alternative way of testing our algorithms, we have looked at how long a query takes in relation to the LCE value it returns, since most of our algorithms have query times, which depend on the returned LCE value. \pref{fig:plot-by-value} shows query times for a fixed string of 1000 characters. We can see how the query times of \fprint[2] and \fprint[3] increases as the LCE value increases, and drops when the LCE value becomes long enough to make one more step at the higher level with fingerprints of longer substrings. We also see that the query time of \fprint[\log n] increases whenever the LCE value becomes long enough to reach a higher level of the data structure.
 
 The plots in \pref{fig:plot-by-value} contains a lot of noise compared to our other plots. The number of measurements we make on these plots is many times bigger than the number of measurements we make on other plots. Therefore each measurement is an average over only 10000 queries instead of a million queries, which gives less accurate results.
 
-We need to measure a sum of many queries to get an accurate timing, since each individual query is too fast to measure. While measureing a sequence of randomly generated queries is a very artificial test, which is unlikely to occur in practice, we think that it is even more artificial to measure a sequence of queries for which we already know that the LCE value is the same each time. On our worst case string $s=aaaaaaa...$, the queries we measure in each point in \pref{fig:plot-by-value} have the pattern $\max(i,j)=v$, which may give very different performance characteristics compared to random queries due to cache effects. We cannot meaningfully measure performance by LCE value on average case strings, as these strings do not contain large LCE values. The second plot in \pref{fig:plot-by-value} is on a string, which attempts to avoid a strong pattern like $\max(i,j)=v$ while it still has large LCE values.
+We need to measure a sum of many queries to get an accurate timing, since each individual query is too fast to measure. While measuring a sequence of randomly generated queries is a very artificial test, which is unlikely to occur in practice, we think that it is even more artificial to measure a sequence of queries for which we already know that the LCE value is the same each time. On our worst case string $s=aaaaaaa...$, the queries we measure in each point in \pref{fig:plot-by-value} have the pattern $\max(i,j)=v$, which may give very different performance characteristics compared to random queries due to cache effects. We cannot meaningfully measure performance by LCE value on average case strings, as these strings do not contain large LCE values. The second plot in \pref{fig:plot-by-value} is on a string, which attempts to avoid a strong pattern like $\max(i,j)=v$ while it still has large LCE values.
 
 Because of the amount of noise in the plots and the strong pattern of $\max(i,j)=v$, we have not focused on this way of measuring query time performance in our analysis.
 
@@ -892,7 +897,7 @@ A string $s$ of length $N$ has a corresponding \textit{compressed string} $z$ of
     \zlabel_z(x) & \textrm{otherwise}
 \end{cases}
 \end{align*}
-where "$\cdot$" denotes string contatenation. From a compressed string $z = z_1,...,z_n$, we can get the original string $s=\zphrase_z(1)\cdot...\cdot\zphrase_z(n)$.
+where "$\cdot$" denotes string concatenation. From a compressed string $z = z_1,...,z_n$, we can get the original string $s=\zphrase_z(1)\cdot...\cdot\zphrase_z(n)$.
 
 We can easily get the decompressed string $s$ from the compressed string $z$ using the definitions. To get the compressed string $z$ from the original string $s$ we can look at the compression elements as a tree, where the reference of each compression element corresponds to the parent pointer of each node in the tree. We consume $s$ from left to right while we build the tree:
 \begin{enumerate}
@@ -900,7 +905,7 @@ We can easily get the decompressed string $s$ from the compressed string $z$ usi
 \item If $c$ has a child $u$, where $\zlabel(u)=s[i]$, set $c=u$. Otherwise create the child node $u$, set $\zlabel(u)=s[i]$ and set $c=z_0$.
 \item Increment $i$ by one and repeat from step 2 until the entire string is consumed when $i = n$.
 \end{enumerate}
-The zompressed string $z$ is now the tree except the special root node $z_0$.
+The compressed string $z$ is now the tree except the special root node $z_0$.
 
 The size of the compressed string is at most $n=O(N)$ and at least $n=\Omega(\sqrt{N})$.
 % N= 1+2+3+4+...+n=(n^2+n)/2
@@ -908,7 +913,7 @@ The size of the compressed string is at most $n=O(N)$ and at least $n=\Omega(\sq
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Compressed \proc{DirectComp}\label{sec:lz-iterate-forward}}
 
-We can adapt \proc{DirectComp} to work on a compressed string. To work directly on a compressed string, we first need to have ramdom access to the characters of the original string.
+We can adapt \proc{DirectComp} to work on a compressed string. To work directly on a compressed string, we first need to have random access to the characters of the original string.
 
 \begin{lemma}
 \label{lem:lz-random-access}
@@ -988,7 +993,7 @@ We can look at the other LCE algorithms we have examined in addition to \proc{Di
 
 Fingerprinting does not compress well either. We could LC-compress each level of fingerprints just like the original string is compressed, but as the substrings fingerprinted becomes longer at each elvel, the compression ration becomes worse, and at the top level with $t_\ell = \Omega(N)$, we need $\Omega(N)$ space to store $H_\ell$, since all fingerprints would be unique or have very few copies.
 
-Since we have not been able to find improvements to the $O(N)$ worst case query time in $O(n)$ space using existing algorithms, we have looked into new algorithms. The compression elements of a compressed string $z$ forms a tree, and each phrase in $z$ is a path in the tree. The LCE value is the length of a substring occuring at two positions $i$ and $j$ in the input string. This substring spans a number of phrases, where each phrase is a path in the tree of compression elements. If we can make fast LCE queries on such a tree, we can make fast LCE queries on highly compressable strings.
+Since we have not been able to find improvements to the $O(N)$ worst case query time in $O(n)$ space using existing algorithms, we have looked into new algorithms. The compression elements of a compressed string $z$ forms a tree, and each phrase in $z$ is a path in the tree. The LCE value is the length of a substring, which occurs at two positions $i$ and $j$ in the input string. This substring spans a number of phrases, where each phrase is a path in the tree of compression elements. If we can make fast LCE queries on such a tree, we can make fast LCE queries on highly compressable strings.
 
 \begin{theorem}
 \label{thm:lz-tree}
@@ -1004,7 +1009,7 @@ In \pref{sec:tree-lce} we describe how to perform LCE queries on a static tree o
 
 We have looked into the cache performance of compressed \proc{DirectComp}. If the string does not compress at all, i.e.\ the compressed string is $z=(0,a)(0,b)(0,c)...$, \proc{DirectComp} reads from the string in the best way possible using $O(N/B)$ I/O's in worst case. When the string is LZ-compressable, the I/O pattern becomes much worse. If $\zreference(x_1) = x_2 > 0$, the algorithm will read from position $x_1$ and then $x_2$, and these two may not be next to each other in memory. This can happen many times, which gives $O(N)$ I/O's in worst case.
 
-We could lay out the tree of compression elements in memory as a B-tree, where we store groups of adjacant nodes next to eachother in memory, to optimize the number of I/O's within each phrase, but each node may have more than $B$ children, and in this case it would not improve the worst case number of I/O's, as each node visited may be in a new group.
+We could lay out the tree of compression elements in memory as a B-tree, where we store groups of adjacent nodes next to each other in memory, to optimize the number of I/O's within each phrase, but each node may have more than $B$ children, and in this case it would not improve the worst case number of I/O's, as each node visited may be in a new group.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1016,13 +1021,13 @@ To achieve the result of \pref{thm:lz-tree}, we need to do LCE on a tree in $O(\
 \subsection{Definition\label{sec:tree-def}}
 
 Let $T$ be a rooted tree with $n$ nodes where each edge from parent node $p$ to child node $c$ is labeled with a character $\zlabel(c)$.
-Let $p_i$ be a path in $T$ from a node $u_i$ to a node $w_i$, such that $w_i$ is a decendent of $u_i$, and
-let $p_j$ be a path in $T$ from a node $u_j$ to a node $w_j$, such that $w_j$ is a decendent of $u_j$.
+Let $p_i$ be a path in $T$ from a node $u_i$ to a node $w_i$, such that $w_i$ is a descendant of $u_i$, and
+let $p_j$ be a path in $T$ from a node $u_j$ to a node $w_j$, such that $w_j$ is a descendant of $u_j$.
 Then $\LCE_T(p_i, p_j)$ is the length of the longest common prefix of $s_i$ and $s_j$, where
 $s_i$ is the concatenation of the edge labels of $p_i$, and
 $s_j$ is the concatenation of the edge labels of $p_j$.
 
-This definition of LCE on a tree is chosen to match the tree of LZ compression elements and the nessecary LCE queries on it described in \pref{sec:lz-other}.
+This definition of LCE on a tree is chosen to match the tree of LZ compression elements and the necessary LCE queries on it described in \pref{sec:lz-other}.
 
 To simplify our description of our tree LCE algorithms, we define $p_i(v)$ to be the node on $p_i$ with distance $v$ to $u_i$, and similarly for $p_j(v)$. We can calculate $p_i$ in constant time as $p_i(v)=\LA(d(u_i)+v,w_i)$, where $d(u_i)$ is the depth of $u_i$, and $\LA$ is a Level Ancestor query.
 
@@ -1054,7 +1059,7 @@ We can adapt our \fprintk\ algorithm on strings to work on trees, which we call 
 
 We define a natural number $F_t[u]$ to be the fingerprint for node $u$ of length $t$. For two nodes $u$ and $w$ in a tree $T$, their fingerprints $F_t[u]$ and $F_t[w]$ of the same length $t$ are the same if and only if the last $t$ characters on the path from the root of $T$ to $u$ is the same as the last $t$ characters on the path from the root of $T$ to $w$.
 
-For a given parameter $k$, where $1\leq k \leq \logceil$, we define the \tfprintk\ data structure as follows: For each number $\ell$ between $0$ and $k-1$, let $t_\ell=\Theta(n^{\ell/k})$, and let $t_0 = 1$. For each number $\ell$ between $0$ and $k-1$ and each node $u$ in $T$, whoes depth is at least $t_\ell$, let $H_\ell[u] = F_{t_\ell}[u]$
+For a given parameter $k$, where $1\leq k \leq \logceil$, we define the \tfprintk\ data structure as follows: For each number $\ell$ between $0$ and $k-1$, let $t_\ell=\Theta(n^{\ell/k})$, and let $t_0 = 1$. For each number $\ell$ between $0$ and $k-1$ and each node $u$ in $T$, whose depth is at least $t_\ell$, let $H_\ell[u] = F_{t_\ell}[u]$
 
 \begin{lemma}
 The \tfprintk\ data structure takes $O(k\cdot n)$ space.
@@ -1079,7 +1084,7 @@ We have changed nothing from the \fprintk\ query on strings, which negatively af
     \begin{center}
         \includegraphics[width=0.7\textwidth,page=1]{tree-fingerprint.pdf}
     \end{center}
-    \caption{\label{fig:tree-query}Finging the right fingerprint to look at for a \tfprintk\ query.}
+    \caption{\label{fig:tree-query}Finding the right fingerprint to look at for a \tfprintk\ query.}
 \end{figure}
 
 The fingerprints we choose to compare are the fingerprints, which represents substrings on $p_i$ and $p_j$. At any given iteration at level $\ell$, the query algorithm has already looked at the string on the path from $u_i$ to $p_i(v)$, and we now need to look at the string on the path from $p_i(v)$ to $p_i(v+t_\ell)$, as shown in \pref{fig:tree-query}. From our definition of fingerprints in a tree, this string has fingerprint $H_\ell[p_i(v+t_\ell)]$. The LCE query is therefore correct when we use $H_\ell[p_i(v+t_\ell)]$ (and similar for $j$ instead of $i$).
@@ -1091,10 +1096,10 @@ We use Karp-Miller-Rosenberg~\cite{karp-miller-rosenberg} to preprocess the \tfp
 \begin{enumerate}
 \item Make pairs of fingerprints $H_\ell[u] = (H_{\ell-1}[LA(d(u)-t_\ell+t_{\ell-1},u)], H_{\ell-1}[u])$ for all $u$ where $d(u) \geq t_\ell$.
 \item Sort the pairs lexicographically.
-\item Replace each pair with a new fingerprint, by going throug them in lexichographical order, while updating the fingerprint whenever the pair changes.
+\item Replace each pair with a new fingerprint, by going through them in lexicographical order, while updating the fingerprint whenever the pair changes.
 \end{enumerate}
 
-Repeat the steps above for each level, starting with $\ell = 1$ and ending with $\ell = k-1$. When $k < \logceil$, the condition that $t_\ell \leq 2t_{\ell-1}$ is not satisfied. In this case we need to add extra levels in the preprocessing, which we will only store temporarely. We therefore always need to preprocess $O(\log n)$ levels, even if we only store some of them.
+Repeat the steps above for each level, starting with $\ell = 1$ and ending with $\ell = k-1$. When $k < \logceil$, the condition that $t_\ell \leq 2t_{\ell-1}$ is not satisfied. In this case we need to add extra levels in the preprocessing, which we will only store temporarily. We therefore always need to preprocess $O(\log n)$ levels, even if we only store some of them.
 
 \begin{lemma}
 The KMR algorithm for preprocessing \tfprintk\ gives the correct data structure.
@@ -1102,7 +1107,7 @@ The KMR algorithm for preprocessing \tfprintk\ gives the correct data structure.
 \begin{proof}
 Two strings $S$ and $T$ of length $a$ are the same if and only if we can split each of them into two smaller substrings $S = S_1\cdot S_2$ and $T=T_1\cdot T_2$ such that $S_1=T_1$ and $S_2=T_2$, where "$\cdot$" is string concatenation. Therefore we can assign fingerprints $F_a[S]=F_b[S_1]\cdot F_c[S_2]$ and $F_a[T]=F_b[T_1]\cdot F_c[T_2]$ in step one of the preprocessing algorithm. The same also holds when the two smaller substrings overlap.
 
-The fingerprints from level $\ell-1$ are natural numbers, less than $n$. Step one of the preprocessing algorithm makes each fingerprint at level $\ell$ a natural number less than $n^2$. Step two and three of the preprocessing algorithm reduceses that universe of fingerprints back to $n$ without changing the equality of the fingerprints.
+The fingerprints from level $\ell-1$ are natural numbers, less than $n$. Step one of the preprocessing algorithm makes each fingerprint at level $\ell$ a natural number less than $n^2$. Step two and three of the preprocessing algorithm reduces that universe of fingerprints back to $n$ without changing the equality of the fingerprints.
 \end{proof}
 
 \begin{lemma}
@@ -1135,7 +1140,7 @@ The \proc{HeavyPathLce} data structure consists of the following:
 \item An input tree $T$ with a heavy path decomposition.
 \item A string $s$, which is a concatenation of all heavy path labels of $T$, where the label of a heavy path is the concatenation of the label on a light edge, and the labels on all edges on the heavy path following that light edge. \pref{fig:tree-heavy-ds} shows an example of $s$.
 \item For a node $u$, $\textit{end}(u)$ points to the node of greatest depth in $u$'s heavy path, $d(u)$ is the depth of $u$, and $\textit{index}(u)$ is the index in $s$, which stores $\zlabel(u)$.
-\item Data structurs for constant time NCA on $T$, constant time LA on $T$, and constant time LCE on $s$.
+\item Data structures for constant time NCA on $T$, constant time LA on $T$, and constant time LCE on $s$.
 \end{itemize}
 
 \begin{lemma}
@@ -1156,19 +1161,19 @@ Preprocessing LCE on $s$ using \proc{SuffixNca} or \proc{LcpRmq} takes $O(\sortt
 
 In a \proc{HeavyPathLce} query $\LCE_T(p_i,p_j)$ we start with $v=0$ and do the following repeatedly:
 \begin{enumerate}
-\item Stop when we resch either $p_i(v)=w_i$ or $p_j(v)=w_j$, and return $v$.
+\item Stop when we reach either $p_i(v)=w_i$ or $p_j(v)=w_j$, and return $v$.
 \item Find $v'=\LCE_s(\textit{index}(p_i(v+1)),\textit{index}(p_j(v+1)))$.
 \item Find $m_i = d(\NCA_T(\textit{end}(p_i(v+1)), w_i))-(d(u_i)+v)$.
 \item Find $m_j = d(\NCA_T(\textit{end}(p_j(v+1)), w_j))-(d(u_j)+v)$.
 \item Stop if $v'<\min(m_i,m_j)$ and return $v+v'$.
-\item Otherwise increment $v$ by $m$.
+\item Otherwise increment $v$ by $\min(m_i,m_j)$.
 \end{enumerate}
 
 \begin{lemma}
 The \proc{HeavyPathLce} query finds the correct LCE value.
 \end{lemma}
 \begin{proof}
-The query algorithm maintains the invariant $v\leq\LCE_T(p_i,p_j)$. In step three, $m_i$ is the number of edges on a single heavy path at the beginning of the path from $p_i(v)$ to $w_i$, and similar for $m_j$ in step four, like illustrated in \pref{fig:tree-heavy-query}. The labels of these edges are stored concecutively in $s$. If $v'<\min(m_i,m_j)$, the LCE query found the longest common prefix to be within both of the two paths $p_i$ and $p_j$ we are searching, and we have therefore found the LCE value and stop. If $v'\geq\min(m_i,m_j)$, we had a matching prefix which was as long or longer than the part of the heavy path we are interested in, and we therefore need to continue looking at the next heavy path to find the LCE value.
+The query algorithm maintains the invariant $v\leq\LCE_T(p_i,p_j)$. In step three, $m_i$ is the number of edges on a single heavy path at the beginning of the path from $p_i(v)$ to $w_i$, and similar for $m_j$ in step four, like illustrated in \pref{fig:tree-heavy-query}. The labels of these edges are stored consecutively in $s$. If $v'<\min(m_i,m_j)$, the LCE query found the longest common prefix to be within both of the two paths $p_i$ and $p_j$ we are searching, and we have therefore found the LCE value and stop. If $v'\geq\min(m_i,m_j)$, we had a matching prefix which was as long or longer than the part of the heavy path we are interested in, and we therefore need to continue looking at the next heavy path to find the LCE value.
 
 \begin{figure}[tp]
     \begin{center}
@@ -1234,7 +1239,7 @@ We have looked at applying \proc{SuffixNca} and \proc{LcpRmq} directly to trees 
 \proc{TreeLcpRmq} and \proc{TreeSuffixNca} can preprocess a static tree of $n$ nodes to answer LCE queries as defined in \pref{sec:tree-def} using $O(1)$ query time and $O(n^2)$ space.
 \end{theorem}
 \begin{proof}
-\proc{LcpRmq} relies on accessing two suffixes in SA, $i$ and $j$. In \proc{TreeLcpRmq} the two suffixes are pairs $p_i=(u_i,w_i)$ and $p_j=(u_j,w_j)$, and each of these can be chosen in $O(n^2)$ ways. We can restrict $w_i$ and $w_j$ to be leafs and still be able to answer the tree original LCE query in $O(1)$ time, but with this modification a tree like the one shown in \pref{fig:quadratic-tree} still has $\Omega(n^2)$ ways to choose each pair. The SA and LCP arrays would therefore be of length $O(n^2)$. When we look at \proc{TreeSuffixNca}, the same argument holds for the nessesary number of leafs in the suffix tree.
+\proc{LcpRmq} relies on accessing two suffixes in SA, $i$ and $j$. In \proc{TreeLcpRmq} the two suffixes are pairs $p_i=(u_i,w_i)$ and $p_j=(u_j,w_j)$, and each of these can be chosen in $O(n^2)$ ways. We can restrict $w_i$ and $w_j$ to be leafs and still be able to answer the tree original LCE query in $O(1)$ time, but with this modification a tree like the one shown in \pref{fig:quadratic-tree} still has $\Omega(n^2)$ ways to choose each pair. The SA and LCP arrays would therefore be of length $O(n^2)$. When we look at \proc{TreeSuffixNca}, the same argument holds for the necessary number of leafs in the suffix tree.
 \end{proof}
 
 Because of the quadratic space requirement, this result is not interesting when we use LCE on a tree to answer LCE queries on a compressed string in \pref{sec:lz-other}.
@@ -1244,19 +1249,10 @@ Because of the quadratic space requirement, this result is not interesting when 
 
 The constant time solution for the Level Ancestor problem by Bendera~et~al.~\cite{level-ancestor} combines two $O(\log n)$ time solutions to get constant query times in linear space. We have looked at this algorithm to see if we can use similar techniques to achieve constant time LCE on trees in linear space. The two solutions used by the Level Ancestors algorithm are Jump Pointers and Ladder Decomposition. For the query $v=\LA(\ell,u)$, first use jump pointers to jump from $u$ half way to $v$ in constant time, and then use ladder decomposition to jump from the half way node to $v$.
 
-\proc{LadderLce}, whic we describe in the next section, finds the LCE value of the first half of $p_i$ and $p_j$ in constant time, similar to how the ladder decomposition is used to jump from the half way node to $v$ in the Level Ancestor algorithm. We have not found a constant time solution to find the LCE value of the second half of these paths, in the samy way jump pointers is used to jump from $u$ node to the half way node node in the Level Ancestor algorithm. We have thus not found a constant time linear space solution for LCE on trees.
+\proc{LadderLce}, whic we describe in the next section, finds the LCE value of the first half of $p_i$ and $p_j$ in constant time, similar to how the ladder decomposition is used to jump from the half way node to $v$ in the Level Ancestor algorithm. We have not found a constant time solution to find the LCE value of the second half of these paths, in the same way jump pointers is used to jump from $u$ node to the half way node node in the Level Ancestor algorithm. We have thus not found a constant time linear space solution for LCE on trees.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Using Constant Time String LCE in a Ladder Decomposition}
-
-%% BEGIN PRELIMINARY
-\fixme{preliminary}
-\paragraph{Ladder Decomposition}
-To make a ladder decomposition of a tree, we first create a ladder of nodes from the root of the tree to the leaf of greatest depth. We then remove the nodes in the ladder from the tree and repeat this operation recursively for all remaining subtrees, until all nodes are part of a ladder. Node $u$'s ladder is the ladder which contains $u$ at this point. Finally, we double the length of each ladder by extending it towards the root of the tree. If we reach the root before we have doubled the length of the ladder, we stop at the root. Each node may thus be in multiple ladders.
-
-For any path in a tree of $n$ nodes, we can find $O(\log n)$ ladders, which contain all the nodes in the path. If a node $u$ is half way down a path, $u$'s ladder contains all ancestors of $u$, which are in that path. The combined size of the ladders is at most $2n$.~\cite{level-ancestor}
-%% END PRELIMINARY
-\subsection*{END PRELIMINARY}
 
 We can use the ladder decomposition in the same way we use the heavy tree decomposition to get an algorithm for LCE on trees, which we call \proc{LadderLce}, and which has the same properties as \proc{HeavyPathLce}.
 
@@ -1314,7 +1310,7 @@ The \proc{LadderLce} query finds the correct LCE value.
 \begin{proof}
 The algorithm maintains the invariant that $v\leq\LCE(p_i,p_j)$. Which means that we know that $\zlabel(p_i(v))=\zlabel(p_j(v))$, but we do not know if $\zlabel(p_i(v+1))=\zlabel(p_j(v+1))$.
 
-In step two, $i$ refers to a position in $v_i'$'s ladder, and $s[i]$ is the label of $p_i(v+1)$. Similarly $s[j]$ is the label of $p_j(v+1)$. The LCE query thus determines the LCE value starting from $p_i(v+1)$ and $p_j(v+1)$ until we reach either $v_i'$ or $v_j'$, whichever comes first, which is distance $\min(m_i,m_j)$ from $d_i(v)$ and $d_j(v)$. When $v' < \min(m_i,m_j)$, we have found the final LCE value within the current pair of ladders and we can stop, otherwise we need to continue looking at other ladders.
+In step two, $i$ refers to a position in $v_i'$'s ladder, because the height of $v_i'$ is at least $m_i$. Therefore $s[i\twodots i+m_i-1]$ is the label of the path from $p_i(v)$ to $v_i'$, and similarly $s[j\twodots m_i-1]$ is the label of the path from $p_j(v)$ to $v_j'$. The LCE query thus determines the LCE value starting from $p_i(v+1)$ and $p_j(v+1)$ until we reach either $v_i'$ or $v_j'$, whichever comes first, which is distance $\min(m_i,m_j)$ from $d_i(v)$ and $d_j(v)$. When $v' < \min(m_i,m_j)$, we have found the final LCE value within the current pair of ladders and we can stop, otherwise we need to continue looking at other ladders.
 \end{proof}
 
 \begin{lemma}
