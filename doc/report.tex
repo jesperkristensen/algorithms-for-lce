@@ -973,7 +973,7 @@ But the question is how big $n_2$ is relative to $n_1$. From knowing how much co
 
 Our original goal of looking into compression was to see if using the techniques used in compression could improve the worst case query time of \proc{DirectComp} to something better than $O(N)$. Our idea is that whenever you have a long LCE value, you have a repetition within the string, and repetitions would typically give good compression. If the compressed string can be searched over similarly to how \proc{DirectComp} searches the uncompressed string, it might be possible to establish a better worst case query time.
 
-We have found one case where we can make compressed \proc{DirectComp} faster than \proc{DirectComp} on uncompressed strings, but our finding does not improve worst case query time. We explain this in terms of the reversed compressed \proc{DirectComp}, as it is simpler, but it also works without the string reversal. Reversed compressed \proc{DirectComp} starts with two positions $(x_i,y_i)$ and $(x_j,y_j)$ corresponding to the two positions $i$ and $j$ in $\LCE(i,j)$. At each iteration, it then updates $(x_i,y_i)$ and $(x_j,y_j)$ to find the previous two positions. If $x_i = x_j$ we know that we can add $\textit{depth}[x_i]$ to the LCE value, where \textit{depth} is the depth of a node in the tree of compression elements. Compressed \proc{DirectComp} can then compare $\textit{depth}[x_i]$ characters in constant time.
+We have found one case where we can make compressed \proc{DirectComp} faster than \proc{DirectComp} on uncompressed strings, but our finding does not improve worst case query time. We explain this in terms of the reversed compressed \proc{DirectComp}, as it is simpler, but it also works without the string reversal. Reversed compressed \proc{DirectComp} starts with two positions $(x_i,y_i)$ and $(x_j,y_j)$ corresponding to the two positions $i$ and $j$ in $\LCE(i,j)$. At each iteration, it then updates $(x_i,y_i)$ and $(x_j,y_j)$ to find the previous two positions. If $x_i = x_j$ we know that we can add $d(x_i)$ to the LCE value, where $d(x_i)$ is the depth of node $x_i$ in the tree of compression elements. Compressed \proc{DirectComp} can then compare $d(x_i)$ characters in constant time.
 
 Through this technique can improve query time in some cases, it does not improve the worst case time of $\Theta(N)$. This is because we cannot be sure to hit the condition allowing us to compare many characters in constant time, even for long LCE values. As an example, $LCE(1,2)$ on a string where all $N$ characters are the same takes $\Omega(N)$ time. For such a string, the tree representing the compressed string is always a path, and $x_i$ and $x_j$ will always be either a node and its parent or the root and some other node. They will therefore never end up being the same node at the same time, as shown in \pref{fig:lz-no-jumps}.
 
@@ -1015,26 +1015,38 @@ We could lay out the tree of compression elements in memory as a B-tree, where w
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{LCE on Trees\label{sec:tree-lce}}
 
+\newcommand{\zlength}{\textit{length}}
+\newcommand{\zindex}{\textit{index}}
+\newcommand{\zend}{\textit{end}}
+
 To achieve the result of \pref{thm:lz-tree}, we need to do LCE on a tree in $O(\log n)$ query time and $O(n)$ space. In this section we analyze ways to achieve this.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Definition\label{sec:tree-def}}
+\subsection{Definitions\label{sec:tree-def}}
 
-Let $T$ be a rooted tree with $n$ nodes where each edge from parent node $p$ to child node $c$ is labeled with a character $\zlabel(c)$.
-Let $p_i$ be a path in $T$ from a node $u_i$ to a node $w_i$, such that $w_i$ is a descendant of $u_i$, and
-let $p_j$ be a path in $T$ from a node $u_j$ to a node $w_j$, such that $w_j$ is a descendant of $u_j$.
-Then $\LCE_T(p_i, p_j)$ is the length of the longest common prefix of $s_i$ and $s_j$, where
-$s_i$ is the concatenation of the edge labels of $p_i$, and
-$s_j$ is the concatenation of the edge labels of $p_j$.
+\paragraph{Trees}
+Let $T$ be a rooted tree with $n$ nodes where each edge from parent node $u$ to child node $w$ is labeled with a character $\zlabel(w)$.
+
+\paragraph{Paths}
+A path $p=(u,w)$ in a tree is a path, which starts at node $u$ and ends at node $w$, where $u$ is an ancestor of $w$. We use the following notation on path $p=(u,w)$:
+\begin{itemize}
+\item The path has length $e=\zlength(p)=d(w)-d(u)$, i.e.\ $p$ has $e$ edges and $e+1$ nodes.
+\item The node $p[a]$ is a node in $p$, such that the distance between $u$ and $p[a]$ is $a$. The start and end nodes of the path are $p[0]=u$ and $p[e]=w$. We can calculate $p[a]$ in constant time as $p[a]=\LA(d(u)+a,w)$, where $d(u)$ is the depth of $u$, and $\LA$ is a Level Ancestor query.
+\item The subpath $p[a\twodots b]=(p[a],p[b])$ is the path, which starts at node $p[a]$ and ends at node $p[b]$. The entire path is $p = p[0,e]$.
+\item The label of a path $\zlabel(p)=\zlabel(p[1])\cdot...\cdot\zlabel(p[e])$ is the concatenation of the labels on all edges between nodes in the path.
+\end{itemize}
+
+\paragraph{LCE on trees}
+Given two paths $p_i=(u_i,w_i)$ and $p_j=(u_j,w_j)$ of lengths $e_i$ and $e_j$ in a tree $T$, the Longest Common Extension $v=\LCE_T(p_i, p_j)$ is the length of the longest common prefix of $\zlabel(p_i)$ and $\zlabel(p_j)$.
+
+In other words $\zlabel(p_i[0\twodots v])=\zlabel(p_j[0\twodots v])$, and either $v=e_i$, $v=e_j$, or $\zlabel(p_i[v+1]) \neq \zlabel(p_j[v+1])$.
 
 This definition of LCE on a tree is chosen to match the tree of LZ compression elements and the necessary LCE queries on it described in \pref{sec:lz-other}.
-
-To simplify our description of our tree LCE algorithms, we define $p_i(v)$ to be the node on $p_i$ with distance $v$ to $u_i$, and similarly for $p_j(v)$. We can calculate $p_i$ in constant time as $p_i(v)=\LA(d(u_i)+v,w_i)$, where $d(u_i)$ is the depth of $u_i$, and $\LA$ is a Level Ancestor query.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Walking the Paths with Level Ancestor\label{sec:tree-dc}}
 
-We can find $\LCE(i,j)$ in $O(|\LCE(i,j)|)$ query time using Level Ancestor, in the same way \proc{DirectComp} finds LCE on strings: First compare $\textit{label}(p_i(1))$ to $\textit{label}(p_j(1))$, then compare $\textit{label}(p_i(2))$ to $\textit{label}(p_j(2))$ and so on until the two characters differ or either $w_i$ or $w_j$ is reached.
+We can find $\LCE(i,j)$ in $O(|\LCE(i,j)|)$ query time using Level Ancestor, in the same way \proc{DirectComp} finds LCE on strings: First compare $\zlabel(p_i[1])$ to $\zlabel(p_j[1])$, then compare $\zlabel(p_i[2])$ to $\zlabel(p_j[2])$ and so on until the two characters differ or either $w_i$ or $w_j$ is reached.
 
 \begin{theorem}
 \proc{TreeDirectComp} can preprocess a static tree of $n$ nodes to answer LCE queries as defined in \pref{sec:tree-def} using $O(|\LCE(i,j)|)$ query time, and $O(n)$ space and preprocessing time.
@@ -1070,7 +1082,7 @@ The data structure contains $k$ numbers $t_\ell$ and $k$ tables of fingerprints 
 
 \subsubsection{Query}
 
-The quey for \tfprintk\ is nearly the same as the query for \fprintk\ on strings, except we replace $H_\ell[i+v]$ and $H_\ell[j+v]$ with $H_\ell[p_i(v+t_\ell)]$ and $H_\ell[p_j(v+t_\ell)]$. We also stop the algorithm after we reach $p_i(v+t_\ell)=w_i$ or $p_j(v+t_\ell)=w_j$.
+The query for \tfprintk\ is nearly the same as the query for \fprintk\ on strings, except we replace $H_\ell[i+v]$ and $H_\ell[j+v]$ with $H_\ell[p_i[v+t_\ell]]$ and $H_\ell[p_j[v+t_\ell]]$. We also decrement the level $\ell$ whenever we reach $v+t_\ell=e_i$ or $v+t_\ell=e_j$, since we no longer have a special character \$ to tell when we have reached the end.
 
 \begin{lemma}
 The \tfprintk\ query finds the correct tree LCE value in $O(k\cdot n^{1/k})$ time.
@@ -1087,7 +1099,7 @@ We have changed nothing from the \fprintk\ query on strings, which negatively af
     \caption{\label{fig:tree-query}Finding the right fingerprint to look at for a \tfprintk\ query.}
 \end{figure}
 
-The fingerprints we choose to compare are the fingerprints, which represents substrings on $p_i$ and $p_j$. At any given iteration at level $\ell$, the query algorithm has already looked at the string on the path from $u_i$ to $p_i(v)$, and we now need to look at the string on the path from $p_i(v)$ to $p_i(v+t_\ell)$, as shown in \pref{fig:tree-query}. From our definition of fingerprints in a tree, this string has fingerprint $H_\ell[p_i(v+t_\ell)]$. The LCE query is therefore correct when we use $H_\ell[p_i(v+t_\ell)]$ (and similar for $j$ instead of $i$).
+The fingerprints we choose to compare are the fingerprints, which represents substrings on $p_i$ and $p_j$. At any given iteration at level $\ell$, we know that $\zlabel(p_i[0\twodots v])=\zlabel(p_j[0\twodots v])$, and we now check if $\zlabel(p_i[v\twodots v+t_\ell])=\zlabel(p_j[v\twodots v+t_\ell])$, as shown in \pref{fig:tree-query}. From our definition of fingerprints in a tree, these two labels have fingerprints $H_\ell[p_i[v+t_\ell]]$ and  $H_\ell[p_j[v+t_\ell]]$, which is what our LCE query uses.
 \end{proof}
 
 \subsubsection{Preprocessing}
@@ -1138,8 +1150,8 @@ To answer LCE queries on a tree, we can create a heavy path decomposition of the
 The \proc{HeavyPathLce} data structure consists of the following:
 \begin{itemize}
 \item An input tree $T$ with a heavy path decomposition.
-\item A string $s$, which is a concatenation of all heavy path labels of $T$, where the label of a heavy path is the concatenation of the label on a light edge, and the labels on all edges on the heavy path following that light edge. \pref{fig:tree-heavy-ds} shows an example of $s$.
-\item For a node $u$, $\textit{end}(u)$ points to the node of greatest depth in $u$'s heavy path, $d(u)$ is the depth of $u$, and $\textit{index}(u)$ is the index in $s$, which stores $\zlabel(u)$.
+\item A string $s$, which is a concatenation of strings of all light edges of $T$, where the string of a light edge is the label of the light edge concatenated with the label of the heavy path, which follows that light edge. \pref{fig:tree-heavy-ds} shows an example of $s$.
+\item For a node $u$, $\zend(u)$ points to the node of greatest depth in $u$'s heavy path, $d(u)$ is the depth of $u$, and $\zindex(u)$ is the index in $s$, which stores $\zlabel(u)$.
 \item Data structures for constant time NCA on $T$, constant time LA on $T$, and constant time LCE on $s$.
 \end{itemize}
 
@@ -1147,33 +1159,37 @@ The \proc{HeavyPathLce} data structure consists of the following:
 The \proc{HeavyPathLce} data structure takes $O(n)$ space.
 \end{lemma}
 \begin{proof}
-The string $s$ contains $n-1$ characters, one for each edge in $T$. The space usage for NCA, LA, LCE, and the extra information about each node (\textit{end}, \textit{index}, and \textit{d}) is all $O(n)$.
+The string $s$ contains $n-1$ characters, one for each edge in $T$. The space usage for NCA, LA, LCE, and the extra information about each node (\zend, \zindex, and $d$) is all $O(n)$.
 \end{proof}
 
 \begin{lemma}
 We can preprocess the \proc{HeavyPathLce} data structure in $O(\sortt)$ time.
 \end{lemma}
 \begin{proof}
-Preprocessing LCE on $s$ using \proc{SuffixNca} or \proc{LcpRmq} takes $O(\sortt)$ time. If we walk through the tree and for each leaf append the heavy path ending in that leaf to $s$, we can construct $s$ in $O(n)$ time. The rest of the data structures can be preprocessed in $O(n)$ time.
+Preprocessing LCE on $s$ using \proc{SuffixNca} or \proc{LcpRmq} takes $O(\sortt)$ time. If we walk through the tree and for each leaf append the light edge string ending in that leaf to $s$, we can construct $s$ in $O(n)$ time. The rest of the data structures can be preprocessed in $O(n)$ time.
 \end{proof}
 
 \subsubsection{Query}
 
 In a \proc{HeavyPathLce} query $\LCE_T(p_i,p_j)$ we start with $v=0$ and do the following repeatedly:
 \begin{enumerate}
-\item Stop when we reach either $p_i(v)=w_i$ or $p_j(v)=w_j$, and return $v$.
-\item Find $v'=\LCE_s(\textit{index}(p_i(v+1)),\textit{index}(p_j(v+1)))$.
-\item Find $m_i = d(\NCA_T(\textit{end}(p_i(v+1)), w_i))-(d(u_i)+v)$.
-\item Find $m_j = d(\NCA_T(\textit{end}(p_j(v+1)), w_j))-(d(u_j)+v)$.
-\item Stop if $v'<\min(m_i,m_j)$ and return $v+v'$.
-\item Otherwise increment $v$ by $\min(m_i,m_j)$.
+\item Stop when we reach either $v=e_i$ or $v=e_j$, and return $v$.
+\item Find $m_i = \zlength(d_i[v], \NCA_T(\zend(p_i[v+1]), w_i))$ and $i=\zindex(p_i[v+1])$.
+\item Find $m_j = \zlength(d_j[v], \NCA_T(\zend(p_j[v+1]), w_j))$ and $j=\zindex(p_j[v+1])$.
+\item Find $v'=\min\{\LCE_s(i,j),m_i,m_j\}$.
+\item Increment $v$ by $v'$.
+\item Stop if $v'<\min\{m_i,m_j\}$ and return $v$.
 \end{enumerate}
 
 \begin{lemma}
 The \proc{HeavyPathLce} query finds the correct LCE value.
 \end{lemma}
 \begin{proof}
-The query algorithm maintains the invariant $v\leq\LCE_T(p_i,p_j)$. In step three, $m_i$ is the number of edges on a single heavy path at the beginning of the path from $p_i(v)$ to $w_i$, and similar for $m_j$ in step four, like illustrated in \pref{fig:tree-heavy-query}. The labels of these edges are stored consecutively in $s$. If $v'<\min(m_i,m_j)$, the LCE query found the longest common prefix to be within both of the two paths $p_i$ and $p_j$ we are searching, and we have therefore found the LCE value and stop. If $v'\geq\min(m_i,m_j)$, we had a matching prefix which was as long or longer than the part of the heavy path we are interested in, and we therefore need to continue looking at the next heavy path to find the LCE value.
+In step two, $m_i$ is the number of edges on a single heavy path at the beginning of $p_i[v\twodots e_i]$, like illustrated in \pref{fig:tree-heavy-query}. The labels of these edges are stored consecutively in $s$, such that $\zlabel(p_i[v\twodots v+m_i])=s[i\twodots i + m_i-1]$. The same holds for $m_j$ in step three.
+
+The algorithm keeps the invariant $\zlabel(p_i[0\twodots v]) = \zlabel(p_j[0\twodots v])$. At each iteration we find $v'$, which is the longest common prefix of $\zlabel(p_i[v\twodots v+m_i])$ and $\zlabel(p_j[v\twodots v+m_j])$. This gives $\zlabel(p_i[0\twodots v+v']) = \zlabel(p_j[0\twodots v+v'])$, and we therefore keep the invariant when we add $v'$ to $v$ in step five.
+
+If $v'<\min\{m_i,m_j\}$ in step six, we also know that $\zlabel(p_i[v+1]) \neq \zlabel(p_j[v+1])$, and therefore that $v=\LCE(p_i,p_j)$.
 
 \begin{figure}[tp]
     \begin{center}
@@ -1194,7 +1210,7 @@ The query algorithm maintains the invariant $v\leq\LCE_T(p_i,p_j)$. In step thre
 The \proc{HeavyPathLce} query takes $O(\log n)$ time.
 \end{lemma}
 \begin{proof}
-Since there is at most $O(\log n)$ light edges in any simple path in $T$, the two paths $p_i$ and $p_j$ contains at most $O(\log n)$ light edges in total. Since and each iteration of the query takes constant time, and we reach reach a new light edge in each iteration, as shown in \pref{fig:tree-heavy-query2}, the query time is $O(\log n)$.
+Since there is at most $O(\log n)$ light edges in any simple path in $T$, the two paths $p_i$ and $p_j$ contains at most $O(\log n)$ light edges in total. Since and each iteration of the query takes constant time, and we reach reach a new light edge of either $p_i$ or $p_j$ in each iteration, as shown in \pref{fig:tree-heavy-query2}, the query time is $O(\log n)$.
 \end{proof}
 
 \begin{comment}
@@ -1239,7 +1255,7 @@ We have looked at applying \proc{SuffixNca} and \proc{LcpRmq} directly to trees 
 \proc{TreeLcpRmq} and \proc{TreeSuffixNca} can preprocess a static tree of $n$ nodes to answer LCE queries as defined in \pref{sec:tree-def} using $O(1)$ query time and $O(n^2)$ space.
 \end{theorem}
 \begin{proof}
-\proc{LcpRmq} relies on accessing two suffixes in SA, $i$ and $j$. In \proc{TreeLcpRmq} the two suffixes are pairs $p_i=(u_i,w_i)$ and $p_j=(u_j,w_j)$, and each of these can be chosen in $O(n^2)$ ways. We can restrict $w_i$ and $w_j$ to be leafs and still be able to answer the tree original LCE query in $O(1)$ time, but with this modification a tree like the one shown in \pref{fig:quadratic-tree} still has $\Omega(n^2)$ ways to choose each pair. The SA and LCP arrays would therefore be of length $O(n^2)$. When we look at \proc{TreeSuffixNca}, the same argument holds for the necessary number of leafs in the suffix tree.
+\proc{LcpRmq} relies on accessing two suffixes in SA, $i$ and $j$. In \proc{TreeLcpRmq} we change the two suffixes to paths $p_i=(u_i,w_i)$ and $p_j=(u_j,w_j)$, and each of these can be chosen in $O(n^2)$ ways. We can restrict $w_i$ and $w_j$ to be leafs and still be able to answer the original LCE query in $O(1)$ time, but even with this modification, a tree like the one shown in \pref{fig:quadratic-tree} still has $\Omega(n^2)$ ways to choose each path. The SA and LCP arrays would therefore be of length $O(n^2)$. When we look at \proc{TreeSuffixNca}, the same argument holds for the necessary number of leafs in the suffix tree.
 \end{proof}
 
 Because of the quadratic space requirement, this result is not interesting when we use LCE on a tree to answer LCE queries on a compressed string in \pref{sec:lz-other}.
@@ -1273,8 +1289,8 @@ We can use the ladder decomposition in the same way we use the heavy tree decomp
 The \proc{LadderLce} data structure consists of the following:
 \begin{itemize}
 \item An input tree $T$ with a ladder decomposition.
-\item A strings $s$, which is a concatenation of ladder labels for each ladder in $T$, where a ladder label is the concatenation of labels of edges between nodes in the ladder. \pref{fig:ladder-ds} shows an example of $s$.
-\item For a node $u$, $\textit{index}(u)$ is an index in $s$ within the ladder label of $u$'s ladder, where $\zlabel(u)$ is stored.
+\item A strings $s$, which is a concatenation of ladder labels for each ladder in $T$, where a ladder label for is $\zlabel(p)$, where $p$ is the path from the first node in the ladder to the last node in the ladder. \pref{fig:ladder-ds} shows an example of $s$.
+\item For a node $u$, $\zindex(u)$ is an index in $s$ within the ladder label of $u$'s ladder, where $\zlabel(u)$ is stored.
 \item Data structures for constant time LA on $T$ and constant time LCE on $s$.
 \end{itemize}
 
@@ -1282,7 +1298,7 @@ The \proc{LadderLce} data structure consists of the following:
 The \proc{LadderLce} data structure takes $O(n)$ space.
 \end{lemma}
 \begin{proof}
-The string $s$ contains at most $2n$ characters. The rest of the data structures takes $O(n)$ space.
+The string $s$ contains at most $2n$ characters. The rest of the data structures take $O(n)$ space.
 \end{proof}
 
 \begin{lemma}
@@ -1296,28 +1312,28 @@ Constructing $s$ from the ladders takes $O(n)$ time, and preprocessing it for co
 
 The \proc{LadderLce} query starts with $v=0$ and repeats the following:
 \begin{enumerate}
-\item Stop when $d_i(v) = w_i$ or $d_j(v) = w_j$ and return $v$.
-\item Find $m_i = d(v_i')-d(p_i(v))$ and $i = \textit{index}(v_i') - m_i + 1$, where $v_i'$ is the node half way from $p_i(v)$ to $w_i$.
-\item Find $m_j = d(v_j')-d(p_j(v))$ and $j = \textit{index}(v_j') - m_j + 1$, where $v_j'$ is the node half way from $p_j(v)$ to $w_j$.
-\item Find $v' = LCE_s(i,j)$
-\item Stop if $v' < \min(m_i,m_j)$ and return $v+v'$.
-\item Otherwise add $\min(m_i,m_j)$ to $v$.
+\item Stop when $v = e_i$ or $v = e_j$ and return $v$.
+\item Find $m_i = \zlength(p_i[v\twodots e_i])/2$ and $i = \zindex(p_i[v+m_i]) - m_i + 1$.
+\item Find $m_j = \zlength(p_j[v\twodots e_j])/2$ and $j = \zindex(p_j[v+m_j]) - m_j + 1$.
+\item Find $v' = \min\{LCE_s(i,j),m_i,m_j\}$
+\item Increment $v$ by $v'$.
+\item Stop if $v' < \min\{m_i,m_j\}$ and return $v$.
 \end{enumerate}
 
 \begin{lemma}
 The \proc{LadderLce} query finds the correct LCE value.
 \end{lemma}
 \begin{proof}
-The algorithm maintains the invariant that $v\leq\LCE(p_i,p_j)$. Which means that we know that $\zlabel(p_i(v))=\zlabel(p_j(v))$, but we do not know if $\zlabel(p_i(v+1))=\zlabel(p_j(v+1))$.
+In step two, $i$ refers to a position in $p_i[v+m_i]$'s ladder, because the height of $p_i[v+m_i]$ is at least $m_i$. Therefore $s[i\twodots i+m_i-1] = \zlabel(p_i[v\twodots v+m_i])$, and similarly $s[j\twodots j+m_i-1] = \zlabel(p_j[v\twodots v+m_j])$.
 
-In step two, $i$ refers to a position in $v_i'$'s ladder, because the height of $v_i'$ is at least $m_i$. Therefore $s[i\twodots i+m_i-1]$ is the label of the path from $p_i(v)$ to $v_i'$, and similarly $s[j\twodots m_i-1]$ is the label of the path from $p_j(v)$ to $v_j'$. The LCE query thus determines the LCE value starting from $p_i(v+1)$ and $p_j(v+1)$ until we reach either $v_i'$ or $v_j'$, whichever comes first, which is distance $\min(m_i,m_j)$ from $d_i(v)$ and $d_j(v)$. When $v' < \min(m_i,m_j)$, we have found the final LCE value within the current pair of ladders and we can stop, otherwise we need to continue looking at other ladders.
+By the same argument as we use for \proc{HeavyPathLce}, the algorithm maintains the invariant $\zlabel(p_i[0\twodots v])=\zlabel(p_j[0\twodots v])$, and gives the correct LCE value.
 \end{proof}
 
 \begin{lemma}
 The \proc{LadderLce} query takes $O(\log n)$ time.
 \end{lemma}
 \begin{proof}
-Each iteration is constant time, and in each iteration we halve the distance between $d_i(v)$ and $w_i$ or between $d_j(v)$ and $w_j$.
+Each iteration takes constant time, and in each iteration we halve either $\zlength(d_i[v\twodots e_i])$ or $\zlength(d_j[v\twodots e_j])$.
 \end{proof}
 
 \proc{LadderLce} is very similar to \proc{HeavyPathLce}, however it has an extra property, which \proc{HeavyPathLce} does not have: If $\LCE(p_i,p_j)$ is less than half the length of $p_i$ and less than half the length of $p_j$, the LCE query takes constant time, since it only needs to look at one ladder.
