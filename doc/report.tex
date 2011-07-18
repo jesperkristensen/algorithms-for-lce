@@ -352,9 +352,9 @@ Our \fprintk\ algorithm generalizes \proc{DirectComp}. It compares characters st
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Definition of a Fingerprint}
 
-Given a string $s$, the fingerprint $F_t[i]$ is a natural number identifying the substring $s[i\twodots i+t]$ among all $t$-length substrings of $s$. We assign fingerprints such that for any $i$, $j$ and $t$, $F_t[i] = F_t[j]$ if and only if $s[i\twodots i+t] = s[j\twodots j+t]$. In other words, if two substrings of $s$ have the same length, they have the same fingerprints if and only if the substrings themselves are the same.
+Given a string $s$, the fingerprint $F_t[i]$ is a natural number identifying the substring $s[i\twodots i+t-1]$ among all $t$-length substrings of $s$. We assign fingerprints such that for any $i$, $j$ and $t$, $F_t[i] = F_t[j]$ if and only if $s[i\twodots i+t-1] = s[j\twodots j+t-1]$. In other words, if two substrings of $s$ have the same length, they have the same fingerprints if and only if the substrings themselves are the same.
 
-At the end of a string when $i+t>n$, we define $F_t[i]$ by adding extra characters to the end of the string as needed.
+At the end of a string when $i+t-1>n$, we define $F_t[i]$ by adding extra characters to the end of the string as needed.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Data Structure\label{sec:fingerprint-ds}}
@@ -378,7 +378,7 @@ Each of the $k$ tables stores $n$ fingerprints of constant size.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Query\label{sec:fingerprint-query}}
 
-To perform an LCE query using the \fprintk\ data structure, start with $v=0$ and $\ell=0$, then do the following steps:
+To perform a LCE query using the \fprintk\ data structure, start with $v=0$ and $\ell=0$, then do the following steps:
 \begin{samepage}
 \begin{enumerate}
 \item As long as $H_\ell[i+v] = H_\ell[j+v]$, increment $v$ by $t_\ell$, increment $\ell$ by one, and repeat this step unless and $\ell = k-1$.
@@ -439,7 +439,7 @@ We can preprocess the data structure in $O(\sortt + k\cdot n)$ time using the SA
 \begin{enumerate}
 \item Loop through the $n$ substrings of length $t_\ell$ in lexicographically sorted order by looping through the elements of SA.
 \item Assign an arbitrary fingerprint to the first substring.
-\item If the current substring $s[\SA[i]\twodots\SA[i]+t_\ell]$ is equal to the substring examined in the previous iteration of the loop, give the current substring the same fingerprint as the previous substring, otherwise give the current substring a new unused fingerprint. The two substrings are equal when $\LCE[i] \geq t_\ell$.
+\item If the current substring $s[\SA[i]\twodots\SA[i]+t_\ell-1]$ is equal to the substring examined in the previous iteration of the loop, give the current substring the same fingerprint as the previous substring, otherwise give the current substring a new unused fingerprint. The two substrings are equal when $\LCE[i] \geq t_\ell$.
 \end{enumerate}
 
 An example is shown in \pref{fig:fingerprint-preproc}.
@@ -997,7 +997,7 @@ Since we have not been able to find improvements to the $O(N)$ worst case query 
 
 \begin{theorem}
 \label{thm:lz-tree}
-Let $s$ be a string of length $N$ and let $z$ of length $n$ be the LZ-compression of $s$. We can preprocess $z$ using $O(n)$ space to answer LCE queries $v=\LCE(i,j)$ in $O(\log\log N + \log n \cdot \textit{\#phrases})$ time, where \textit{\#phrases} is the number of phrases of $z$ used to store $s[i\twodots i+v]$ and $s[j\twodots j+v]$.
+Let $s$ be a string of length $N$ and let $z$ of length $n$ be the LZ-compression of $s$. We can preprocess $z$ using $O(n)$ space to answer LCE queries $v=\LCE(i,j)$ in $O(\log\log N + \log n \cdot \textit{\#phrases})$ time, where \textit{\#phrases} is the number of phrases of $z$ used to store $s[i\twodots i+v-1]$ and $s[j\twodots j+v-1]$.
 \end{theorem}
 
 \begin{proof}
@@ -1016,10 +1016,27 @@ We could lay out the tree of compression elements in memory as a B-tree, where w
 \section{LCE on Trees\label{sec:tree-lce}}
 
 \newcommand{\zlength}{\textit{length}}
+\newcommand{\tfprint}[1][k]{\ensuremath{\proc{TreeFingerprint}_{#1}}}
+\newcommand{\tfprintk}{\tfprint[k]}
 \newcommand{\zindex}{\textit{index}}
 \newcommand{\zend}{\textit{end}}
 
-To achieve the result of \pref{thm:lz-tree}, we need to do LCE on a tree in $O(\log n)$ query time and $O(n)$ space. In this section we analyze ways to achieve this.
+To achieve the result of \pref{thm:lz-tree}, we need to do LCE on a tree in $O(\log n)$ query time and $O(n)$ space. In this section we analyze ways to achieve this. We first define LCE on trees, and then describe different solutions we have found to the problem. \pref{tab:tree-lce-algs} lists the different solutions we have found.
+
+\begin{table}[tp]
+\centering
+\begin{tabular}{l|l|l|l}
+\hline\hline
+Algorithm & Space & Query time & Preprocessing \\ [0.5ex] \hline
+\proc{TreeDirectComp} & $O(n)$ & $O(n)$ & $O(n)$ \\ \hline
+\tfprintk, $1\leq k\leq\logceil$ & $O(kn)$ & $O(k\cdot n^{1/k})$ & $O(n\log n)$ \\ \hline
+\proc{HeavyPathLce} & $O(n)$ & $O(\log n)$ & $O(\sortt)$ \\ \hline
+\proc{TreeLcpRmq} & $O(n^2)$ & $O(1)$ & - \\ \hline
+\proc{TreeSuffixNca} & $O(n^2)$ & $O(1)$ & - \\ \hline
+\proc{LadderLce} & $O(n)$ & $O(\log n)$ & $O(\sortt)$ \\ \hline
+\end{tabular}
+\caption{Algorithms for LCE on trees with their space requirements, query times and preprocessing times.}\label{tab:tree-lce-algs}
+\end{table}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Definitions\label{sec:tree-def}}
@@ -1028,16 +1045,16 @@ To achieve the result of \pref{thm:lz-tree}, we need to do LCE on a tree in $O(\
 Let $T$ be a rooted tree with $n$ nodes where each edge from parent node $u$ to child node $w$ is labeled with a character $\zlabel(w)$.
 
 \paragraph{Paths}
-A path $p=(u,w)$ in a tree is a path, which starts at node $u$ and ends at node $w$, where $u$ is an ancestor of $w$. We use the following notation on path $p=(u,w)$:
+A path $p=(u,w)$ in a tree is a path, which starts at node $u$ and ends at node $w$, where $u$ is an ancestor of $w$. We use the following notation on paths:
 \begin{itemize}
-\item The path has length $e=\zlength(p)=d(w)-d(u)$, i.e.\ $p$ has $e$ edges and $e+1$ nodes.
-\item The node $p[a]$ is a node in $p$, such that the distance between $u$ and $p[a]$ is $a$. The start and end nodes of the path are $p[0]=u$ and $p[e]=w$. We can calculate $p[a]$ in constant time as $p[a]=\LA(d(u)+a,w)$, where $d(u)$ is the depth of $u$, and $\LA$ is a Level Ancestor query.
-\item The subpath $p[a\twodots b]=(p[a],p[b])$ is the path, which starts at node $p[a]$ and ends at node $p[b]$. The entire path is $p = p[0,e]$.
+\item The path $p=(u,w)$ has length $e=\zlength(p)=d(w)-d(u)$, i.e.\ $p$ has $e$ edges and $e+1$ nodes.
+\item The node $p[x]$ is a node in $p=(u,w)$, such that the distance between $u$ and $p[x]$ is $x$. The start and end nodes of the path are $p[0]=u$ and $p[e]=w$. We can calculate $p[x]$ in constant time as $p[x]=\LA(d(u)+x,w)$, where $d(u)$ is the depth of $u$, and $\LA$ is a Level Ancestor query.
+\item The subpath $p[x\twodots y]=(p[x],p[y])$ of a path $p$ is the path, which starts at node $p[x]$ and ends at node $p[y]$. The entire path is $p = p[0,e]$.
 \item The label of a path $\zlabel(p)=\zlabel(p[1])\cdot...\cdot\zlabel(p[e])$ is the concatenation of the labels on all edges between nodes in the path.
 \end{itemize}
 
 \paragraph{LCE on trees}
-Given two paths $p_i=(u_i,w_i)$ and $p_j=(u_j,w_j)$ of lengths $e_i$ and $e_j$ in a tree $T$, the Longest Common Extension $v=\LCE_T(p_i, p_j)$ is the length of the longest common prefix of $\zlabel(p_i)$ and $\zlabel(p_j)$.
+Given two paths $p_i$ and $p_j$ of lengths $e_i$ and $e_j$ in a tree $T$, the Longest Common Extension $v=\LCE_T(p_i, p_j)$ is the length of the longest common prefix of $\zlabel(p_i)$ and $\zlabel(p_j)$.
 
 In other words $\zlabel(p_i[0\twodots v])=\zlabel(p_j[0\twodots v])$, and either $v=e_i$, $v=e_j$, or $\zlabel(p_i[v+1]) \neq \zlabel(p_j[v+1])$.
 
@@ -1057,9 +1074,6 @@ Each Level Ancestor query takes constant time, and we do $2|\LCE(i,j)| + 2$ of t
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Using Fingerprinting}
-
-\newcommand{\tfprint}[1][k]{\ensuremath{\proc{TreeFingerprint}_{#1}}}
-\newcommand{\tfprintk}{\tfprint[k]}
 
 We can adapt our \fprintk\ algorithm on strings to work on trees, which we call \tfprintk. If we store the fingerprint of $s[i\twodots i+t_\ell]$ in $H_\ell[i+t_\ell]$ instead of $H_\ell[i]$, then the \fprintk\ query directly adapts to \tfprintk. If we wanted to use the same preprocessing as we use for \fprintk\ on strings, we would have to adapt the suffix array to apply to trees, and find a way to construct it in $\sortt$ time, which we have not looked at. Instead we can preprocess the fingerprints of the tree with Karp-Miller-Rosenberg~\cite{karp-miller-rosenberg}.
 
@@ -1084,6 +1098,8 @@ The data structure contains $k$ numbers $t_\ell$ and $k$ tables of fingerprints 
 
 The query for \tfprintk\ is nearly the same as the query for \fprintk\ on strings, except we replace $H_\ell[i+v]$ and $H_\ell[j+v]$ with $H_\ell[p_i[v+t_\ell]]$ and $H_\ell[p_j[v+t_\ell]]$. We also decrement the level $\ell$ whenever we reach $v+t_\ell=e_i$ or $v+t_\ell=e_j$, since we no longer have a special character \$ to tell when we have reached the end.
 
+\fixme{Write out the query in full}
+
 \begin{lemma}
 The \tfprintk\ query finds the correct tree LCE value in $O(k\cdot n^{1/k})$ time.
 \end{lemma}
@@ -1092,14 +1108,8 @@ We have changed nothing from the \fprintk\ query on strings, which negatively af
 
 % The combination of Level Ancestor and the definition that a fingerprint relates to a substring from a given node to an ancestor that node, ensures that the fingerprints we choose to compare are the fingerprints, which represents the strings on the paths from $u_i$ to $w_i$ and from $u_j$ to $w_j$.
 
-\begin{figure}[tp]
-    \begin{center}
-        \includegraphics[width=0.7\textwidth,page=1]{tree-fingerprint.pdf}
-    \end{center}
-    \caption{\label{fig:tree-query}Finding the right fingerprint to look at for a \tfprintk\ query.}
-\end{figure}
-
-The fingerprints we choose to compare are the fingerprints, which represents substrings on $p_i$ and $p_j$. At any given iteration at level $\ell$, we know that $\zlabel(p_i[0\twodots v])=\zlabel(p_j[0\twodots v])$, and we now check if $\zlabel(p_i[v\twodots v+t_\ell])=\zlabel(p_j[v\twodots v+t_\ell])$, as shown in \pref{fig:tree-query}. From our definition of fingerprints in a tree, these two labels have fingerprints $H_\ell[p_i[v+t_\ell]]$ and  $H_\ell[p_j[v+t_\ell]]$, which is what our LCE query uses.
+\fixme{Improve this paragraph}
+At any given iteration at level $\ell$, we know that $\zlabel(p_i[0\twodots v])=\zlabel(p_j[0\twodots v])$, and we now check if $\zlabel(p_i[v\twodots v+t_\ell])=\zlabel(p_j[v\twodots v+t_\ell])$. From our definition of fingerprints in a tree, these two labels have fingerprints $H_\ell[p_i[v+t_\ell]]$ and $H_\ell[p_j[v+t_\ell]]$, which is what our LCE query uses.
 \end{proof}
 
 \subsubsection{Preprocessing}
@@ -1174,8 +1184,8 @@ Preprocessing LCE on $s$ using \proc{SuffixNca} or \proc{LcpRmq} takes $O(\sortt
 In a \proc{HeavyPathLce} query $\LCE_T(p_i,p_j)$ we start with $v=0$ and do the following repeatedly:
 \begin{enumerate}
 \item Stop when we reach either $v=e_i$ or $v=e_j$, and return $v$.
-\item Find $m_i = \zlength(d_i[v], \NCA_T(\zend(p_i[v+1]), w_i))$ and $i=\zindex(p_i[v+1])$.
-\item Find $m_j = \zlength(d_j[v], \NCA_T(\zend(p_j[v+1]), w_j))$ and $j=\zindex(p_j[v+1])$.
+\item Find $m_i = \zlength(p_i[v], \NCA_T(\zend(p_i[v+1]), p_i[e_i]))$ \\ and $i=\zindex(p_i[v+1])$.
+\item Find $m_j = \zlength(p_j[v], \NCA_T(\zend(p_j[v+1]), p_j[e_j]))$ \\ and $j=\zindex(p_j[v+1])$.
 \item Find $v'=\min\{\LCE_s(i,j),m_i,m_j\}$.
 \item Increment $v$ by $v'$.
 \item Stop if $v'<\min\{m_i,m_j\}$ and return $v$.
@@ -1314,6 +1324,7 @@ The \proc{LadderLce} query starts with $v=0$ and repeats the following:
 \begin{enumerate}
 \item Stop when $v = e_i$ or $v = e_j$ and return $v$.
 \item Find $m_i = \zlength(p_i[v\twodots e_i])/2$ and $i = \zindex(p_i[v+m_i]) - m_i + 1$.
+\fixme{afrunding}
 \item Find $m_j = \zlength(p_j[v\twodots e_j])/2$ and $j = \zindex(p_j[v+m_j]) - m_j + 1$.
 \item Find $v' = \min\{LCE_s(i,j),m_i,m_j\}$
 \item Increment $v$ by $v'$.
