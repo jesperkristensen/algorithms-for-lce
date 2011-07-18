@@ -1293,13 +1293,13 @@ We can use the ladder decomposition in the same way we use the heavy tree decomp
         \includegraphics[width=0.4\textwidth,page=1]{ladder.pdf}
         \includegraphics[width=0.4\textwidth,page=2]{ladder.pdf}
     \end{center}
-    \caption{\label{fig:ladder-ds} Ladders of a tree before and after their length is doubled. A \proc{LadderLce} string $s$ for this ladder decomposition is $s=abc|ade|f|ghijkl|hno|m$, where the splits between ladders are marked with a vertical line.}
+    \caption{\label{fig:ladder-ds} Ladders of a tree before and after their length is doubled. A \proc{LadderLce} string $s$ for this ladder decomposition is $s=abc|ade|df|ghijkl|ghno|jm$, where the splits between ladders are marked with a vertical line.}
 \end{figure}
 
 The \proc{LadderLce} data structure consists of the following:
 \begin{itemize}
 \item An input tree $T$ with a ladder decomposition.
-\item A strings $s$, which is a concatenation of ladder labels for each ladder in $T$, where a ladder label for is $\zlabel(p)$, where $p$ is the path from the first node in the ladder to the last node in the ladder. \pref{fig:ladder-ds} shows an example of $s$.
+\item A strings $s$, which is a concatenation of ladder labels of each ladder in $T$, where the label of a ladder is the concatenation of labels of each node in the ladder, ordered ascending by the depth of the nodes. \pref{fig:ladder-ds} shows an example of $s$.
 \item For a node $u$, $\zindex(u)$ is an index in $s$ within the ladder label of $u$'s ladder, where $\zlabel(u)$ is stored.
 \item Data structures for constant time LA on $T$ and constant time LCE on $s$.
 \end{itemize}
@@ -1323,9 +1323,9 @@ Constructing $s$ from the ladders takes $O(n)$ time, and preprocessing it for co
 The \proc{LadderLce} query starts with $v=0$ and repeats the following:
 \begin{enumerate}
 \item Stop when $v = e_i$ or $v = e_j$ and return $v$.
-\item Find $m_i = \zlength(p_i[v\twodots e_i])/2$ and $i = \zindex(p_i[v+m_i]) - m_i + 1$.
+\item Find $m_i = \lceil\zlength(p_i[v\twodots e_i])/2\rceil$ and $i = \zindex(p_i[v+m_i]) - m_i + 1$.
 \fixme{afrunding}
-\item Find $m_j = \zlength(p_j[v\twodots e_j])/2$ and $j = \zindex(p_j[v+m_j]) - m_j + 1$.
+\item Find $m_j = \lceil\zlength(p_j[v\twodots e_j])/2\rceil$ and $j = \zindex(p_j[v+m_j]) - m_j + 1$.
 \item Find $v' = \min\{LCE_s(i,j),m_i,m_j\}$
 \item Increment $v$ by $v'$.
 \item Stop if $v' < \min\{m_i,m_j\}$ and return $v$.
@@ -1335,7 +1335,7 @@ The \proc{LadderLce} query starts with $v=0$ and repeats the following:
 The \proc{LadderLce} query finds the correct LCE value.
 \end{lemma}
 \begin{proof}
-In step two, $i$ refers to a position in $p_i[v+m_i]$'s ladder, because the height of $p_i[v+m_i]$ is at least $m_i$. Therefore $s[i\twodots i+m_i-1] = \zlabel(p_i[v\twodots v+m_i])$, and similarly $s[j\twodots j+m_i-1] = \zlabel(p_j[v\twodots v+m_j])$.
+In step two, $i$ refers to a position in $p_i[v+m_i]$'s ladder, because the height of $p_i[v+m_i]$ is at least $m_i-1$. Therefore $s[i\twodots i+m_i-1] = \zlabel(p_i[v\twodots v+m_i])$, and similarly $s[j\twodots j+m_i-1] = \zlabel(p_j[v\twodots v+m_j])$.
 
 By the same argument as we use for \proc{HeavyPathLce}, the algorithm maintains the invariant $\zlabel(p_i[0\twodots v])=\zlabel(p_j[0\twodots v])$, and gives the correct LCE value.
 \end{proof}
