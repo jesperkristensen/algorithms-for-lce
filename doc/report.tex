@@ -24,9 +24,11 @@
 \newrefformat{app}{\appendixname~\ref{#1}}
 \newrefformat{alg}{Algorithm~\ref{#1}}
 
-\title{Algorithms for Longest Common Extensions} 
+\title{{\large Master Thesis}\\{\normalsize on}\\Algorithms for Longest Common Extensions} 
 
-\author{Jesper Kristensen, s062397}
+\author{Jesper Kristensen\\s062397\\DTU Informatics\\Technical University of Denmark}
+
+\date{August 1, 2011}
 
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}{Lemma}
@@ -178,7 +180,7 @@ The algorithm stores LCE values for some of the $n^2$ possible query inputs on a
 \paragraph{Tree notation.}
 The ancestors of a node $u$ is $u$ itself as well as any node, which is a parent of an ancestor of $u$. The depth of a node $u$ is one greater than the depth of $u$'s parent, and the depth of the root is zero. A path in a tree begins at node $u$ and ends at node $v$, where $u$ is an ancestor of $v$.
 
-\paragraph{Sorting complexity.} The time it takes to sort $n$ numbers of $\sigma$ distinct values is written as $\sortt$.
+\paragraph{Sorting complexity.} The time it takes to sort $n$ numbers within an universe of $\sigma$ is written as $\sortt$.
 
 \paragraph{Suffix tree.} A suffix tree $\mathcal{T}$ encodes all suffixes of a string $s$ of length $n$ with alphabet $\sigma$. The tree has $n$ leaves named $L_1$ to $L_n$, one for each suffix of $s$. Each edge is labeled with a substring of $s$, such that for any $1\leq i\leq n$, the concatenation of labels on edges on the path from the root to $L_i$ gives $\suff_i$. Any internal node must have more than one child, and the labels of two child edges must not share the same first character. The string depth $D[v]$ of a node $v$ is the length of the string formed when concatenating the edge labels on the path from the root to $v$.
 The tree uses $O(n)$ space, and building it takes $O(\sortt)$ time~\cite{sort-complexity}.
@@ -216,7 +218,7 @@ The weight of a node $u$ is the size of the subtree rooted at $u$. For a given n
 \paragraph{Ladder Decomposition}
 To make a ladder decomposition of a tree, we first create a ladder of nodes from the root of the tree to the leaf of greatest depth. We then remove the nodes in the ladder from the tree and repeat this operation recursively for all remaining subtrees, until all nodes are part of a ladder. Node $u$'s ladder is the ladder which contains $u$ at this point. Finally, we double the number of nodes in each ladder by extending it towards the root of the tree. If we reach the root before we have doubled the number of nodes, we stop at the root. Each node may thus be in multiple ladders.
 
-For any path in a tree of $n$ nodes, we can find $O(\log n)$ ladders, which contain all the nodes in the path. If a node $u$ has height $h$, $u$'s ladder contains at least the last $h$ ancestors of $u$. The combined size of the ladders is at most $2n$.~\cite{level-ancestor}
+For any path in a tree of $n$ nodes, we can find $O(\log n)$ ladders, which contain all the nodes in the path. If a node $u$ has height $h$, $u$'s ladder contains all the ancestors of $u$ whose distance to $u$ is at most $h+1$. The combined size of the ladders is at most $2n$.~\cite{level-ancestor}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -383,11 +385,10 @@ To perform a LCE query using the \fprintk\ data structure, start with $v=0$ and 
 \begin{enumerate}
 \item As long as $H_\ell[i+v] = H_\ell[j+v]$, increment $v$ by $t_\ell$, increment $\ell$ by one, and repeat this step unless and $\ell = k-1$.
 \item As long as $H_\ell[i+v] = H_\ell[j+v]$, increment $v$ by $t_\ell$ and repeat this step.
-\item When $H_\ell[i+v] \neq H_\ell[j+v]$, decrement $\ell$ by one and repeat step 2.
-\item Stop when $\ell = 0$ and $H_\ell[i+v] \neq H_\ell[j+v]$.
+\item Stop and return $v$ when $\ell = 0$, otherwise decrement $\ell$ by one and go to step two.
 \end{enumerate}
 
-The LCE value is now $v = \LCE(i,j)$. An example is shown in \pref{fig:fingerprint-query}.
+An example of a query is shown in \pref{fig:fingerprint-query}.
 \end{samepage}
 
 \begin{figure}[tp]
@@ -483,7 +484,7 @@ The size of each fingerprint table will grow from $|H_\ell| = n$ to $|H_\ell| = 
 
 \paragraph{Vertical, inter-level optimization}
 
-For larger values of $k$, we can attempt to optimize memory access accross different levels. When we move down through the levels for $k=\logceil$, we can continue in two directions after reading $H_\ell[i]$: $H_{\ell-1}[i]$ or $H_{\ell-1}[i+t_\ell]$. Neither of these positions are next to $H_\ell[i]$ in memory. We can optimize for the case where we reach $H_{\ell-1}[i]$ by flipping the direction in which we store the fingerprints, such that all fingerprints $H_\ell[i]$ for all $\ell$ and a specific $i$ are stored next to each other. This will not improve the asymptotic I/O bound, but could improve practical query times.
+For larger values of $k$, we can attempt to optimize memory access across different levels. When we move down through the levels for $k=\logceil$, we can continue in two directions after reading $H_\ell[i]$: $H_{\ell-1}[i]$ or $H_{\ell-1}[i+t_\ell]$. Neither of these positions are next to $H_\ell[i]$ in memory. We can optimize for the case where we reach $H_{\ell-1}[i]$ by flipping the direction in which we store the fingerprints, such that all fingerprints $H_\ell[i]$ for all $\ell$ and a specific $i$ are stored next to each other. This will not improve the asymptotic I/O bound, but could improve practical query times.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Space Usage}
@@ -885,25 +886,27 @@ Where $\proc{Plot}(f,x,y)$ adds point $(x,y)$ to series $f$.
 \newcommand{\zlabel}{\textit{label}}
 \newcommand{\zphrase}{\textit{phrase}}
 
-Sometimes it can be useful to store a string in a compressed format and query the compressed string directly without using extra space and time to first decompress the string. In this section we explore the LCE problem on strings compressed using LZ78 compression. We look at solutions, which require space proportional to the compressed size of a string, and are able to answer LCE queries fast.
+Sometimes it can be useful to store a string in a compressed format and query the compressed string directly without using extra space and time to first decompress the string. In this section we explore the LCE problem on strings compressed using LZ78 compression. We look at solutions, which require space relative to the compressed size of a string, and we try to find solutions, which can answer LCE queries fast.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{LZ78 definition\label{sec:lz-definition}}
+\subsection{LZ78 definition}
 A string $s$ of length $N$ has a corresponding \textit{compressed string} $z$ of compressed length $n$, where $z$ is a list of \textit{compression elements}, $z = z_1, z_2, ..., z_n$. Each compression element $z_x$ is a pair $(r_x, \alpha_x)$, where the reference, $\zreference_z(x)=r_x$, is an index of an earlier compression element in the compressed string or zero, i.e. $0 \leq \zreference_z(x) < x$, and the label, $\zlabel_z(x)=\alpha_z$, is a character from the original uncompressed string $s$. The \zphrase\ of a compression element is defined as:
 \begin{align*}
 \zphrase_z(x) =
 \begin{cases}
-    \zphrase_z(\zreference_z(x)) \cdot \zlabel_z(x) & \textrm{if}~ \zreference \neq 0\\
+    \zphrase_z(\zreference_z(x)) \cdot \zlabel_z(x) & \textrm{if}~ \zreference_z(x) \neq 0\\
     \zlabel_z(x) & \textrm{otherwise}
 \end{cases}
 \end{align*}
 where "$\cdot$" denotes string concatenation. From a compressed string $z = z_1,...,z_n$, we can get the original string $s=\zphrase_z(1)\cdot...\cdot\zphrase_z(n)$.
 
+\subsubsection{Compressing and Decompressing\label{sec:lz-comp-alg}}
+
 We can easily get the decompressed string $s$ from the compressed string $z$ using the definitions. To get the compressed string $z$ from the original string $s$ we can look at the compression elements as a tree, where the reference of each compression element corresponds to the parent pointer of each node in the tree. We consume $s$ from left to right while we build the tree:
 \begin{enumerate}
-\item Let the tree be single special root node $z_0$, let $i = 1$ and $c=z_0$.
-\item If $c$ has a child $u$, where $\zlabel(u)=s[i]$, set $c=u$. Otherwise create the child node $u$, set $\zlabel(u)=s[i]$ and set $c=z_0$.
-\item Increment $i$ by one and repeat from step 2 until the entire string is consumed when $i = n$.
+\item Let the tree be a single special root node $z_0$, let $i = 1$ and $c=z_0$.
+\item If $c$ has a child $u$, where $\zlabel(u)=s[i]$, set $c=u$. Otherwise create a new node $u$ as a child of $c$, set $\zlabel(u)=s[i]$, and set $c=z_0$.
+\item Increment $i$ by one and repeat from step two until the entire string is consumed when $i = N$.
 \end{enumerate}
 The compressed string $z$ is now the tree except the special root node $z_0$.
 
@@ -921,7 +924,7 @@ Let $s$ be a string of length $N$ and let $z$ of length $n$ be the LZ-compressio
 \end{lemma}
 
 \begin{proof}
-To find the character $s[i]$, we can first use a Predecessor query to find out which compression element $s[i]$ is in. We can then use a Level Ancestor query to find the correct character from the found compression element.
+To find the character $s[i]$, we can first use a Predecessor query to find out which phrase $s[i]$ is in. We can then use a Level Ancestor query to find the correct character from the found phrase.
 
 % We can find the $i$'th character of $s$ as $s[i] = \zphrase(\proc{Pred}(i))[i - \textit{start}[\proc{Pred}(i)]]$ where $\proc{Pred}(i)$ is the index of the compression element containing $s[i]$, and $\textit{start}[x]$ is the position in $s$ of the first character of $\zphrase(x)$, i.e. $s[\textit{start}[x]] = \zphrase(x)[1]$.
 
@@ -935,13 +938,13 @@ Let $s$ be a string of length $N$ and let $z$ of length $n$ be the LZ-compressio
 \end{theorem}
 
 \begin{proof}
-Whenever \proc{DirectComp} reads a character of the string $s$, we instead use the random access described in \pref{lem:lz-random-access} to read the character from the compressed string. The predecessor query is only needed in the first comparison of the two indexes $i$ and $j$ in $\LCE(i,j)$. In subsequent iterations of \proc{DirectComp} we know that we always need the same compression element or the following compression element as we used in the previous iteration of the loop, and we therefore do not need the predecessor query to find the compression element. The total query time for \proc{DirectComp} on LZ-compressed strings becomes $O(\log\log N + |\LCE(i,j)|)$, which is $O(N)$ in worst case and $O(\log \log N)$ on average.
+Whenever \proc{DirectComp} reads a character of the string $s$, we instead use the random access described in \pref{lem:lz-random-access} to read the character from the compressed string. The predecessor query is only needed in the first comparison of the two indexes $i$ and $j$ in $\LCE(i,j)$. In subsequent iterations of \proc{DirectComp} we always need the same phrase or the phrase following the one we used used in the previous iteration of the loop, and we therefore do not need the predecessor query to find the phrase. The total query time for \proc{DirectComp} on LZ-compressed strings becomes $O(\log\log N + |\LCE(i,j)|)$, which is $O(N)$ in worst case and $O(\log \log N)$ on average.
 \end{proof}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Reversed Compressed \proc{DirectComp}}
 
-A simpler way of doing LCE on compressed a string is to reverse the string and then run \proc{DirectComp} in the reverse direction on the reversed string, which gives the same result since reversing a string twice gives the original string. Where \proc{DirectComp} compares $s[i+v]$ against $s[j+v]$ in each iteration of its loop, reversed \proc{DirectComp} compares $s[N+1-i-v]$ against $s[N+1-j-v]$ in each iteration. This is simpler than using \proc{DirectComp} directly on the compressed string, because Level Ancestor queries are no longer needed at each iteration, since we can use the reference of the current compression element as follows, where the position of each of $i$ and $j$ is stored as a pair $(x,y)$:
+A simpler way of doing LCE on a compressed string is to reverse the string and then run \proc{DirectComp} in the reverse direction on the reversed string, which gives the same result since reversing a string twice gives the original string. Where \proc{DirectComp} compares $s[i+v]$ against $s[j+v]$ in each iteration of its loop, reversed \proc{DirectComp} compares $s^R[N+1-i-v]$ against $s^R[N+1-j-v]$ in each iteration. This is simpler than using \proc{DirectComp} directly on the compressed string, because Level Ancestor queries are no longer needed at each iteration, since we can use the reference of the current compression element as follows, where the position of each of $i$ and $j$ is stored as a pair $(x,y)$:
 \begin{align*}
 \proc{PreviousPosition}(x, y)=&
 \begin{cases}
@@ -964,7 +967,7 @@ We can try to completely avoid Predecessor and Level Ancestor when initializing 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Length of the Reversed String}
 
-Reversing the string can be done in $O(N)$ time and $O(n_1 + n_2)$ space, where $n_1$ and $n_2$ are the compressed lengths of the original and reversed string respectively. To achieve this, we have already shown how we can read a string from right to left one character at a time in $O(1)$ space, and the compression algorithm described in \pref{sec:lz-definition} reads its input string one character at a time from left to right and uses $O(n)$ space for its tree of compression elements.
+We can reverse the string in $O(N)$ time and $O(n_1 + n_2)$ space, where $n_1$ and $n_2$ are the compressed lengths of the original and reversed string respectively. To achieve this, we have already shown how we can read a string from right to left one character at a time in $O(1)$ space, and the compression algorithm described in \pref{sec:lz-comp-alg} reads its input string one character at a time from left to right and uses $O(n)$ space for its tree of compression elements.
 
 But the question is how big $n_2$ is relative to $n_1$. From knowing how much compression is possible with LZ-compression, we can see that $n_2=O(n_1^{~2})$. It might be possible to improve that bound, but for the string $z=(0,a)$ $(1,b)$ $(2,c)$ $...$ $(n-1,z)$, we have experimentally determined that reversing $z$ gives $n_2=0.89n_1^{~1.51}$, so we cannot get an optimal bound of $n_2=O(n_1)$. This is a disadvantage of doing LCE on the reversed string compared to doing it on the original compressed string using Level Ancestor queries.
 
@@ -973,7 +976,7 @@ But the question is how big $n_2$ is relative to $n_1$. From knowing how much co
 
 Our original goal of looking into compression was to see if using the techniques used in compression could improve the worst case query time of \proc{DirectComp} to something better than $O(N)$. Our idea is that whenever you have a long LCE value, you have a repetition within the string, and repetitions would typically give good compression. If the compressed string can be searched over similarly to how \proc{DirectComp} searches the uncompressed string, it might be possible to establish a better worst case query time.
 
-We have found one case where we can make compressed \proc{DirectComp} faster than \proc{DirectComp} on uncompressed strings, but our finding does not improve worst case query time. We explain this in terms of the reversed compressed \proc{DirectComp}, as it is simpler, but it also works without the string reversal. Reversed compressed \proc{DirectComp} starts with two positions $(x_i,y_i)$ and $(x_j,y_j)$ corresponding to the two positions $i$ and $j$ in $\LCE(i,j)$. At each iteration, it then updates $(x_i,y_i)$ and $(x_j,y_j)$ to find the previous two positions. If $x_i = x_j$ we know that we can add $d(x_i)$ to the LCE value, where $d(x_i)$ is the depth of node $x_i$ in the tree of compression elements. Compressed \proc{DirectComp} can then compare $d(x_i)$ characters in constant time.
+We have found one case where we can make the reversed compressed \proc{DirectComp} faster than \proc{DirectComp} on uncompressed strings, but our finding does not improve worst case query time. Reversed compressed \proc{DirectComp} starts with two positions $(x_i,y_i)$ and $(x_j,y_j)$ corresponding to the two positions $i$ and $j$ in $\LCE(i,j)$. At each iteration, it then updates $(x_i,y_i)$ and $(x_j,y_j)$ to find the previous two positions. If $x_i = x_j$ we know that we can add $d(x_i)$ to the LCE value, where $d(x_i)$ is the depth of node $x_i$ in the tree of compression elements. Reversed compressed \proc{DirectComp} can then compare $d(x_i)$ characters in constant time.
 
 Through this technique can improve query time in some cases, it does not improve the worst case time of $\Theta(N)$. This is because we cannot be sure to hit the condition allowing us to compare many characters in constant time, even for long LCE values. As an example, $LCE(1,2)$ on a string where all $N$ characters are the same takes $\Omega(N)$ time. For such a string, the tree representing the compressed string is always a path, and $x_i$ and $x_j$ will always be either a node and its parent or the root and some other node. They will therefore never end up being the same node at the same time, as shown in \pref{fig:lz-no-jumps}.
 
@@ -989,9 +992,9 @@ Through this technique can improve query time in some cases, it does not improve
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Compression with Other Algorithms\label{sec:lz-other}}
 
-We can look at the other LCE algorithms we have examined in addition to \proc{DirectComp}, and see if we can apply them to LZ-compressed strings. We have not found a way to apply \proc{SuffixNca} or \proc{LcpRmq}, as the string we want to find LCE values on still has N suffixes, and we have not found a way to relate the compression rate of the NCA structure or suffix array to the compression rate of the string.
+We can look at the other LCE algorithms we have examined in addition to \proc{DirectComp}, to see if we can apply them to LZ-compressed strings. We have not found a way to apply \proc{SuffixNca} or \proc{LcpRmq}, as the string we want to find LCE values on still has N suffixes, and we have not found a way to relate the compression rate of the NCA structure or suffix array to the compression rate of the string.
 
-Fingerprinting does not compress well either. We could LC-compress each level of fingerprints just like the original string is compressed, but as the substrings fingerprinted becomes longer at each elvel, the compression ration becomes worse, and at the top level with $t_\ell = \Omega(N)$, we need $\Omega(N)$ space to store $H_\ell$, since all fingerprints would be unique or have very few copies.
+Fingerprinting does not compress well either. We could LZ-compress each level of fingerprints just like the original string is compressed, but as the substrings fingerprinted becomes longer at each level, the compression ratio becomes worse, and at the top level with $t_\ell = \Omega(N)$, we need $\Omega(N)$ space to store $H_\ell$, since all fingerprints would be unique or have very few copies.
 
 Since we have not been able to find improvements to the $O(N)$ worst case query time in $O(n)$ space using existing algorithms, we have looked into new algorithms. The compression elements of a compressed string $z$ forms a tree, and each phrase in $z$ is a path in the tree. The LCE value is the length of a substring, which occurs at two positions $i$ and $j$ in the input string. This substring spans a number of phrases, where each phrase is a path in the tree of compression elements. If we can make fast LCE queries on such a tree, we can make fast LCE queries on highly compressable strings.
 
@@ -1007,7 +1010,7 @@ In \pref{sec:tree-lce} we describe how to perform LCE queries on a static tree o
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Cache Performance}
 
-We have looked into the cache performance of compressed \proc{DirectComp}. If the string does not compress at all, i.e.\ the compressed string is $z=(0,a)(0,b)(0,c)...$, \proc{DirectComp} reads from the string in the best way possible using $O(N/B)$ I/O's in worst case. When the string is LZ-compressable, the I/O pattern becomes much worse. If $\zreference(x_1) = x_2 > 0$, the algorithm will read from position $x_1$ and then $x_2$, and these two may not be next to each other in memory. This can happen many times, which gives $O(N)$ I/O's in worst case.
+We have looked into the cache performance of compressed \proc{DirectComp}. If we ignore the predecessor and level ancestor queries, and the string does not compress at all, i.e.\ the compressed string is $z=(0,a)(0,b)(0,c)...$, compressed \proc{DirectComp} reads from the string in the best way possible using $O(N/B)$ I/O's in worst case. When the string has a better LZ-compression ratio, the I/O pattern becomes much worse. If $\zreference(x_1) = x_2 > 0$, the algorithm will read from position $x_1$ and then $x_2$, and these two may not be next to each other in memory. This can happen many times, which gives $O(N)$ I/O's in worst case.
 
 We could lay out the tree of compression elements in memory as a B-tree, where we store groups of adjacent nodes next to each other in memory, to optimize the number of I/O's within each phrase, but each node may have more than $B$ children, and in this case it would not improve the worst case number of I/O's, as each node visited may be in a new group.
 
@@ -1049,7 +1052,7 @@ A path $p=(u,w)$ in a tree is a path, which starts at node $u$ and ends at node 
 \begin{itemize}
 \item The path $p=(u,w)$ has length $e=\zlength(p)=d(w)-d(u)$, i.e.\ $p$ has $e$ edges and $e+1$ nodes.
 \item The node $p[x]$ is a node in $p=(u,w)$, such that the distance between $u$ and $p[x]$ is $x$. The start and end nodes of the path are $p[0]=u$ and $p[e]=w$. We can calculate $p[x]$ in constant time as $p[x]=\LA(d(u)+x,w)$, where $d(u)$ is the depth of $u$, and $\LA$ is a Level Ancestor query.
-\item The subpath $p[x\twodots y]=(p[x],p[y])$ of a path $p$ is the path, which starts at node $p[x]$ and ends at node $p[y]$. The entire path is $p = p[0,e]$.
+\item The subpath $p[x\twodots y]=(p[x],p[y])$ of a path $p$ is the path, which starts at node $p[x]$ and ends at node $p[y]$. The entire path is $p = p[0\twodots e]$.
 \item The label of a path $\zlabel(p)=\zlabel(p[1])\cdot...\cdot\zlabel(p[e])$ is the concatenation of the labels on all edges between nodes in the path.
 \end{itemize}
 
@@ -1063,7 +1066,7 @@ This definition of LCE on a tree is chosen to match the tree of LZ compression e
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Walking the Paths with Level Ancestor\label{sec:tree-dc}}
 
-We can find $\LCE(i,j)$ in $O(|\LCE(i,j)|)$ query time using Level Ancestor, in the same way \proc{DirectComp} finds LCE on strings: First compare $\zlabel(p_i[1])$ to $\zlabel(p_j[1])$, then compare $\zlabel(p_i[2])$ to $\zlabel(p_j[2])$ and so on until the two characters differ or either $w_i$ or $w_j$ is reached.
+We can find $\LCE(i,j)$ in $O(|\LCE(i,j)|)$ query time using Level Ancestor, in the same way \proc{DirectComp} finds LCE on strings: First compare $\zlabel(p_i[1])$ to $\zlabel(p_j[1])$, then compare $\zlabel(p_i[2])$ to $\zlabel(p_j[2])$ and so on until the two characters differ or either $p_i[e_i]$ or $p_j[e_j]$ is reached.
 
 \begin{theorem}
 \proc{TreeDirectComp} can preprocess a static tree of $n$ nodes to answer LCE queries as defined in \pref{sec:tree-def} using $O(|\LCE(i,j)|)$ query time, and $O(n)$ space and preprocessing time.
@@ -1075,7 +1078,7 @@ Each Level Ancestor query takes constant time, and we do $2|\LCE(i,j)| + 2$ of t
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Using Fingerprinting}
 
-We can adapt our \fprintk\ algorithm on strings to work on trees, which we call \tfprintk. If we store the fingerprint of $s[i\twodots i+t_\ell]$ in $H_\ell[i+t_\ell]$ instead of $H_\ell[i]$, then the \fprintk\ query directly adapts to \tfprintk. If we wanted to use the same preprocessing as we use for \fprintk\ on strings, we would have to adapt the suffix array to apply to trees, and find a way to construct it in $\sortt$ time, which we have not looked at. Instead we can preprocess the fingerprints of the tree with Karp-Miller-Rosenberg~\cite{karp-miller-rosenberg}.
+We can adapt our \fprintk\ algorithm on strings to work on trees, which we call \tfprintk. If we store the fingerprint of $s[i\twodots i+t_\ell-1]$ in $H_\ell[i+t_\ell]$ instead of $H_\ell[i]$, then the \fprintk\ query directly adapts to \tfprintk. If we wanted to use the same preprocessing as we use for \fprintk\ on strings, we would have to adapt the suffix array to apply to trees, and find a way to construct it in $\sortt$ time, which we have not looked at. Instead we can preprocess the fingerprints of the tree with Karp-Miller-Rosenberg~\cite{karp-miller-rosenberg}.
 
 \begin{theorem}
 \tfprintk, where $k$ is a parameter $1\leq k\leq\logceil$, can preprocess a static tree of $n$ nodes to answer LCE queries as defined in \pref{sec:tree-def} using $O(k\cdot n^{1/k})$ query time, $O(k\cdot n)$ space, and $O(n\log n)$ preprocessing time.
@@ -1098,25 +1101,36 @@ The data structure contains $k$ numbers $t_\ell$ and $k$ tables of fingerprints 
 
 The query for \tfprintk\ is nearly the same as the query for \fprintk\ on strings, except we replace $H_\ell[i+v]$ and $H_\ell[j+v]$ with $H_\ell[p_i[v+t_\ell]]$ and $H_\ell[p_j[v+t_\ell]]$. We also decrement the level $\ell$ whenever we reach $v+t_\ell=e_i$ or $v+t_\ell=e_j$, since we no longer have a special character \$ to tell when we have reached the end.
 
-\fixme{Write out the query in full}
+In the \tfprintk\ query, start with $v=0$ and $\ell=0$, then do the following steps:
+\begin{samepage}
+\begin{enumerate}
+\item As long as $v+t_\ell\leq e_i\lor v+t_\ell\leq e_j$ and $H_\ell[p_i[v+t_\ell]] = H_\ell[p_j[v+t_\ell]]$, increment $v$ by $t_\ell$, increment $\ell$ by one, and repeat this step unless $\ell = k-1$.
+\item As long as  $v+t_\ell\leq e_i\lor v+t_\ell\leq e_j$ and $H_\ell[p_i[v+t_\ell]] = H_\ell[p_j[v+t_\ell]]$, increment $v$ by $t_\ell$ and repeat this step.
+\item Stop and return $v$ when $\ell = 0$, otherwise decrement $\ell$ by one and go to step two.
+\end{enumerate}
+\end{samepage}
 
 \begin{lemma}
-The \tfprintk\ query finds the correct tree LCE value in $O(k\cdot n^{1/k})$ time.
+The \tfprintk\ query finds the correct tree LCE value.
+\end{lemma}
+\begin{proof}
+The query algorithm keeps the invariant $\zlabel(p_i[0\twodots v])=\zlabel(p_j[0\twodots v])$. At any given step at level $\ell$, we check if $H_\ell[p_i[v+t_\ell]]=H_\ell[p_j[v+t_\ell]]$, which by the definition of our data structure is equivalent to $\zlabel(p_i[v\twodots v+t_\ell])=\zlabel(p_j[v\twodots v+t_\ell])$. If the equality holds, we know that $\zlabel(p_i[0\twodots v+t_\ell])=\zlabel(p_j[0\twodots v+t_\ell])$, and we maintain our invariant when we increment $v$ by $t_\ell$.
+
+We stop when $v+1>e_i$, $v+1>e_j$, or $H_0[p_i[v+1]] \neq H_0[p_j[v+1]]$, at which point $v=\LCE(p_i,p_j)$.
+\end{proof}
+
+\begin{lemma}
+The \tfprintk\ query takes $O(k\cdot n^{1/k})$ time.
 \end{lemma}
 \begin{proof}
 We have changed nothing from the \fprintk\ query on strings, which negatively affects the query time, so the query time is the same.
-
-% The combination of Level Ancestor and the definition that a fingerprint relates to a substring from a given node to an ancestor that node, ensures that the fingerprints we choose to compare are the fingerprints, which represents the strings on the paths from $u_i$ to $w_i$ and from $u_j$ to $w_j$.
-
-\fixme{Improve this paragraph}
-At any given iteration at level $\ell$, we know that $\zlabel(p_i[0\twodots v])=\zlabel(p_j[0\twodots v])$, and we now check if $\zlabel(p_i[v\twodots v+t_\ell])=\zlabel(p_j[v\twodots v+t_\ell])$. From our definition of fingerprints in a tree, these two labels have fingerprints $H_\ell[p_i[v+t_\ell]]$ and $H_\ell[p_j[v+t_\ell]]$, which is what our LCE query uses.
 \end{proof}
 
 \subsubsection{Preprocessing}
 
 We use Karp-Miller-Rosenberg~\cite{karp-miller-rosenberg} to preprocess the \tfprintk\ data structure. When $t_\ell$ is $t_{\ell-1} < t_\ell \leq 2t_{\ell-1}$, we preprocess level $\ell$ like this:
 \begin{enumerate}
-\item Make pairs of fingerprints $H_\ell[u] = (H_{\ell-1}[LA(d(u)-t_\ell+t_{\ell-1},u)], H_{\ell-1}[u])$ for all $u$ where $d(u) \geq t_\ell$.
+\item Make pairs of fingerprints $H_\ell[u] = (H_{\ell-1}[LA(d(u)-t_\ell+t_{\ell-1},u)], H_{\ell-1}[u])$ for all nodes $u$ in $T$, where $d(u) \geq t_\ell$.
 \item Sort the pairs lexicographically.
 \item Replace each pair with a new fingerprint, by going through them in lexicographical order, while updating the fingerprint whenever the pair changes.
 \end{enumerate}
@@ -1160,7 +1174,7 @@ To answer LCE queries on a tree, we can create a heavy path decomposition of the
 The \proc{HeavyPathLce} data structure consists of the following:
 \begin{itemize}
 \item An input tree $T$ with a heavy path decomposition.
-\item A string $s$, which is a concatenation of strings of all light edges of $T$, where the string of a light edge is the label of the light edge concatenated with the label of the heavy path, which follows that light edge. \pref{fig:tree-heavy-ds} shows an example of $s$.
+\item A string $s$, which is a concatenation of strings of all heavy paths of $T$, where the string of a heavy path is the label of the light edge leading to the heavy path concatenated with the label of the heavy path. \pref{fig:tree-heavy-ds} shows an example of $s$.
 \item For a node $u$, $\zend(u)$ points to the node of greatest depth in $u$'s heavy path, $d(u)$ is the depth of $u$, and $\zindex(u)$ is the index in $s$, which stores $\zlabel(u)$.
 \item Data structures for constant time NCA on $T$, constant time LA on $T$, and constant time LCE on $s$.
 \end{itemize}
@@ -1176,7 +1190,7 @@ The string $s$ contains $n-1$ characters, one for each edge in $T$. The space us
 We can preprocess the \proc{HeavyPathLce} data structure in $O(\sortt)$ time.
 \end{lemma}
 \begin{proof}
-Preprocessing LCE on $s$ using \proc{SuffixNca} or \proc{LcpRmq} takes $O(\sortt)$ time. If we walk through the tree and for each leaf append the light edge string ending in that leaf to $s$, we can construct $s$ in $O(n)$ time. The rest of the data structures can be preprocessed in $O(n)$ time.
+Preprocessing LCE on $s$ using \proc{SuffixNca} or \proc{LcpRmq} takes $O(\sortt)$ time. If we walk through the tree and for each leaf append the heavy path string ending in that leaf to $s$, we can construct $s$ in $O(n)$ time. The rest of the data structures can be preprocessed in $O(n)$ time.
 \end{proof}
 
 \subsubsection{Query}
@@ -1265,7 +1279,7 @@ We have looked at applying \proc{SuffixNca} and \proc{LcpRmq} directly to trees 
 \proc{TreeLcpRmq} and \proc{TreeSuffixNca} can preprocess a static tree of $n$ nodes to answer LCE queries as defined in \pref{sec:tree-def} using $O(1)$ query time and $O(n^2)$ space.
 \end{theorem}
 \begin{proof}
-\proc{LcpRmq} relies on accessing two suffixes in SA, $i$ and $j$. In \proc{TreeLcpRmq} we change the two suffixes to paths $p_i=(u_i,w_i)$ and $p_j=(u_j,w_j)$, and each of these can be chosen in $O(n^2)$ ways. We can restrict $w_i$ and $w_j$ to be leafs and still be able to answer the original LCE query in $O(1)$ time, but even with this modification, a tree like the one shown in \pref{fig:quadratic-tree} still has $\Omega(n^2)$ ways to choose each path. The SA and LCP arrays would therefore be of length $O(n^2)$. When we look at \proc{TreeSuffixNca}, the same argument holds for the necessary number of leafs in the suffix tree.
+\proc{LcpRmq} relies on accessing two suffixes in SA, $i$ and $j$. In \proc{TreeLcpRmq} we change the two suffixes to paths $p_i=(u_i,w_i)$ and $p_j=(u_j,w_j)$, and each of these can be chosen in $O(n^2)$ ways. We can restrict $w_i$ and $w_j$ to be leafs and still be able to answer the original LCE query in $O(1)$ time, but even with this modification, a tree like the one shown in \pref{fig:quadratic-tree} still has $\Omega(n^2)$ ways to choose each path. The SA and LCP arrays in \proc{TreeLcpRmq} would therefore be of length $O(n^2)$. When we look at \proc{TreeSuffixNca}, the same argument holds for the necessary number of leafs in the suffix tree.
 \end{proof}
 
 Because of the quadratic space requirement, this result is not interesting when we use LCE on a tree to answer LCE queries on a compressed string in \pref{sec:lz-other}.
@@ -1275,7 +1289,7 @@ Because of the quadratic space requirement, this result is not interesting when 
 
 The constant time solution for the Level Ancestor problem by Bendera~et~al.~\cite{level-ancestor} combines two $O(\log n)$ time solutions to get constant query times in linear space. We have looked at this algorithm to see if we can use similar techniques to achieve constant time LCE on trees in linear space. The two solutions used by the Level Ancestors algorithm are Jump Pointers and Ladder Decomposition. For the query $v=\LA(\ell,u)$, first use jump pointers to jump from $u$ half way to $v$ in constant time, and then use ladder decomposition to jump from the half way node to $v$.
 
-\proc{LadderLce}, whic we describe in the next section, finds the LCE value of the first half of $p_i$ and $p_j$ in constant time, similar to how the ladder decomposition is used to jump from the half way node to $v$ in the Level Ancestor algorithm. We have not found a constant time solution to find the LCE value of the second half of these paths, in the same way jump pointers is used to jump from $u$ node to the half way node node in the Level Ancestor algorithm. We have thus not found a constant time linear space solution for LCE on trees.
+\proc{LadderLce}, which we describe in the next section, finds the LCE value of the first half of $p_i$ and $p_j$ in constant time, similar to how the ladder decomposition is used to jump from the half way node to $v$ in the Level Ancestor algorithm. We have not found a constant time solution to find the LCE value of the second half of these paths, in the same way jump pointers is used to jump from node $u$ to the half way node in the Level Ancestor algorithm. We have thus not found a constant time linear space solution for LCE on trees.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Using Constant Time String LCE in a Ladder Decomposition}
@@ -1299,7 +1313,7 @@ We can use the ladder decomposition in the same way we use the heavy tree decomp
 The \proc{LadderLce} data structure consists of the following:
 \begin{itemize}
 \item An input tree $T$ with a ladder decomposition.
-\item A strings $s$, which is a concatenation of ladder labels of each ladder in $T$, where the label of a ladder is the concatenation of labels of each node in the ladder, ordered ascending by the depth of the nodes. \pref{fig:ladder-ds} shows an example of $s$.
+\item A strings $s$, which is a concatenation of ladder labels of each ladder in $T$, where the label of a ladder is the concatenation of labels on each edge leading to a node in the ladder, ordered ascending by the depth of the nodes. \pref{fig:ladder-ds} shows an example of $s$.
 \item For a node $u$, $\zindex(u)$ is an index in $s$ within the ladder label of $u$'s ladder, where $\zlabel(u)$ is stored.
 \item Data structures for constant time LA on $T$ and constant time LCE on $s$.
 \end{itemize}
@@ -1324,7 +1338,6 @@ The \proc{LadderLce} query starts with $v=0$ and repeats the following:
 \begin{enumerate}
 \item Stop when $v = e_i$ or $v = e_j$ and return $v$.
 \item Find $m_i = \lceil\zlength(p_i[v\twodots e_i])/2\rceil$ and $i = \zindex(p_i[v+m_i]) - m_i + 1$.
-\fixme{afrunding}
 \item Find $m_j = \lceil\zlength(p_j[v\twodots e_j])/2\rceil$ and $j = \zindex(p_j[v+m_j]) - m_j + 1$.
 \item Find $v' = \min\{LCE_s(i,j),m_i,m_j\}$
 \item Increment $v$ by $v'$.
@@ -1335,9 +1348,9 @@ The \proc{LadderLce} query starts with $v=0$ and repeats the following:
 The \proc{LadderLce} query finds the correct LCE value.
 \end{lemma}
 \begin{proof}
-In step two, $i$ refers to a position in $p_i[v+m_i]$'s ladder, because the height of $p_i[v+m_i]$ is at least $m_i-1$. Therefore $s[i\twodots i+m_i-1] = \zlabel(p_i[v\twodots v+m_i])$, and similarly $s[j\twodots j+m_i-1] = \zlabel(p_j[v\twodots v+m_j])$.
+In step two, $\zlength(p_i[v\twodots v+m_i]) +1 \leq \zlength(p_i[v+m_i\twodots e_i])\leq h(p_i[v+m_i])$, where $h$ is the height of a node. For a node $u$ of height $h$, the ladder decomposition guarantees that $u$'s ancestor with distance $h+1$ to $u$ is in $u$'s ladder. Therefore, $p_i[v+1]$ is in $p_i[v+m_i]$'s ladder, and $s[i\twodots i+m_i-1] = \zlabel(p_i[v\twodots v+m_i])$. Similarly in step three, $s[j\twodots j+m_i-1] = \zlabel(p_j[v\twodots v+m_j])$.
 
-By the same argument as we use for \proc{HeavyPathLce}, the algorithm maintains the invariant $\zlabel(p_i[0\twodots v])=\zlabel(p_j[0\twodots v])$, and gives the correct LCE value.
+By the same argument we use for \proc{HeavyPathLce}, the algorithm maintains the invariant $\zlabel(p_i[0\twodots v])=\zlabel(p_j[0\twodots v])$, and gives the correct LCE value.
 \end{proof}
 
 \begin{lemma}
@@ -1381,7 +1394,7 @@ Each iteration takes constant time, and in each iteration we halve either $\zlen
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section*{THE END}
+%\section*{THE END}
 
 \begin{comment}
 \subsection*{Tinta tests}
@@ -1445,6 +1458,7 @@ The two tests of LCE query performance used in the Tinta paper are shown in \pre
 \fxfatal{Opskriv funktioner for plads.}
 \fi % article
 
+\begin{comment}
 \subsection*{Dropped}
 \begin{enumerate}
 \item DOC: Test on another machine.
@@ -1454,7 +1468,6 @@ The two tests of LCE query performance used in the Tinta paper are shown in \pre
 
 \listoffixmes
 
-\begin{comment}
 \section{What is the time for KMR?}
 \subsection{Original KMR}
 "Rapid identification of repeated patterns in strings, trees and arrays"
