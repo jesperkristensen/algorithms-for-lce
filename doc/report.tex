@@ -85,7 +85,7 @@ We have found two new algorithms. They both have better than linear worst case q
 
 In \pref{sec:algorithms} we theoretically describe and analyze the LCE algorithms introduced here in \pref{sec:intro}, and in \pref{sec:results} we analyze results from practical C++ implementations of these algorithms.
 
-We also look at how to apply the LCE problem to Ziv-Lempel compressed strings, such that we can answer LCE queries fast while only using space, which is a function of the compressed size of the string. In \pref{sec:lz-compress} we describe LZ compression, and how we can convert the simple linear time LCE algorithm to work on compressed strings with space linear to the size of the compressed string, worst case query time linear to the size of the uncompressed string, and average case query time $O(\log\log N)$. In \pref{sec:tree-lce} we look at how we can use the tree structure of LZ compression to get better query times on compressed strings.
+We also look at how to apply the LCE problem to Ziv-Lempel compressed strings, such that we can answer LCE queries fast while only using space relative to the compressed size of the string. In \pref{sec:lz-compress} we describe LZ compression, and how we can convert the simple linear time LCE algorithm to work on compressed strings. It uses space linear to the size of the compressed string, and it has worst case query time linear to the size of the uncompressed string, and average case query time $O(\log\log N)$. In \pref{sec:tree-lce} we look at how we can use the tree structure of LZ compression to get better query times on compressed strings.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{The LCE Problem}
