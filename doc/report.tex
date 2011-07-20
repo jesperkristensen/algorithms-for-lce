@@ -2,6 +2,7 @@
 % skarpere plots
 % sørg for at figurer ikke sidder underligt
 % Prøv at formindske for store mellemrum mellem ord ved at lave påtvungne linjeskift
+
 % hav plot for $r=\sqrt n$ med til forsvar
 
 \documentclass[a4]{article}
@@ -320,31 +321,31 @@ LCE(i,j) &=
 \end{cases}
 \end{align*}
 
-\begin{figure}[tp]
+\begin{figure}[p]
     \begin{center}
-        \includegraphics[width=0.5\textwidth,page=1]{resultspace.pdf}
+        \includegraphics[width=0.42\textwidth,page=1]{resultspace.pdf}
     \end{center}
     \caption{\label{fig:resultspace-empty}The result space for $LCE_s(i,j)$ for $1 \leq i < j \leq n$ where $s = abacbbacbacacabc$.}
 \end{figure}
 
-\begin{figure}[tp]
+\begin{figure}[p]
     \begin{center}
-        \includegraphics[width=0.5\textwidth,page=2]{resultspace.pdf}
+        \includegraphics[width=0.42\textwidth,page=2]{resultspace.pdf}
     \end{center}
     \caption{\label{fig:resultspace-directcomp}$LCE(3,7)$ using \proc{DirectComp}.}
+\end{figure}
+
+\begin{figure}[p]
+    \begin{center}
+        \includegraphics[width=0.42\textwidth,page=3]{resultspace.pdf}
+    \end{center}
+    \caption{\label{fig:resultspace-t-row}$LCE(3,7)$ with distance $t=4$ between each stored row.}
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{\proc{DirectComp} and \proc{DirectLookup} Combined}
 
 \proc{DirectComp} and \proc{DirectLookup} preprocesses and stores no results and all results respectively. If we only store some results, we can use \proc{DirectComp} until we reach a stored result, and then retrieve this result using \proc{DirectLookup}. If we store every $t$'th row, as shown in \pref{fig:resultspace-t-row}, the space usage will be $O(n^2/t)$ and the worst case query time will be $O(t)$. We call this algorithm \proc{DirectCompLookup}.
-
-\begin{figure}[tp]
-    \begin{center}
-        \includegraphics[width=0.5\textwidth,page=3]{resultspace.pdf}
-    \end{center}
-    \caption{\label{fig:resultspace-t-row}$LCE(3,7)$ with distance $t=4$ between each stored row.}
-\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{The \fprintk\ Algorithm}
@@ -475,13 +476,14 @@ We always assign two different fingerprints whenever two substrings are differen
 We always assign the same fingerprint whenever two substrings are equal, because all substrings, which are equal, are grouped next to each other, when we loop through them in lexicographical order.
 \end{proof}
 
+\begin{samepage}
 \begin{lemma}
 The preprocessing algorithm described above takes $O(\sortt + k\cdot n)$ time.
 \end{lemma}
-
 \begin{proof}
 We first construct the SA and LCP arrays, which takes $O(\sortt)$ time~\cite{sort-complexity}. We then preprocess each of the $k$ levels in $O(n)$ time, since we loop through $n$ substrings, and comparing neighboring substrings takes constant time when we use the LCE array. The total preprocessing time becomes $O(\sortt\\ + k\cdot n)$.
 \end{proof}
+\end{samepage}
 
 \ifreport
 
@@ -598,7 +600,7 @@ The RMQ algorithms show a significant jump in query times around $n=1.000.000$ o
 % line = 4*2^10 = 4096
 % --LL=1073741824,262144,4096
 
-\begin{figure}[tp]
+\begin{figure}[p]
     \begin{center}
         \includegraphics[width=0.49\textwidth,type=pdf,ext=.pdf,read=.pdf]{../src/results/length-rmq-rand10.plt}
         \includegraphics[width=0.49\textwidth,type=pdf,ext=.pdf,read=.pdf]{../src/results/length-rmq-alla.plt}
@@ -611,7 +613,7 @@ The RMQ algorithms show a significant jump in query times around $n=1.000.000$ o
 
 \pref{fig:plot-rmq-directcomp} also shows \proc{DirectComp+LcpRmq}, where we first try \proc{DirectComp}, and if we have not found the LCE value after one iteration, we use \proc{LcpRmq} instead. We see that \proc{DirectComp+LcpRmq} is worse than \proc{DirectComp} on average case strings. We could increase the cutoff from one iteration to something bigger, which might improve average case performance. That would however increase worst case time. None of the two plots we measure represents a good worst case for \proc{DirectComp+LcpRmq} compared to the other algorithms we test. The worst case for \proc{DirectComp+LcpRmq} relative to the other algorithms would be when the average LCE value is slightly larger than the cutoff, such that \proc{DirectComp+LcpRmq} reaches \proc{LcpRmq} in most queries, while other algorithms still work on LCE values as small as possible. As described in \pref{sec:dc-lcprmq}, \proc{DirectComp+LcpRmq} also uses a lot of space.
 
-\begin{figure}[tp]
+\begin{figure}[p]
     \begin{center}
         \includegraphics[width=0.49\textwidth,type=pdf,ext=.pdf,read=.pdf]{../src/results/length-rmq-directcomp-rand10.plt}
         \includegraphics[width=0.49\textwidth,type=pdf,ext=.pdf,read=.pdf]{../src/results/length-rmq-directcomp-alla.plt}
@@ -622,19 +624,19 @@ The RMQ algorithms show a significant jump in query times around $n=1.000.000$ o
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\proc{DirectCompLookup} Results}
 
-\pref{fig:plot-complookup} shows \proc{DirectCompLookup} with different time/space-tradeoffs together with \proc{LcpRmq}. In average case, \proc{DirectCompLookup} is slower than \proc{DirectComp}, most likely because it needs to do an extra check to find out if it has reached a position for which a result is stored. For short strings, \proc{DirectLookup} is faster than \proc{DirectCompLookup}, since it does not need to check if the value it needs is stored. However, it quickly grows to be as slow as \proc{LcpRmq}, while \proc{DirectCompLookup} does not experience this slowdown. We explain this with that \proc{DirectLookup} reads from its $O(n^2)$ table of results in every query, whereas \proc{DirectCompLookup} only reads from the $O(n)$ string in average case, and thus has a significantly smaller working set.
-
-In the worst case, the \proc{DirectCompLookup} variants which use more space are faster in practice, just like in theory. If we are willing to use $O(n\log n)$ space, \proc{DirectCompLookup}\textless$n/\log n$\textgreater\ will only halve the worst case query time compared to \proc{DirectComp}. This makes \proc{DirectCompLookup} better than \proc{DirectComp}, but still not a very good candidate when worst case query time is important.
-
-\proc{DirectCompLookup} uses $O(n^2)$ preprocessing time no matter what parameter $t$ we choose, which is significantly slower than any of the other algorithms we have tested, and it is also the reason why we have only tested this algorithm up until $n=100.000$. The only way we have found to improve this preprocessing time is to use one of the other algorithms we have covered to preprocess the data structure of \proc{DirectCompLookup}.
-
-\begin{figure}[tp]
+\begin{figure}[p]
     \begin{center}
         \includegraphics[width=0.49\textwidth,type=pdf,ext=.pdf,read=.pdf]{../src/results/length-complookup-rand10.plt}
         \includegraphics[width=0.49\textwidth,type=pdf,ext=.pdf,read=.pdf]{../src/results/length-complookup-alla.plt}
     \end{center}
     \caption{\label{fig:plot-complookup}Query times of our new DirectCompLookup algorithm versus the existing \proc{DirectComp} and \proc{LcpRmq} algorithms.}
 \end{figure}
+
+\pref{fig:plot-complookup} shows \proc{DirectCompLookup} with different time/space-tradeoffs together with \proc{LcpRmq}. In average case, \proc{DirectCompLookup} is slower than \proc{DirectComp}, most likely because it needs to do an extra check to find out if it has reached a position for which a result is stored. For short strings, \proc{DirectLookup} is faster than \proc{DirectCompLookup}, since it does not need to check if the value it needs is stored. However, it quickly grows to be as slow as \proc{LcpRmq}, while \proc{DirectCompLookup} does not experience this slowdown. We explain this with that \proc{DirectLookup} reads from its $O(n^2)$ table of results in every query, whereas \proc{DirectCompLookup} only reads from the $O(n)$ string in average case, and thus has a significantly smaller working set.
+
+In the worst case, the \proc{DirectCompLookup} variants which use more space are faster in practice, just like in theory. If we are willing to use $O(n\log n)$ space, \proc{DirectCompLookup}\textless$n/\log n$\textgreater\ will only halve the worst case query time compared to \proc{DirectComp}. This makes \proc{DirectCompLookup} better than \proc{DirectComp}, but still not a very good candidate when worst case query time is important.
+
+\proc{DirectCompLookup} uses $O(n^2)$ preprocessing time no matter what parameter $t$ we choose, which is significantly slower than any of the other algorithms we have tested, and it is also the reason why we have only tested this algorithm up until $n=100.000$. The only way we have found to improve this preprocessing time is to use one of the other algorithms we have covered to preprocess the data structure of \proc{DirectCompLookup}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\fprintk\ Results}
@@ -700,7 +702,7 @@ We conclude that our new \fprintk\ algorithm achieves a tradeoff between worst c
 
 Our results indicate that reading values from $H_0$ is faster than reading values from $H_1$. Differences between these two tables include that elements of $H_0 = s$ use one byte, whereas elements of $H_1$ use four bytes, and that elements we read from $H_0$ are located next to each other in memory, whereas elements we read from $H_1$ are spaced $t_1$ elements apart in memory.
 
-\begin{figure}[tp]
+\begin{figure}[p]
     \begin{center}
         \includegraphics[width=0.49\textwidth,type=pdf,ext=.pdf,read=.pdf]{../src/results/length-fingerprint-2l-rand10.plt}
         \includegraphics[width=0.49\textwidth,type=pdf,ext=.pdf,read=.pdf]{../src/results/length-fingerprint-2l-alla.plt}
@@ -714,7 +716,7 @@ Our results indicate that reading values from $H_0$ is faster than reading value
 
 In \pref{sec:improved-avg} we discussed how our \fprintk\ algorithm is optimized for the average case to get $O(1)$ instead of $O(k)$ average case query time, while it keeps the same asymptotic worst case query time. But in practice the worst case query time is slightly affected.
 
-\begin{figure}[tp]
+\begin{figure}[p]
     \begin{center}
         \includegraphics[width=0.49\textwidth,type=pdf,ext=.pdf,read=.pdf]{../src/results/length-fingerprint-avglog-rand10.plt}
         \includegraphics[width=0.49\textwidth,type=pdf,ext=.pdf,read=.pdf]{../src/results/length-fingerprint-avglog-alla.plt}
@@ -724,7 +726,7 @@ In \pref{sec:improved-avg} we discussed how our \fprintk\ algorithm is optimized
 
 In \pref{fig:plot-fingerprint-avglog} we see that on worst case strings, the query time of \fprint[\logceil] doubles when we use the average case optimization. On average case strings, the query time of \fprint[\logceil] is up to 40 times faster when using average case optimization. All four cases in \pref{fig:plot-fingerprint-avglog} show their expected $O(1)$ and $O(\log n)$ query times. In \pref{fig:plot-fingerprint-avg3l}, we see the same results for \fprint[3], as we saw for \fprint[\logceil], but at a smaller scale. The negative effect of doing average case optimization is barely measurable on worst case strings, while the improvement on average case strings is up to 40\%.
 
-\begin{figure}[tp]
+\begin{figure}[p]
     \begin{center}
         \includegraphics[width=0.49\textwidth,type=pdf,ext=.pdf,read=.pdf]{../src/results/length-fingerprint-avg3l-rand10.plt}
         \includegraphics[width=0.49\textwidth,type=pdf,ext=.pdf,read=.pdf]{../src/results/length-fingerprint-avg3l-alla.plt}
@@ -739,7 +741,7 @@ We conclude that using average case optimization yields a query time improvement
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Cache Optimization}
 
-\begin{figure}[tp]
+\begin{figure}[p]
     \begin{center}
         \includegraphics[width=0.49\textwidth,type=pdf,ext=.pdf,read=.pdf]{../src/results/length-fingerprint-cache-rand10.plt}
         \includegraphics[width=0.49\textwidth,type=pdf,ext=.pdf,read=.pdf]{../src/results/length-fingerprint-cache-alla.plt}
@@ -748,6 +750,15 @@ We conclude that using average case optimization yields a query time improvement
     \end{center}
     \caption{\label{fig:plot-fingerprint-cache-horiz}Query times of \fprint[2] with and without intra-level cache optimization.}
 \end{figure}
+
+\begin{figure}[p]
+    \begin{center}
+        \includegraphics[width=0.49\textwidth,type=pdf,ext=.pdf,read=.pdf]{../src/results/length-fingerprint-log-cache-rand10.plt}
+        \includegraphics[width=0.49\textwidth,type=pdf,ext=.pdf,read=.pdf]{../src/results/length-fingerprint-log-cache-alla.plt}
+    \end{center}
+    \caption{\label{fig:plot-fingerprint-cache-vert}Query times of \fprint[2] with and without inter-level cache optimization.}
+\end{figure}
+
 
 \paragraph{Horizontal, intra-level optimization}
 
@@ -758,14 +769,6 @@ On average case strings the cache optimization does not change the query times, 
 The last plot on \pref{fig:plot-fingerprint-cache-horiz} shows a variant of average case where the alphabet size is changed to two. This plot attempts to show the worst case for cache optimized \fprint[3]. LCE values in this plot are large enough to ensure that $H_1$ is used often, which should make the extra complexity of calculating indexes into $H_1$ visible. At the same time the LCE values are small enough to ensure, that the cache optimization has no effect. In this plot we see that the cache optimized variant of \fprint[3] has only slightly worse query time compared to the variant, which is not cache optimized.
 
 We conclude that this cache optimization does not visibly affect average case query times, while it improves worst case query times. However, due to late timing of this discovery, the cache optimized variant of \fprintk\ is not the main focus of our analysis.
-
-\begin{figure}[tp]
-    \begin{center}
-        \includegraphics[width=0.49\textwidth,type=pdf,ext=.pdf,read=.pdf]{../src/results/length-fingerprint-log-cache-rand10.plt}
-        \includegraphics[width=0.49\textwidth,type=pdf,ext=.pdf,read=.pdf]{../src/results/length-fingerprint-log-cache-alla.plt}
-    \end{center}
-    \caption{\label{fig:plot-fingerprint-cache-vert}Query times of \fprint[2] with and without inter-level cache optimization.}
-\end{figure}
 
 \paragraph{Vertical, inter-level optimization}
 
@@ -891,6 +894,7 @@ Where $\proc{Plot}(f,x,y)$ adds point $(x,y)$ to series $f$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
 \section{Ziv-Lempel Compression\label{sec:lz-compress}}
 
 \newcommand{\zreference}{\textit{reference}}
@@ -1173,6 +1177,7 @@ To answer LCE queries on a tree, we can create a heavy path decomposition of the
 \proc{HeavyPathLce} can preprocess a static tree of $n$ nodes to answer LCE queries as defined in \pref{sec:tree-def} using $O(\log n)$ query time, $O(n)$ space, and $O(\sortt)$ preprocessing time.
 \end{theorem}
 
+\begin{samepage}
 \subsubsection{Data Structure}
 
 \begin{figure}[tp]
@@ -1189,6 +1194,7 @@ The \proc{HeavyPathLce} data structure consists of the following:
 \item For a node $u$, $\zend(u)$ points to the node of greatest depth in $u$'s heavy path, $d(u)$ is the depth of $u$, and $\zindex(u)$ is the index in $s$, which stores $\zlabel(u)$.
 \item Data structures for constant time NCA on $T$, constant time LA on $T$, and constant time LCE on $s$.
 \end{itemize}
+\end{samepage}
 
 \begin{lemma}
 The \proc{HeavyPathLce} data structure takes $O(n)$ space.
@@ -1284,7 +1290,7 @@ LCE(u_i,w_i,u_j,w_j)
     \caption{\label{fig:quadratic-tree}A tree with $\Omega(n^2)$ ways to choose a leaf and an ancestor of that leaf.}
 \end{figure}
 
-We have looked at applying \proc{SuffixNca} and \proc{LcpRmq} directly to trees like we did with \proc{DirectComp} and \fprintk, such that we can get $O(1)$ query time.
+We have looked at applying \proc{SuffixNca} and \proc{LcpRmq} directly to trees like we did with \proc{DirectComp} and \fprintk, to get $O(1)$ query time.
 
 \begin{theorem}
 \proc{TreeLcpRmq} and \proc{TreeSuffixNca} can preprocess a static tree of $n$ nodes to answer LCE queries as defined in \pref{sec:tree-def} using $O(1)$ query time and $O(n^2)$ space.
