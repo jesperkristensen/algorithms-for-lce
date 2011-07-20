@@ -1,5 +1,5 @@
 #set notitle
-set size 0.7,0.7
+set size 0.6,0.6
 set xlabel 'string length'
 set ylabel 'Query time in seconds/query'
 #set label 'y=x' at 1,2
