@@ -1,5 +1,7 @@
 % TODOs
 % skarpere plots
+% sørg for at figurer ikke sidder underligt
+% Prøv at formindske for store mellemrum mellem ord ved at lave påtvungne linjeskift
 % hav plot for $r=\sqrt n$ med til forsvar
 
 \documentclass[a4]{article}
@@ -1220,7 +1222,7 @@ The \proc{HeavyPathLce} query finds the correct LCE value.
 \begin{proof}
 In step two, $m_i$ is the number of edges on a single heavy path at the beginning of $p_i[v\twodots e_i]$, like illustrated in \pref{fig:tree-heavy-query}. The labels of these edges are stored consecutively in $s$, such that $\zlabel(p_i[v\twodots v+m_i])=s[i\twodots i + m_i-1]$. The same holds for $m_j$ in step three.
 
-The algorithm keeps the invariant $\zlabel(p_i[0\twodots v]) = \zlabel(p_j[0\twodots v])$. At each iteration we find $v'$, which is the longest common prefix of $\zlabel(p_i[v\twodots v+m_i])$ and $\zlabel(p_j[v\twodots v+m_j])$. This gives $\zlabel(p_i[0\twodots v+v']) = \zlabel(p_j[0\twodots v+v'])$, and we therefore keep the invariant when we add $v'$ to $v$ in step five.
+The algorithm keeps the invariant $\zlabel(p_i[0\twodots v]) = \zlabel(p_j[0\twodots v])$. At each iteration we find $v'$, which is the length of the longest common prefix of $\zlabel(p_i[v\twodots v+m_i])$ and $\zlabel(p_j[v\twodots v+m_j])$. This gives $\zlabel(p_i[0\twodots v+v']) = \zlabel(p_j[0\twodots v+v'])$, and we therefore keep the invariant when we add $v'$ to $v$ in step five.
 
 If $v'<\min\{m_i,m_j\}$ in step six, we also know that $\zlabel(p_i[v+1]) \neq \zlabel(p_j[v+1])$, and therefore that $v=\LCE(p_i,p_j)$.
 
@@ -1316,7 +1318,7 @@ We can use the ladder decomposition in the same way we use the heavy tree decomp
         \includegraphics[width=0.4\textwidth,page=1]{ladder.pdf}
         \includegraphics[width=0.4\textwidth,page=2]{ladder.pdf}
     \end{center}
-    \caption{\label{fig:ladder-ds} Ladders of a tree before and after their length is doubled. A \proc{LadderLce} string $s$ for this ladder decomposition is $s=abc|ade|df|ghijkl|ghno|jm$, where the splits between ladders are marked with a vertical line.}
+    \caption{\label{fig:ladder-ds} Ladders of a tree before and after their size is doubled. A \proc{LadderLce} string $s$ for this ladder decomposition is $s=abc|ade|df|ghijkl|ghno|jm$, where the splits between ladders are marked with a vertical line.}
 \end{figure}
 
 The \proc{LadderLce} data structure consists of the following:
@@ -1357,7 +1359,7 @@ The \proc{LadderLce} query starts with $v=0$ and repeats the following:
 The \proc{LadderLce} query finds the correct LCE value.
 \end{lemma}
 \begin{proof}
-In step two, $\zlength(p_i[v\twodots v+m_i]) +1 \leq \zlength(p_i[v+m_i\twodots e_i])\leq h(p_i[v+m_i])$, where $h$ is the height of a node. For a node $u$ of height $h$, the ladder decomposition guarantees that $u$'s ancestor with distance $h+1$ to $u$ is in $u$'s ladder. Therefore, $p_i[v+1]$ is in $p_i[v+m_i]$'s ladder, and $s[i\twodots i+m_i-1] = \zlabel(p_i[v\twodots v+m_i])$. Similarly in step three, $s[j\twodots j+m_i-1] = \zlabel(p_j[v\twodots v+m_j])$.
+In step two, $\zlength(p_i[v\twodots v+m_i]) +1 \leq \zlength(p_i[v+m_i\twodots e_i])\leq h(p_i[v+m_i])$, where $h(u)$ is the height of node $u$. For a node $u$ of height $h$, the ladder decomposition guarantees that $u$'s ancestor with distance $h+1$ to $u$ is in $u$'s ladder. Therefore, $p_i[v+1]$ is in $p_i[v+m_i]$'s ladder, and $s[i\twodots i+m_i-1] = \zlabel(p_i[v\twodots v+m_i])$. Similarly in step three, $s[j\twodots j+m_i-1]\\ = \zlabel(p_j[v\twodots v+m_j])$.
 
 By the same argument we use for \proc{HeavyPathLce}, the algorithm maintains the invariant $\zlabel(p_i[0\twodots v])=\zlabel(p_j[0\twodots v])$, and gives the correct LCE value.
 \end{proof}
