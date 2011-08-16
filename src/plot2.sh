@@ -99,6 +99,23 @@ datafile="results/length-repeat-sqrt.txt"
 plotfile="results/length-article-repeat-sqrt.plt"
 oneplot "DirectComp," "Fingerprint_2<sqrt n>ac," "Fingerprint_3<n^{2/3};n^{1/3}>ac," "Fingerprint_{log n}ac," "RMQ<n;1>,"
 
+#Overall Fingerprint Slides
+slides="\nunset title\nunset xlabel\nunset ylabel\nunset key"
+xtra="$yavg$slides"
+datafile="results/length-rand10.txt"
+plotfile="results/length-slides-rand10.plt"
+oneplot "DirectComp," "Fingerprint_2<sqrt n>ac," "Fingerprint_3<n^{2/3};n^{1/3}>ac," "Fingerprint_{log n}ac," "RMQ<n;1>,"
+
+xtra="$ywc$slides"
+datafile="results/length-alla.txt"
+plotfile="results/length-slides-alla.plt"
+oneplot "DirectComp," "Fingerprint_2<sqrt n>ac," "Fingerprint_3<n^{2/3};n^{1/3}>ac," "Fingerprint_{log n}ac," "RMQ<n;1>,"
+
+xtra="$ymc$slides"
+datafile="results/length-repeat-pow.txt"
+plotfile="results/length-slides-repeat-pow.plt"
+oneplot "DirectComp," "Fingerprint_2<sqrt n>ac," "Fingerprint_3<n^{2/3};n^{1/3}>ac," "Fingerprint_{log n}ac," "RMQ<n;1>,"
+
 # Not used
 #xtra=$yavg
 #datafile="results/length-rand10.txt"
@@ -198,7 +215,7 @@ datafile="results/length-alla.txt"
 plotfile="results/length-rmq-alla.plt"
 oneplot "RMQ<1;n>_{virtual}," "RMQ<n;1>_{virtual}," "RMQ<n;2log n>_{virtual}," "RMQ<n;4log n>_{virtual}," #"RMQ<succinct;?>_{virtual}," "RMQ<optimal>_{virtual},"
 
-# RMQ vs. DirectComp
+# RMQ vs. DirectComp vs. combination
 xtra=$yavg
 datafile="results/length-rand10.txt"
 plotfile="results/length-rmq-directcomp-rand10.plt"
@@ -208,6 +225,17 @@ xtra=$ywc
 datafile="results/length-alla.txt"
 plotfile="results/length-rmq-directcomp-alla.plt"
 oneplot "DirectComp," "RMQ<n;1>," "DirectComp<1>RMQ<n;1>,"
+
+# RMQ vs. DirectComp
+xtra="$yavg\nunset title\nunset xlabel\nunset ylabel\nunset key"
+datafile="results/length-rand10.txt"
+plotfile="results/length-rmq-directcomp-slide-rand10.plt"
+oneplot "DirectComp," "RMQ<n;1>,"
+
+xtra="$ywc\nunset title\nunset xlabel\nunset ylabel\nunset key"
+datafile="results/length-alla.txt"
+plotfile="results/length-rmq-directcomp-slide-alla.plt"
+oneplot "DirectComp," "RMQ<n;1>,"
 
 # space
 xtra="set logscale y\nset yrange [2:3e14]"
