@@ -10,6 +10,7 @@ Fingerprint_k - 10 min
         DS - 2 min
         query - 2 min
         preproc - 1-2 min
+        cache
     resultater - 5 min
         overordnede resultater - 3-4 min
         caching - 1-2 min
