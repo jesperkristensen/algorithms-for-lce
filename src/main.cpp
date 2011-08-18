@@ -23,6 +23,8 @@
 #ifndef _MSC_VER
 #include "algRmq.h"
 #endif
+#include "algFingerprint3AQCacheHorizShift.h"
+#include "algFingerprint3AQCacheHorizMult.h"
 
 #include "correctness.h"
 #include "functionalTest.h"
@@ -57,6 +59,32 @@ uint32 log2_nf(uint32 n) { return (uint32) log2((double)n); } NamedFunc log2_n =
 uint32 ndlog2nf(uint32 n) { return (uint32) (((double)n)/log2((double)n)); } NamedFunc ndlog2n = {ndlog2nf, "n/log n"};
 
 int main(int argc, char* argv[]) {
+    double preproc_limit = 6;
+    double query_limit = 1e-6;
+    uint32 max_n = 10000000;
+
+    Algorithm* slidealgs[] = {
+        new AlgorithmDirectComp,
+        new Fingerprint2AQCacheHorizShift(&sqrt_n),
+        new Fingerprint2AQCacheHorizMult(&sqrt_n),
+        new Fingerprint3AQCacheHorizShift(&pow23, &pow13),
+        new Fingerprint3AQCacheHorizMult(&pow23, &pow13),
+        new FingerprintLA(),
+        new AlgorithmRmq1,
+        NULL
+    };
+    correctness(slidealgs, RANDOM10_STRING);
+    correctness(slidealgs, RANDOM2_STRING);
+    correctness(slidealgs, ALL_A_STRING);
+    correctness(slidealgs, REPEAT_POW_STRING);
+    graphIncreasingLength(slidealgs, RANDOM10_STRING, "results/length-slides-rand10.txt", preproc_limit, query_limit, max_n);
+    graphIncreasingLength(slidealgs, RANDOM2_STRING, "results/length-slides-rand2.txt", preproc_limit, query_limit, max_n);
+    graphIncreasingLength(slidealgs, ALL_A_STRING, "results/length-slides-alla.txt", preproc_limit, 1e-5, max_n);
+    graphIncreasingLength(slidealgs, REPEAT_POW_STRING, "results/length-slides-repeat-pow.txt", preproc_limit, 1e-5, max_n);
+    printf("\nThe slides end\n");
+}
+
+int notmain(int argc, char* argv[]) {
 #if defined(CACHE_ALLA)
     cacheTest(2000000, ALL_A_STRING);
 #elif defined(CACHE_RAND10)

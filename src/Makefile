@@ -22,6 +22,8 @@ main: *.h *.cpp qsufsort.o RMQ.a
 		algRmqN.cpp \
 		algRmq1.cpp \
 		algRmq11.cpp \
+		algFingerprint3AQCacheHorizShift.cpp \
+		algFingerprint3AQCacheHorizMult.cpp \
 		testRandom.cpp \
 		graphIncreasingLength.cpp \
 		graphSpaceIncreasingLength.cpp \

@@ -57,8 +57,9 @@ uint32 Fingerprint2AQCacheHorizMult::query(uint32 i, uint32 j) {
     if (i == j)
         return n - i;
     if (s[i + v] == s[j + v]) {
-        uint32 ihh = HH(i);
-        uint32 jhh = HH(j);
+        v++;
+        uint32 ihh = HH(i + v);
+        uint32 jhh = HH(j + v);
         while (H[ihh] == H[jhh]) {
             v += t;
             ihh++;
