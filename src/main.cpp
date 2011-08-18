@@ -65,8 +65,10 @@ int main(int argc, char* argv[]) {
 
     Algorithm* slidealgs[] = {
         new AlgorithmDirectComp,
+        new Fingerprint2AQ(&sqrt_n),
         new Fingerprint2AQCacheHorizShift(&sqrt_n),
         new Fingerprint2AQCacheHorizMult(&sqrt_n),
+        new Fingerprint3AQ(&pow23, &pow13),
         new Fingerprint3AQCacheHorizShift(&pow23, &pow13),
         new Fingerprint3AQCacheHorizMult(&pow23, &pow13),
         new FingerprintLA(),
