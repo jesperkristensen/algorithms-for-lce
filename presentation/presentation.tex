@@ -106,7 +106,7 @@
         Space & $O(1)$ \\
         Query & $O(|\LCE(i,j)|)=O(n)$ \\
         Average query & $O(1)$ \\
-        Query I/Os & $O\Big(\frac{|\LCE(i,j)|}{B}\Big)$ \\
+        Query I/O & $O\Big(\frac{|\LCE(i,j)|}{B}\Big)$ \\
     \end{tabular}
 
     \vspace{1cm}
@@ -146,7 +146,7 @@
             Space & $O(n)$ \\
             Query & $O(1)$ \\
             Average query & $O(1)$ \\
-            Query I/Os & $O(1)$ \\
+            Query I/O & $O(1)$ \\
         \end{tabular}
     \end{center}
     %}
@@ -247,14 +247,14 @@
         \begin{itemize}
             \item Data structure: $H_\ell[i] = F_{t_\ell}[i]$
             \item Size: $|H_\ell| = n$
-            \item I/Os: $O\big(k\cdot n^{1/k}\big)$
+            \item I/O: $O\big(k\cdot n^{1/k}\big)$
         \end{itemize}
         \item Cache optimized:
         %Instead of storing the fingerprint of $s[i\twodots i+t_\ell-1]$ at $H_\ell[i]$, we can store it at 
         \begin{itemize}
             \item Data structure: \\~~$H_\ell[((i-1)\mod t_\ell)\cdot\lceil n/t_\ell\rceil+\lfloor (i-1)/t_\ell\rfloor+1] = F_{t_\ell}[i]$
             \item Size: $|H_\ell| = n+t_\ell$
-            \item I/Os: $O\Big(k\cdot\Big(\frac{n^{1/k}}{B}+1\Big)\Big)$
+            \item I/O: $O\Big(k\cdot\Big(\frac{n^{1/k}}{B}+1\Big)\Big)$
             \begin{itemize}
                 \item Best when $k$ is small $\implies$ $n^{1/k}$ is large.
             \end{itemize}
@@ -269,7 +269,7 @@
         Space & $O(k\cdot n)$\\
         Query & $O(k\cdot n^{1/k})$ \\
         Average query & $O(1)$ \\
-        Query I/Os & $O\Big(k\cdot\Big(\frac{n^{1/k}}{B}+1\Big)\Big)$ \\
+        Query I/O & $O\Big(k\cdot\Big(\frac{n^{1/k}}{B}+1\Big)\Big)$ \\
     \end{tabular}
 
     \hfill\\$k=1$:
@@ -293,7 +293,7 @@
             Space & $O(n)$\\
             Query & $O(\sqrt n)$ \\
             Average query & $O(1)$ \\
-            Query I/Os & $O\Big(\frac{\sqrt n}{B}\Big)$ \\
+            Query I/O & $O\Big(\frac{\sqrt n}{B}\Big)$ \\
         \end{tabular}
         \newpage
         $k=\logceil$:
@@ -303,7 +303,7 @@
             Space & $O(n\log n)$\\
             Query & $O(\log n)$ \\
             Average query & $O(1)$ \\
-            Query I/Os & $O(\log n)$ \\
+            Query I/O & $O(\log n)$ \\
         \end{tabular}
     }
     \end{multicols}
@@ -350,7 +350,7 @@
     \end{multicols}
 \end {frame}
 
-\subsection{Practical I/O}
+%\subsection{Practical I/O}
 \begin{frame}{The \fprintk\ Algorithm: Practical Results, I/O}
     Query times of \fprint[2]
     \textcolor{red}{without cache optimization}
@@ -368,9 +368,8 @@
         \end{center}
     }
     \end{multicols}
-\end {frame}
+\end{frame}
 
-\subsection{Practical I/O}
 \begin{frame}{The \fprintk\ Algorithm: Practical Results, I/O}
     Query times of \fprint[3]
     \textcolor{red}{without cache optimization}
@@ -388,7 +387,36 @@
         \end{center}
     }
     \end{multicols}
-\end {frame}
+\end{frame}
+
+\section{LCE on trees}
+\subsection{Compression}
+\begin{frame}{LCE on Compressed Strings}
+    Goal
+    \begin{itemize}
+        \item Allow LCE queries without decompressing the string
+        \item Using Ziv-Lempel compression (LZ)
+    \end{itemize}
+    How
+    \begin{itemize}
+        \item LZ compression represents the string as a tree
+        \item An LCE query on a LZ compressed string is a number of LCE queries on a tree
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{LCE on Trees}
+    \begin{itemize}
+        \item Trees:
+        \begin{itemize}
+            \item One character on each edge
+            \item LCE is the length of the longest common prefix of two strings along two paths
+        \end{itemize}
+        \item $p_i=bbc$ and $p_j=bbba$ gives $\LCE(p_i,p_j)=2$
+    \end{itemize}
+    \begin{center}
+        \includegraphics[width=0.4\textwidth,page=1]{tree-lce.pdf}
+    \end{center}
+\end{frame}
 
 \end{document}
 
