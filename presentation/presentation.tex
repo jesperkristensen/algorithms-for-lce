@@ -184,7 +184,7 @@
         \end{itemize}
     \end{itemize}
     \begin{center}
-        \includegraphics[width=0.98\textwidth,page=1]{../doc/fingerprint.pdf}
+        \includegraphics[width=1\textwidth,page=1]{../doc/fingerprint.pdf}
     \end{center}
     \begin{tabular}{r l}
         Space & $O(k\cdot n)$\\
@@ -199,8 +199,8 @@
         \item Stop and return $v$ when $\ell = 0$, otherwise decrement $\ell$ by one and go to step two.
     \end{enumerate}
     \begin{center}
-        \includegraphics[width=0.8\textwidth,page=2]{../doc/fingerprint.pdf}\\
-         $\LCE(3,12)$
+        \includegraphics[width=1\textwidth,page=2]{../doc/fingerprint.pdf}\\
+         $\LCE(3,12)=9$
     \end{center}
     \begin{tabular}{r l}
         Query & $O(k\cdot n^{1/k})$ \\
@@ -416,6 +416,43 @@
     \begin{center}
         \includegraphics[width=0.4\textwidth,page=1]{tree-lce.pdf}
     \end{center}
+\end{frame}
+
+\subsection{Constant Time String LCE on Heavy Paths}
+\begin{frame}{Constant Time String LCE on Heavy Paths}
+    \begin{multicols}{2}{
+        \begin{itemize}
+            \item Data structure:
+            \begin{itemize}
+                \item Construct a heavy tree decomposition
+                \item For each heavy path, store characters as a substring
+            \end{itemize}
+            \item Query:
+            \begin{itemize}
+                \item Use constant time string LCE on each heavy path
+            \end{itemize}
+        \end{itemize}
+        \begin{center}
+            \includegraphics[width=0.44\textwidth,page=4]{../doc/tree-fingerprint.pdf}
+        \end{center}
+        \begin{itemize}
+            \item How to find the indexes $(i,j)$ in the string:
+            \begin{itemize}
+                \item Store an index at each node
+            \end{itemize}
+            \item How to know then the heavy path splits from the queried path:
+            \begin{itemize}
+                \item Store a pointer to the end of the heavy path at each node
+                \item Find NCA of the end of the heavy path and the end of the queried path
+            \end{itemize}
+        \end{itemize}
+        \begin{tabular}{r l}
+            Preprocessing & $O(\sortt)$ \\
+            Space & $O(n)$\\
+            Query & $O(\log n)$ \\
+        \end{tabular}
+    }
+    \end{multicols}
 \end{frame}
 
 \end{document}
