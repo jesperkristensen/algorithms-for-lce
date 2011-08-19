@@ -435,17 +435,6 @@
         \begin{center}
             \includegraphics[width=0.44\textwidth,page=4]{../doc/tree-fingerprint.pdf}
         \end{center}
-        \begin{itemize}
-            \item How to find the indexes $(i,j)$ in the string:
-            \begin{itemize}
-                \item Store an index at each node
-            \end{itemize}
-            \item How to know then the heavy path splits from the queried path:
-            \begin{itemize}
-                \item Store a pointer to the end of the heavy path at each node
-                \item Find NCA of the end of the heavy path and the end of the queried path
-            \end{itemize}
-        \end{itemize}
         \begin{tabular}{r l}
             Preprocessing & $O(\sortt)$ \\
             Space & $O(n)$\\
@@ -453,6 +442,32 @@
         \end{tabular}
     }
     \end{multicols}
+\end{frame}
+
+\begin{frame}{Constant Time String LCE on Heavy Paths}
+    \begin{columns}[t]
+        \begin{column}{0.7\textwidth}
+            \begin{itemize}
+                \item How to find the indexes $(i,j)$ in the string:
+                \begin{itemize}
+                    \item Store an index at each node
+                \end{itemize}
+                \item How to know then the heavy path splits from the queried path:
+                \begin{itemize}
+                    \item Store a pointer to the end of the heavy path at each node
+                    \item Find NCA of the end of the heavy path and the end of the queried path
+                \end{itemize}
+                \item How to find a node on the queried path:
+                \begin{itemize}
+                    \item Use level ancestor
+                \end{itemize}
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.3\textwidth}
+        \hfill\\
+            \includegraphics[width=1\textwidth,page=3]{../doc/tree-fingerprint.pdf}
+        \end{column}
+    \end{columns}
 \end{frame}
 
 \end{document}
