@@ -1,0 +1,73 @@
+LZ Direct:
+    Annotate each pair with the end-character position
+    (0,a,1)(1,b,3)(2,a,6)(2,b,9)
+    
+    LCE(3,5)=2
+    find Si' = (1,b)(2,a)(2,b)
+    find Sj' = (2,a)(2,b)
+    udfold referencer til i=3 til 3 (0 trin) og j=6 til 5 (1 trin)
+    Si = (1,b)(2,a)(2,b)
+    Sj = (1,b)(0,a)(2,b)
+    sammenlign strenge mens referencer udfoldes.
+    
+    Si og Sj behøver kun gemme udfoldede tegn af det første tegn, de andre kan referere til originalteksten
+    
+    Plads: O(n)
+    Tid: O(N)
+    
+    It is possible to iterate over the characters of an LZ-compressed string in reverse order with two pointers to two compression elements. The inner pointer follows the references of the compression elements, and the outer pointer is used when the reference of the inner pointer becomes null. This takes O(N) time and O(1) space.
+    
+    LCE can preprocessed by reversing the string and then LZ-compressing it.
+    (an LZ compressed string can be reverted in O(N) time and O(n1+n2) space)
+    A query is then done by initializing two iterators, initializing each at i and j steps respectively.
+    Then step the two iterators together and compare characters just like DirectComp does.
+    
+    // Compressed String -> Iterator
+    IteratorInit(z[1..n])
+        return {n, n, z}
+    // Iterator-> Character
+    IteratorGet({inner, outer, z})
+            return label(z[inner])
+    // Iterator -> Iterator
+    IteratorNext({inner, outer, z})
+        if (reference(z[inner]) != 0)
+            return {reference(z[inner]), outer, z}
+        else if (outer - 1 != 0)
+            return {outer-1, outer-1, z}
+        else
+            return END OF STRING
+    
+    iterateReverse(z[1..n])
+        for outer = n downto 1
+            inner = outer
+            while inner != 0
+                yield label(z[inner])
+                inner = reference(z[inner])
+    prepeoc(s)
+        reverse s and lz-compress it.
+    query(z[1..n], i, j)
+        I = iterateReverse(z)
+        J = iterateReverse(z)
+        for k = 1 .. i - 1
+            I.next()
+        for k = 1 .. j - 1
+            J.next()
+        t = 0
+        while I.next() = J.next()
+            t = t + 1
+        return t
+    
+    If each compression element is annotated with the length of its phrase, it is in some cases possible to jump over several characters in an itration step. This can save practical time, but can it save asymptotic worst-case time?
+    The iterators can be initilized to i and j in O(n) time, and from there the average case time is the same as for DirectComp.
+    Faster initialization may be possible.
+        Initialization of the outer pointer is a predecessor problem.
+        Steps of the inner pointer might have an upper bound (O(sqrt(n))??)
+    In the DirectComp part we cannot guarantee large jumps for large LCEs. Take two different larger substrings, which both refer back to a previous instance. Any smaller substring within each would not share reference. But their shared length could be tabulated in O(n^2) space, where n is the compressed length.
+
+Teoretisk bedre end N:
+    Kan man gemme en del af st suffixtræ som svarer til det komprimerede træ, som man stadig kan lave LCA på? Nej.
+    Kan vi komprimere hashing-princippet? Nej, jo højere niveau, jo mindre kan hash-tabellen komprimeres.
+    Succint RMQ findes, men det har ikke noget med komprimering at gøre.
+Praktisk:
+    Kan man reorganisere træet til bedre cache?
+        Nej, vi skal alligevel have en mapping fra index til knude, og den vil være ineffektiv. Eller vil den?

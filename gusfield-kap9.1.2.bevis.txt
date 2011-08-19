@@ -1,0 +1,40 @@
+bevis i kap 9.1.2:
+
+DEFINITIONER:
+
+Strenge S1 og S2
+
+Suffix-træ for S2
+
+m(i) længden af den længste substreng af S1 startende på plads i, som matcher en substreng i S2
+
+p(i) positionen af sådan et match i S2
+
+LongestCommonExtension(i, j):
+    v = LowestCommonAncestor in S2 of leaf p(i) and leaf j
+    return min(m(i), string-depth(v))
+
+BEVIS:
+
+LCE <= string-depth(v),
+fordi lca(i, j) <= lca(p(i), j),
+fordi
+
+p(i) er positionen af en substreng i S2, som er længste fælles streng med en substreng S1 startende på plads i
+p(i) er et suffix af S2, som har et prefix svarende til længste fælles prefix af suffix i af S1 og et hvilket som helelst suffix af S2.
+Længden af dette prefix kan ikke blive længere af at tilføje en restriktion af hvor i S1 suffixet skal starte.
+
+Definition af Longest Common Extension:
+longest common extenstion of i in S1 and j in S2 =
+length of longest common prefix of S1[i..n] and S2[j..m]
+
+longest common prefix of S1[i..n] and S2[j..m] <=
+longest common prefix of S2[p(i)..p(i) + m(i)] and S2[j..m]
+because:
+S1[i..n] and S2[p(i)..p(i) + m(i)] has a common prefix at least as long as the common prefix of S1[i..n] and S2[j..m]
+because:
+S1[i..n] and S2[p(i)..p(i) + m(i)] has a common prefix at least as long as the common prefix of S1[i..n] and S2[j'..m] for any j', per the definition of p(i) and m(i).
+
+longest common prefix of S1[i..n] and S2[j..m] >=
+longest common prefix of S2[p(i)..p(i) + m(i)] and S2[j..m]
+because:

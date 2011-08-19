@@ -1,0 +1,37 @@
+http://www.sciencedirect.com.globalproxy.cvt.dk/science?_ob=ArticleURL&_udi=B6V1G-45FCX1D-1C&_user=641802&_coverDate=09%2F30%2F1991&_rdoc=1&_fmt=high&_orig=gateway&_origin=gateway&_sort=d&_docanchor=&view=c&_acct=C000034418&_version=1&_urlVersion=0&_userid=641802&md5=bb491da1ecac35989756943050e82ab6&searchtype=a
+
+For en given startpos i:
+Lad et komprimeret tegn for position i være (ref:len:count), hvor s[i..i+len] = s[ref..ref+len] for ref+len < i. count er antalg gange s[i..i+len] gentages.
+Start med i = 1, og fortsæt med i = første ikke-behandlede tegn.
+
+LCE(i,j), i < j;
+skal læse s[i..i+lce] og s[j..j+lce]
+    i' = pred i, som har et komprimeret tegn ti
+    j' = pred j, som har et komprimeret tegn tj
+    if (ti er simpelt tegn || tj er simpelt tegn)
+        if (ti er et simpelt tegn)
+            si = ti
+        else
+            si = hent simpelt tegn for i
+        if (tj er et simpelt tegn)
+            sj = tj
+        else
+            sj = hent simpelt tegn for j
+        if si == sj
+            return 1+LCE(i+1,j+1)
+        else
+            return 0
+    else
+
+TODO: Check off by one
+getChar(i)
+    t(ref:len:count) = komprimeret tegn hvori i indgår
+    j = startpos for t
+    getChar(ref + (i - j) % len)
+
+Lad I[j] = i være: i < j hvor LCE(i,j) er så stor som mulig, og V[j]=LCE(i,j). Hvis der er flere muligheder for i vælges mindste.
+For LCE(i,j) vil enten I[j] = i eller I[j] = I[j]???
+LCE(i,j) = min(V[j], lce(i, I[j]))
+Hvor mange rekursive kald kan vi få?
+    I hver rekursion bliver summen af tallene mindre, O(n)
+    I hver rekursion bliver min-limit mindre, O(n) (eller gør den???)
