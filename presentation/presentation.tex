@@ -62,39 +62,50 @@
             \put(140, 30){\framebox(20, 20){b}}
             \put(160, 30){\framebox(20, 20){b}}
             \put(180, 30){\framebox(20, 20){a}}
-            \uncover<2-2>{
-                \put(200, 30){\makebox(100, 20){1 match}}
-                \put(80,30){\framebox(20, 20){\colorbox{matchcolor}{\makebox(13,14){a}}}}
+            \uncover<1-2>{
                 \put(90, 15){\vector(0,1){13}}
                 \put(80, 0){\makebox(20, 15){4}}
-                \put(120,30){\framebox(20, 20){\colorbox{matchcolor}{\makebox(13,14){a}}}}
                 \put(130, 15){\vector(0,1){13}}
                 \put(120, 0){\makebox(20, 15){6}}
             }
-            \uncover<3->{
-                \put(200, 30){\makebox(100, 20){2 matches}}
+            \uncover<2-2>{
+                \put(80,30){\framebox(20, 20){\colorbox{matchcolor}{\makebox(13,14){a}}}}
+                \put(120,30){\framebox(20, 20){\colorbox{matchcolor}{\makebox(13,14){a}}}}
             }
-            \uncover<3-3>{
-                \put(100,30){\framebox(20, 20){\colorbox{matchcolor}{\makebox(13,14){b}}}}
+            \uncover<2-3>{
+                \put(200, 30){\makebox(100, 20){1 match}}
+            }
+            \uncover<3-4>{
                 \put(110, 15){\vector(0,1){13}}
                 \put(100, 0){\makebox(20, 15){5}}
-                \put(140,30){\framebox(20, 20){\colorbox{matchcolor}{\makebox(13,14){b}}}}
                 \put(150, 15){\vector(0,1){13}}
                 \put(140, 0){\makebox(20, 15){7}}
             }
             \uncover<4-4>{
-                \put(120,30){\framebox(20, 20){\colorbox{mismatchcolor}{\makebox(13,14){a}}}}
+                \put(100,30){\framebox(20, 20){\colorbox{matchcolor}{\makebox(13,14){b}}}}
+                \put(140,30){\framebox(20, 20){\colorbox{matchcolor}{\makebox(13,14){b}}}}
+            }
+            \uncover<4->{
+                \put(200, 30){\makebox(100, 20){2 matches}}
+            }
+            \uncover<5-6>{
                 \put(130, 15){\vector(0,1){13}}
                 \put(120, 0){\makebox(20, 15){6}}
-                \put(160,30){\framebox(20, 20){\colorbox{mismatchcolor}{\makebox(13,14){b}}}}
                 \put(170, 15){\vector(0,1){13}}
                 \put(160, 0){\makebox(20, 15){8}}
             }
+            \uncover<6-6>{
+                \put(120,30){\framebox(20, 20){\colorbox{mismatchcolor}{\makebox(13,14){a}}}}
+                \put(160,30){\framebox(20, 20){\colorbox{mismatchcolor}{\makebox(13,14){b}}}}
+            }
         \end{picture}
     \end{block}
-    \uncover<5->{
+    \uncover<7->{
         \begin{block}{Result}
             $LCE_s(4,6)=2$
+        \end{block}
+        \begin{block}{LCE problem}
+            Efficiently perform multiple queries $(i,j)$ on a static string $s$
         \end{block}
     }
 \end{frame}
@@ -106,7 +117,7 @@
         Space & $O(1)$ \\
         Query & $O(|\LCE(i,j)|)=O(n)$ \\
         Average query & $O(1)$ \\
-        Query I/O & $O\Big(\frac{|\LCE(i,j)|}{B}\Big)$ \\
+        Query I/O & $O\Big(\frac{|\LCE(i,j)|}{B}\Big) = O\big(\frac{n}{B}\big)$ \\
     \end{tabular}
 
     \vspace{1cm}
@@ -261,6 +272,9 @@
         \end{itemize}
      \end{itemize}
      %$n+t_\ell-1/t_\ell+2$
+    \begin{center}
+        \includegraphics[width=0.7\textwidth,page=2]{../doc/fingerprint.pdf}\\
+    \end{center}
 \end{frame}
 
 \begin{frame}{The \fprintk\ Algorithm}
@@ -310,7 +324,7 @@
 \end{frame}
 
 \subsection{Practical Results}
-\begin{frame}{The \fprintk\ Algorithm: Practical Results}
+\begin{frame}{Practical Results}
     Query times of
     \textcolor{red}{\proc{DirectComp}},
     \textcolor{green}{\fprint[2] (cache opt.)},
@@ -330,7 +344,7 @@
     \end{multicols}
 \end {frame}
 
-\begin{frame}{The \fprintk\ Algorithm: Practical Results}
+\begin{frame}{Practical Results}
     Query times of
     \textcolor{red}{\proc{DirectComp}},
     \textcolor{green}{\fprint[2] (cache opt.)},
@@ -338,17 +352,25 @@
     \textcolor{magenta}{\fprint[\logceil] (not cache opt.)} and
     \textcolor{cyan}{\proc{LcpRmq}}
     by string length
-    \begin{multicols}{2}{
-        \begin{center}
-            Medium LCE size\\
-            \includegraphics[width=0.49\textwidth,type=pdf,ext=.pdf,read=.pdf]{../src/results/length-slides-cache-repeat-pow.plt}
-            \newpage
-            Cache stress\\
-            \includegraphics[width=0.49\textwidth,type=pdf,ext=.pdf,read=.pdf]{../src/results/length-slides-cache-rand2.plt}
-        \end{center}
-    }
-    \end{multicols}
+    \begin{center}
+        Medium LCE size\\
+        \includegraphics[width=0.49\textwidth,type=pdf,ext=.pdf,read=.pdf]{../src/results/length-slides-cache-repeat-pow.plt}
+    \end{center}
 \end {frame}
+
+\begin{frame}{Cache Optimization, Practical Results}
+    Is I/O optimization good in practice?
+    \begin{itemize}
+        \item Pro: better cache efficiency
+            \begin{itemize}
+                \item Best for small $k$, no change for $k=\logceil$
+            \end{itemize}
+        \item Con: Calculating memory addresses is more complicated
+            \begin{itemize}
+                \item $((i-1)\mod t_\ell)\cdot\lceil n/t_\ell\rceil+\lfloor (i-1)/t_\ell\rfloor+1$ vs.\ $i$
+            \end{itemize}
+    \end{itemize}
+\end{frame}
 
 %\subsection{Practical I/O}
 \begin{frame}{The \fprintk\ Algorithm: Practical Results, I/O}
@@ -389,6 +411,27 @@
     \end{multicols}
 \end{frame}
 
+\begin{frame}{The \fprintk\ Algorithm: Practical Results, I/O}
+    Query times of
+    \textcolor{red}{\proc{DirectComp}},
+    \textcolor{green}{\fprint[2] (cache opt.)},
+    \textcolor{blue}{\fprint[3] (not cache opt.)},
+    \textcolor{magenta}{\fprint[\logceil] (not cache opt.)} and
+    \textcolor{cyan}{\proc{LcpRmq}}
+    by string length
+    \begin{multicols}{2}{
+        \begin{center}
+            Average case
+            \includegraphics[width=0.49\textwidth,type=pdf,ext=.pdf,read=.pdf]{../src/results/length-slides-cache-rand10.plt}
+            \newpage
+            Cache stress\\
+            \includegraphics[width=0.49\textwidth,type=pdf,ext=.pdf,read=.pdf]{../src/results/length-slides-cache-rand2.plt}
+        \end{center}
+    }
+    \end{multicols}
+\end {frame}
+
+\begin{comment}
 \section{LCE on trees}
 \subsection{Compression}
 \begin{frame}{LCE on Compressed Strings}
@@ -469,6 +512,7 @@
         \end{column}
     \end{columns}
 \end{frame}
+\end{comment}
 
 \section{Summary}
 \begin{frame}{Summary}
@@ -479,20 +523,22 @@
         Space & $O(1)$ & $O(n)$ & $O(k\cdot n)$\\
         Query & $O(n)$ & $O(1)$ & $O(k\cdot n^{1/k})$ \\
         Average query & $O(1)$ & $O(1)$ & $O(1)$ \\
-        Query I/O & $O(n/B)$ & $O(1)$ & $O\Big(k\cdot\Big(\frac{n^{1/k}}{B}+1\Big)\Big)$ \\
+        Query I/O & $O\big(\frac{n}{B}\big)$ & $O(1)$ & $O\Big(k\cdot\Big(\frac{n^{1/k}}{B}+1\Big)\Big)$ \\
     \end{tabular}
+    \vspace{1em}
     \begin{itemize}
         \item In practice, the \fprintk\ algorithm is...
         \begin{itemize}
             \item ...almost as good as \proc{DirectComp} and significantly better than \proc{LcpRmq} in average case
             \item ...significantly better than \proc{DirectComp} but worse than \proc{LcpRmq} in worst case
         \end{itemize}
-        \item We can generalize LCE to use on trees:
-        \begin{tabular}{r l}
-            Preprocessing & $O(\sortt)$ \\
-            Space & $O(n)$\\
-            Query & $O(\log n)$ \\
-        \end{tabular}
+        \item Cache optimization of \fprintk\ improves query times at $k=2$ and worsens query times at $k\geq 3$
+        %\item We can generalize LCE to use on trees:
+        %\begin{tabular}{r l}
+        %    Preprocessing & $O(\sortt)$ \\
+        %    Space & $O(n)$\\
+        %    Query & $O(\log n)$ \\
+        %\end{tabular}
     \end{itemize}
 \end {frame}
 
