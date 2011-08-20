@@ -470,6 +470,32 @@
     \end{columns}
 \end{frame}
 
+\section{Summary}
+\begin{frame}{Summary}
+    \begin{tabular}{r l l l}
+        & \proc{Direct-} & \proc{LcpRmq} / & \\
+        & \proc{Comp} & \proc{SuffixNca} & \fprintk \\
+        Preprocessing & $O(1)$ & $O(\sortt)$ & $O(k\cdot n+\sortt)$ \\
+        Space & $O(1)$ & $O(n)$ & $O(k\cdot n)$\\
+        Query & $O(n)$ & $O(1)$ & $O(k\cdot n^{1/k})$ \\
+        Average query & $O(1)$ & $O(1)$ & $O(1)$ \\
+        Query I/O & $O(n/B)$ & $O(1)$ & $O\Big(k\cdot\Big(\frac{n^{1/k}}{B}+1\Big)\Big)$ \\
+    \end{tabular}
+    \begin{itemize}
+        \item In practice, the \fprintk\ algorithm is...
+        \begin{itemize}
+            \item ...almost as good as \proc{DirectComp} and significantly better than \proc{LcpRmq} in average case
+            \item ...significantly better than \proc{DirectComp} but worse than \proc{LcpRmq} in worst case
+        \end{itemize}
+        \item We can generalize LCE to use on trees:
+        \begin{tabular}{r l}
+            Preprocessing & $O(\sortt)$ \\
+            Space & $O(n)$\\
+            Query & $O(\log n)$ \\
+        \end{tabular}
+    \end{itemize}
+\end {frame}
+
 \end{document}
 
 
