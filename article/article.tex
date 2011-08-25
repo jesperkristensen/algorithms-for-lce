@@ -26,7 +26,7 @@
 \newrefformat{app}{\appendixname~\ref{#1}}
 \newrefformat{alg}{Algorithm~\ref{#1}}
 
-\title{Algorithms for Longest Common Extensions} 
+\title{Longest Common Extension via Fingerprinting} 
 
 \author{Philip Bille\\\texttt{phbi@imm.dtu.dk}\and Inte Li Gørtz\\\texttt{ilg@imm.dtu.dk}\and Jesper Kristensen\\\texttt{mail@jesperkristensen.dk}}
 
@@ -78,22 +78,16 @@
 %\newpage
 
 \begin{abstract}
-The \emph{longest common extension} (LCE) problem is to preprocess a string in order to allow for a large number of LCE queries, such that the queries are efficient. The LCE value, $\LCE_s(i,j)$, is the length of the longest common prefix of the pair of suffixes starting at index $i$ and $j$ in the string $s$. The LCE problem can be solved in linear space with constant query time and a preprocessing of sorting complexity. There are two known approaches achieving these bounds, which use nearest common ancestors and range minimum queries respectively. However, in practice a much simpler approach with linear query time, no extra space and no preprocessing achieves significantly better average case performance. We show a new algorithm, \fprintk\, which for a parameter $k$, $1\leq k\leq\logceil$, on a string of length $n$ and alphabet size $\sigma$, gives $O(k\cdot n^{1/k})$ query time using $O(k\cdot n)$ space and $O(k\cdot n + \sortt)$ preprocessing time. Though this solution is asymptotically strictly worse than the asymptotically best previously known algorithms, it outperforms them in practice in average case and is almost as fast as the simple linear time algorithm. On worst case input, this new algorithm is significantly faster in practice compared to the simple linear time algorithm. We also look at cache performance of the new algorithm, and we show that optimizing for cache only improves practical query time for $k=2$.
+The \emph{longest common extension} (LCE) problem is to preprocess a string in order to allow for a large number of LCE queries, such that the queries are efficient. The LCE value, $\LCE_s(i,j)$, is the length of the longest common prefix of the pair of suffixes starting at index $i$ and $j$ in the string $s$. The LCE problem can be solved in linear space with constant query time and a preprocessing of sorting complexity. There are two known approaches achieving these bounds, which use nearest common ancestors and range minimum queries, respectively. However, in practice a much simpler approach with linear query time, no extra space and no preprocessing achieves significantly better average case performance. We show a new algorithm, \fprintk\, which for a parameter $k$, $1\leq k\leq\logceil$, on a string of length $n$ and alphabet size $\sigma$, gives $O(k\cdot n^{1/k})$ query time using $O(k\cdot n)$ space and $O(k\cdot n + \sortt)$ preprocessing time, where $\sortt$ is the time it takes to sort $n$ numbers from $\sigma$. Though this solution is asymptotically strictly worse than the asymptotically best previously known algorithms, it outperforms them in practice in average case and is almost as fast as the simple linear time algorithm. On worst case input, this new algorithm is significantly faster in practice compared to the simple linear time algorithm. We also look at cache performance of the new algorithm, and we show that for $k=2$, cache optimization can improve practical query time.
 \end{abstract}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction\label{sec:intro}}
 
-The \emph{longest common extension} (LCE) problem is to preprocess a string in order to allow for a large number of LCE queries, such that the queries are efficient. The LCE value, $\LCE_s(i,j)$, is the length of the longest common prefix of the pair of suffixes starting at index $i$ and $j$ in the string $s$. The LCE problem can be used in many algorithms for solving other algorithmic problems, e.g.\ the Landau-Vishkin algorithm for approximate string searching~\cite{approx-search}. Solutions with linear space and constant query time exists for the problem~\cite{nca,jf-rmq}. These theoretically good solutions are however not the best in practice, since they have large constant factors for both time and space usage. A much simpler solution exists with average case constant time and no space required other than storing the input string. It has has significantly better practical performance for average case input as well as for average case queries on some real world strings, when compared to the asymptotically best known algorithms~\cite{ilie-navarro-tinta}. However this algorithm has linear worst case query time, and is thus only ideal when worst case performance is irrelevant. In situations where we need both average case and worst case performance to be good, none of the existing solutions are ideal. Such a situation could be use of approximate string searching in a firewall. The firewall should not allow an attacker to significantly degrade its performance by sending it carefully crafted packages. At the same time it must scan legitimate data fast.
+The \emph{longest common extension} (LCE) problem is to preprocess a string in order to allow for a large number of LCE queries, such that the queries are efficient. The LCE value, $\LCE_s(i,j)$, is the length of the longest common prefix of the pair of suffixes starting at index $i$ and $j$ in the string $s$. The LCE problem can be used in many algorithms for solving other algorithmic problems, e.g., the Landau-Vishkin algorithm for approximate string searching~\cite{approx-search}. Solutions with linear space, constant query time, and $O(\sortt)$ preprocessing time exists for the problem~\cite{nca,jf-rmq}. Here $\sortt$ is the time it takes to sort $n$ numbers from an alphabet of size $\sigma$. For $\sigma=O(n^c)$, where $c$ is a constant, we have $\sortt=O(n)$. These theoretically good solutions are however not the best in practice, since they have large constant factors for both query time and space usage. A much simpler solution exists with average case constant time and no space or preprocessing required other than storing the input string. It has significantly better practical performance for average case input as well as for average case queries on some real world strings, when compared to the asymptotically best known algorithms~\cite{ilie-navarro-tinta}. However this algorithm has linear worst case query time, and is thus only ideal when worst case performance is irrelevant. In situations where we need both average case and worst case performance to be good, none of the existing solutions are ideal. Such a situation could be use of approximate string searching in a firewall. The firewall should not allow an attacker to significantly degrade its performance by sending it carefully crafted packages. At the same time it must scan legitimate data fast.
 
-In this paper we give a new algorithm, which is a generalization of the simple linear time algorithm. The new algorithm is almost as simple, yet it has significantly better worst case query time. This algorithm also achieves significantly better average case practical query time compared to the asymptotically best known algorithms. The algorithm uses string fingerprinting to achieve a time/space-tradeoff with $O(k\cdot n^{1/k})$ worst case query time, constant average case query time, and $O(kn)$ space for $k$ between one and $\log n$, on a string of length $n$.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\subsection{The LCE Problem}
-
-%Given a string $s$ of length $n$ and a pair of indexes $1\leq i\leq n$ and $1\leq j\leq n$, the \emph{longest common extension} of $i$ and $j$ on $s$, $\LCE_s(i,j)$, is the length of the longest common prefix of $\suff_i$ and $\suff_j$. If for example $s = abbababba$, $i = 4$ and $j=6$, then $\suff_4 = ababba$ and $\suff_6 = abba$. The longest common prefix of these two suffixes is $ab$, which has length $2$, and therefore we have $\LCE_s(4,6) = 2$.
-
+In this paper we give a new algorithm, which is a generalization of the simple linear time algorithm. The new algorithm is almost as simple, yet it has significantly better worst case query time. This algorithm also achieves significantly better average case practical query time compared to the asymptotically best known algorithms. The algorithm uses string fingerprinting inspired by Karp-Miller-Rosenberg~\cite{karp-miller-rosenberg} to achieve a time/space-tradeoff with $O(k\cdot n^{1/k})$ worst case query time, constant average case query time, and $O(kn)$ space for $k$ between one and $\log n$, on a string of length $n$. The preprocessing time for this algorithm is $O(kn+\sortt)$. We look at a cache optimization for the new fingerprinting based algorithm, which improves query I/O for small values of $k$, and we show that for $k=2$, this cache optimization improves practical query times.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Previous Results\label{sec:existing-results}}
@@ -110,13 +104,13 @@ Both \proc{SuffixNca} and \proc{LcpRmq} have the same asymptotic space and times
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Our Results}
 
-We present a new LCE algorithm, \fprintk, based on multiple levels of string fingerprinting. The algorithm has a parameter $k$ in the range $1\leq k\leq\logceil$, which describes the number of levels used\footnote{All logarithms are base two.}.
+We present a new LCE algorithm, \fprintk, based on multiple levels of string fingerprinting. The algorithm has a parameter $k$ in the range $1\leq k\leq\logceil$, which describes the number of levels used\footnote{All logarithms are base two.}. The performance of the algorithm is summarized by the following theorem:
 
 \begin{theorem}
 For a string $s$ of length $n$ and alphabet size $\sigma$, the \fprintk\ algorithm, where $k$ is a parameter $1 \leq k \leq \logceil$, can solve the LCE problem in $O(k\cdot n^{1/k})$ worst case query time and $O(1)$ average case query time using $O(k\cdot n)$ space and $O(\sortt + k\cdot n)$ preprocessing time.
 \end{theorem}
 
-The exact worst case performance of our solution depends on the amount of space you are willing to use.
+By choosing $k$ we introduce the following tradeoffs:
 
 \begin{corollary}
 \fprint[1] is equivalent to \proc{DirectComp} with $O(n)$ space and $O(n)$ query time.
@@ -158,7 +152,7 @@ Algorithm & Space & Query time & Preprocessing \\ [0.5ex] \hline
 
 In practice, existing state of the art solutions are either good in worst case, while poor in average case (\proc{LcpRmq}), or good in average case while poor in worst case (\proc{DirectComp}). Our \fprintk\ solution targets a worst case vs. average case query time tradeoff between these two extremes. Our solution is almost as fast as \proc{DirectComp} on an average case input, and it is significantly faster than \proc{DirectComp} on a worst case input. Compared to \proc{LcpRmq}, our solution has a significantly better performance on an average case input, but its worst case performance is not as good as that of \proc{LcpRmq}. The space usage for \proc{LcpRmq} and \fprintk\ are approximately the same when $k=6$.
 
-For $k=2$ we can improve practical \fprintk\ query time even further by optimizing it for cache efficiency. However for $k>2$ the query time performance degrades, as the added overhead outweighs the improved cache efficiency.
+For $k=2$ we can improve practical \fprintk\ query time even further by optimizing it for cache efficiency. However for $k>2$, this cache optimization degrades practical query time performance, as the added overhead outweighs the improved cache efficiency.
 
 Our algorithm is fairly simple. Though it is slightly more complicated than \proc{DirectComp}, it does not use any of the advanced algorithmic techniques required by \proc{LcpRmq} and \proc{SuffixNca}.
 
@@ -173,7 +167,7 @@ In \pref{sec:fprintk} we present the \fprintk\ algorithm and analyze its theoret
 % \paragraph{String notation.}
 Let $s$ be a string of length $n$. Then $s[i]$ is the $i$'th character of $s$, and $s[i\twodots j]$ is a substring of $s$ containing characters $s[i]$ to $s[j]$, both inclusive. That is, $s[1]$ is the first character of $s$, $s[n]$ is the last character, and $s[1\twodots n]$ is the entire string. The suffix of $s$ starting at index $i$ is written $\suff_i = s[i\twodots n]$.
 %\paragraph{Sorting complexity.}
-The time it takes to sort $n$ numbers within an universe of size $\sigma$ is written as $\sortt$.
+%The time it takes to sort $n$ numbers within an universe of size $\sigma$ is written as $\sortt$.
 
 %\paragraph{Suffix tree.}
 A \emph{suffix tree} $\mathcal{T}$ encodes all suffixes of a string $s$ of length $n$ with alphabet $\sigma$. The tree has $n$ leaves named $L_1$ to $L_n$, one for each suffix of $s$. Each edge is labeled with a substring of $s$, such that for any $1\leq i\leq n$, the concatenation of labels on edges on the path from the root to $L_i$ gives $\suff_i$. Any internal node must have more than one child, and the labels of two child edges must not share the same first character. The string depth $D[v]$ of a node $v$ is the length of the string formed when concatenating the edge labels on the path from the root to $v$.
@@ -233,11 +227,13 @@ Each of the $k$ tables stores $n$ fingerprints of constant size.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Query\label{sec:fingerprint-query}}
+The \fprintk\ query speeds up \proc{DirectComp} by comparing fingerprints of substrings of the input string instead of individual characters.
+The central part of the query algorithm moves down through the levels comparing fingerprints of progressively shorter substrings. This gives speed at the higher levels and then precision at the lower levels. To achieve constant average case query time, the algorithm starts at the lowest level and moves up through the levels before doing the central part.
 
 To perform a LCE query using the \fprintk\ data structure, start with $v=0$ and $\ell=0$, then do the following steps:
 \begin{samepage}
 \begin{enumerate}
-\item As long as $H_\ell[i+v] = H_\ell[j+v]$, increment $v$ by $t_\ell$, increment $\ell$ by one, and repeat this step unless and $\ell = k-1$.
+\item As long as $H_\ell[i+v] = H_\ell[j+v]$, increment $v$ by $t_\ell$, increment $\ell$ by one, and repeat this step unless $\ell = k-1$.
 \item As long as $H_\ell[i+v] = H_\ell[j+v]$, increment $v$ by $t_\ell$ and repeat this step.
 \item Stop and return $v$ when $\ell = 0$, otherwise decrement $\ell$ by one and go to step two.
 \end{enumerate}
@@ -252,7 +248,7 @@ An example of a query is shown in \pref{fig:fingerprint-query}.
     \caption{\label{fig:fingerprint-query}\fprintk\ query for $\LCE(3,12)$ on the data structure of \pref{fig:fingerprint-ds}. The top half shows how $H_\ell[i+v]$ moves through the data structure, and the bottom half shows $H_\ell[j+v]$.}
 \end{figure}
 
-\begin{lemma}
+\begin{lemma}\label{lem:query-correct}
 The \fprintk\ query algorithm is correct.
 \end{lemma}
 \begin{proof}
@@ -265,14 +261,19 @@ The algorithm never reads $H_\ell[x]$, where $x>n$, because the string contains 
 The worst case query time for \fprintk\ is $O(k\cdot n^{1/k})$, and the average case query time is $O(1)$.
 \end{lemma}
 \begin{proof}
-Step one takes $O(k)$ time. In step two and three, the number of remaining characters left to check at level $\ell$ is $O(n^{(\ell+1)/k})$, since the previous level found two differing substrings of that length (at the top level $\ell=k-1$ we have $O(n^{(\ell+1)/k}) = O(n)$). Since we can check $t_\ell = \Theta(n^{\ell/k})$ characters in constant time at level $\ell$, the algorithm uses $O(n^{(\ell+1)/k})/\Theta(n^{\ell/k}) = O(n^{1/k})$ time at that level. Over all $k$ levels, $O(k\cdot n^{1/k})$ query time is used.
+First we consider the worst case: Step one takes $O(k)$ time. In step two and three, the number of remaining characters left to check at level $\ell$ is $O(n^{(\ell+1)/k})$, since the previous level found two differing substrings of that length (at the top level $\ell=k-1$ we have $O(n^{(\ell+1)/k}) = O(n)$). Since we can check $t_\ell = \Theta(n^{\ell/k})$ characters in constant time at level $\ell$, the algorithm uses $O(n^{(\ell+1)/k})/\Theta(n^{\ell/k}) = O(n^{1/k})$ time at that level. Over all $k$ levels, $O(k\cdot n^{1/k})$ query time is used.
 
-At each step except step three, the algorithm increments $v$. Step three is executed the same number of times as step one, in which $v$ is incremented. The query time is therefore linear to the number of times $v$ is incremented, and it is thereby $O(v)$. The query time is thus $O(1)$ in average case, where $v=O(1)$.
+Next we consider the average case: At each step except step three, the algorithm increments $v$. Step three is executed the same number of times as step one, in which $v$ is incremented. The query time is therefore linear in the number of times $v$ is incremented, and it is thereby $O(v)$. From the proof of \pref{lem:query-correct} we have $v=\LCE(i,j)$, and in average case $\LCE(i,j)=O(1)$~\cite{ilie-navarro-tinta}. The query time is thus $O(1)$ in average case.
 \end{proof}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\paragraph{Average Case Optimization\label{sec:improved-avg}}
+\paragraph{Average Case vs.\ Worst Case\label{sec:improved-avg}}
 
+The query algorithm is optimized for average case. Without this, the average case query time would be $O(k)$, while the asymptotic worst case time would not be affected. The practical worst case query time could however be negatively affected.
+Our experiments have shown that the improvement in practical average case query time far outweighs any degraded worst case performance, and for small values of $k$, changes in worst case performance is barely measurable.
+%Our experiments have shown that for small values of $k$, optimizing for the average case significantly improves average case query time, while any negative effect on worst case query time is barely measurable. For large values of $k$ the improvement in average case far outweighs the slightly degraded practical worst case.
+
+\begin{comment}
 We could have left out step one of the query algorithm and started with $\ell=k-1$. This would keep the asymptotic worst case query time of $O(k\cdot n^{1/k})$, while it might improve practical worst case query time, but it would increase our average case query time to $O(k)$.
 \ifarticle
 Our experiments have shown that whenever $k$ is small, keeping step one improves average case query time, while it does not have a measurable effect on worst case query times. When $k = \logceil$, keeping step one can double the worst case query time, while it can make the average case query time 40 times faster for an input string of ten million characters. We want to optimize our LCE query time for the average case where the LCE value is small, so our results in \pref{sec:results} does not include the variant of \fprintk\ with $O(k)$ average case query time.
@@ -289,6 +290,7 @@ In step one of our query algorithm we perform one comparison at each level. We c
 \ifarticle
 Our experiments have shown that always doing one comparison at each level is the best in practice.
 \fi % article
+\end{comment}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Preprocessing}
@@ -355,7 +357,7 @@ We have tested the algorithms on different kinds of strings:
 \begin{description}
 \item[Average case strings] These strings have many small LCE values, such that the average LCE value over all $n^2$ query pairs is less than one. We use results on these strings as an indication average case query times over all input pairs $(i,j)$ in cases where most or all LCE values are small on expected input strings. We construct these strings by choosing each character uniformly at random from an alphabet of size 10
 \item[Worst case strings] These strings have many large LCE values, such that the average LCE value over all $n^2$ query pairs is $n/2$. We use results on these strings as an indication of worst case query times, since the query times for all tested algorithms are asymptotically at their worst when the LCE value is large. We construct these strings with an alphabet size of one.
-\item[Medium LCE value strings] These strings have an average LCE value over all $n^2$ query pairs of $n/2r$, where $r=0.73n^{0.42}$. This value of $r$ is a power regression over $(r,n) = (5,100)$, $(15,1.000)$, $(35,10.000)$ and $(100,100.000)$, where the each of the values of $n$ were chosen to give the best result for \fprintk\ on a plot with the given constant value of $r$. We use results on these strings as an indication of query times somewhere between the average case and worst case. We construct these strings by repeating a substring of $r$ characters, where each character is unique.
+\item[Medium LCE value strings] These strings have an average LCE value over all $n^2$ query pairs of $n/2r$, where $r=0.73n^{0.42}$. We use results on these strings to show that \fprint\ can be faster than both \proc{DirectComp} and \proc{LcpRmq} on some inputs between the average case and worst case. The value of $r$ is a power regression over $(r,n) = (5,100)$, $(15,1.000)$, $(35,10.000)$ and $(100,100.000)$, where each of the values of $n$ were chosen such that \fprintk\ was faster than both \proc{DirectComp} and \proc{LcpRmq} on a plot with the given constant value of $r$. We construct these strings by repeating a substring of $r$ characters, where each character is unique.
 \end{description}
 
 Each measurement we make is an average of query times over a million random query pairs $(i, j)$. For a given string length and string type (worst case strings vs.\ average case strings), we use the same string and the same million query pairs on all tested algorithms.
@@ -401,7 +403,7 @@ On average case strings, our new \fprintk\ algorithm is approximately 20\% slowe
 
 On worst case strings, the \fprintk\ algorithms are significantly better than \proc{DirectComp} and somewhat worse than \proc{LcpRmq}. Up until $n=30.000$ the three measured \fprintk\ algorithms have nearly the same query times. Of the \fprintk\ algorithms, the $k=2$ variant has a slight advantage for small strings of length less than around $2.000$. For longer strings the $k=3$ variant performs the best up to strings of length $250.000$, at which point the $k=\logceil$ variant becomes the best. This indicates that for shorter strings, using fewer levels is better, and when the input size increases, the \fprintk\ variants with better asymptotic query times have better worst case times in practice.
 
-On strings with medium average LCE values, we see that our \fprintk\ algorithms are faster than both \proc{DirectComp} and \proc{LcpRmq}
+On the plot of strings with medium average LCE values, we see a case where our \fprintk\ algorithms are faster than both \proc{DirectComp} and \proc{LcpRmq}.
 
 We conclude that our new \fprintk\ algorithm achieves a tradeoff between worst case times and average case times, which is better than the existing best \proc{DirectComp} and \proc{LcpRmq} algorithms, yet it is not strictly better than the existing algorithms on all inputs. \fprintk\ is therefore a good choice in cases where both average case and worst case performance is important.
 
@@ -489,15 +491,15 @@ We conclude that using average case optimization yields a query time improvement
 
 The amount of I/O used by \fprintk\ is $O(k\cdot n^{1/k})$. However if we structure our tables of fingerprints differently, we can improve the number of I/O operations to $O(k(n^{1/k}/B+1))$ in the cache-oblivious model. Instead of storing $F_{t_\ell}[i]$ at $H_\ell[i]$, we can store it at $H_\ell[((i-1)\mod t_\ell)\cdot\lceil n/t_\ell\rceil+\lfloor (i-1)/t_\ell\rfloor+1]$. This will group all used fingerprints at level $\ell$ next to each other in memory, such that the amount of I/O at each level is reduced from $O(n^{1/k})$ to $O(n^{1/k}/B)$.
 
-The size of each fingerprint table will grow from $|H_\ell| = n$ to $|H_\ell| = n+t_\ell$, because the rounding operations may introduce one-element gaps in the table after every $n/t_\ell$ elements. We achieve the greatest I/O improvement when $k$ is small. When $k=\logceil$, this cache optimization gives no difference in the amount of I/O.
+The size of each fingerprint table will grow from $|H_\ell| = n$ to $|H_\ell| = n+t_\ell$, because the rounding operations may introduce one-element gaps in the table after every $n/t_\ell$ elements. We achieve the greatest I/O improvement when $k$ is small. When $k=\logceil$, this cache optimization gives no asymptotic difference in the amount of I/O.
 
 We have implemented two cache optimized variants. One as described above, and one where multiplication, division and modulo is replaced with shift operations. To use shift operations, $t_\ell$ and $\lceil n/t_\ell\rceil$ must both be powers of two. This may double the size of the used address space.
 
 \pref{fig:plot-fingerprint-cache-horiz} shows our measurements for \fprint[2]. On average case strings the cache optimization does not change the query times, while on worst case strings and strings with medium size LCE values, cache optimization gives a noticeable improvement for large inputs. The cache optimized \fprint[2] variant with shift operations shows an increase in query times for large inputs, which we cannot explain.
 
-The last plot on \pref{fig:plot-fingerprint-cache-horiz} shows a variant of average case where the alphabet size is changed to two. This plot attempts to show the worst case for cache optimized \fprint[2]. LCE values in this plot are large enough to ensure that $H_1$ is used often, which should make the extra complexity of calculating indexes into $H_1$ visible. At the same time the LCE values are small enough to ensure, that the cache optimization has no effect. In this plot we see that the cache optimized variant of \fprint[2] has only slightly worse query time compared to the variant, which is not cache optimized.
+The last plot on \pref{fig:plot-fingerprint-cache-horiz} shows a variant of average case where the alphabet size is changed to two. This plot shows a bad case for cache optimized \fprint[2]. LCE values in this plot are large enough to ensure that $H_1$ is used often, which should make the extra complexity of calculating indexes into $H_1$ visible. At the same time the LCE values are small enough to ensure, that the cache optimization has no effect. In this bad case plot we see that the cache optimized variant of \fprint[2] has only slightly worse query time compared to the variant, which is not cache optimized.
 
-\pref{fig:plot-fingerprint3-cache} shows our measurements for \fprint[3]. Unlike for \fprint[2], we see a degraded performance on worst case strings compared to the not cache optimized variant. Our results thus show that cache optimization of \fprintk\ only gives a performance improvement for $k=2$.
+\pref{fig:plot-fingerprint3-cache} shows our measurements for \fprint[3]. Unlike for \fprint[2], we see a degraded performance on worst case strings compared to the not cache optimized variant. Our results thus show that this cache optimization of \fprintk\ only gives a performance improvement for $k=2$.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -505,44 +507,7 @@ The last plot on \pref{fig:plot-fingerprint-cache-horiz} shows a variant of aver
 
 We have presented the \fprintk\ algorithm, where $k$ is a parameter $1 \leq k \leq \logceil$, which for a string $s$ of length $n$ and alphabet size $\sigma$, can solve the LCE problem in $O(k\cdot n^{1/k})$ worst case query time and $O(1)$ average case query time using $O(k\cdot n)$ space and $O(\sortt + k\cdot n)$ preprocessing time.
 
-\ifreport
-Of the existing best \proc{DirectComp} and \proc{LcpRmq} algorithms, we have seen that \proc{DirectComp} is best on average case strings, while \proc{LcpRmq} is best on worst case strings.
-
-We have found that our new \proc{DirectCompLookup} algorithm can improve the worst case query time performance of \proc{DirectComp}, while it does not degrade the average case query time to the level of \proc{LcpRmq}. However it is not as interesting as our new \fprintk\ algorithm, because it uses too much space.
-\fi % report
-
-The \fprintk\ algorithm is able to achieve a balance between practical worst case and average case query times. It has almost as good average case query times as \proc{DirectComp}, its worst case query times are significantly better than those of \proc{DirectComp}, and we have found cases between average and worst case where \fprintk\ is better than both \proc{DirectComp} and \proc{LcpRmq}. \fprintk\ gives a good time space tradeoff, and it uses less space than \proc{LcpRmq} when $k$ is small. %The performance of \fprintk\ can be tweaked on many parameters, and we have found that optimizing for average case queries and for memory caches improve practical query time performance.
-
-\ifreport
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Test Code}
-
-To test practical performance, we have implemented the algorithms in C++. The implementation is based on that of Ilie~et~al.~\cite{ilie-navarro-tinta}, which we have heavily modified. We have added a working build system, made it compile on a 32-bit Windows architecture, and generalized it to allow more algorithms and tests to be implemented. \pref{tab:test-variables} summarizes the structure of the code and the parameters we can vary.
-
-\begin{table}[tp]
-\centering
-\begin{tabular}{l l l}
-Variable & Example & Component \\ \hline
-alphabet size & $\sigma = 10$ & string \\
-character pattern & uniformly at random & string \\ \hline
-algorithm & \fprintk & algorithm \\
-alg. parameters & $t_1 = 2\sqrt n$ & algorithm \\ \hline
-string length & exponentially increasing from $1$ to $100.000$ & test \\
-query pattern & uniformly at random & test \\ \hline
-\end{tabular}
-\caption{List of performance variables tested.}\label{tab:test-variables}
-\end{table}
-
-In our implementation, we have made the following assumptions about the LCE problem:
-\begin{itemize}
-\item A character in a string is always eight bits.
-\item A string always ends with a special null character, which does not occur anywhere else in the string. This does not affect our results, since we do not measure practical preprocessing time. If an algorithm has faster query times when the string ends in a special character, it could just add that character to the end of the string in its preprocessing.
-\item We make no assumptions on the order of $i$ and $j$. In some applications of the LCE problem, for example approximate string searching~\cite{approx-search}, we know that $i<j$, and some algorithms might be able to take advantage of this knowledge to get faster query times. We do not measure this case.
-\item Whenever we use random characters or query pairs, we use the \texttt{rand()} function from C. This gives repeatable pseudo-random numbers, which makes it easier for us to compare test runs.
-\end{itemize}
-
-\fi % report
+The \fprintk\ algorithm is able to achieve a balance between practical worst case and average case query times. It has almost as good average case query times as \proc{DirectComp}, its worst case query times are significantly better than those of \proc{DirectComp}, and we have shown cases between average and worst case where \fprintk\ is better than both \proc{DirectComp} and \proc{LcpRmq}. \fprintk\ gives a good time space tradeoff, and it uses less space than \proc{LcpRmq} when $k$ is small. %The performance of \fprintk\ can be tweaked on many parameters, and we have found that optimizing for average case queries and for memory caches improve practical query time performance.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
