@@ -39,8 +39,8 @@
 \end{frame}
 
 \section{Introduction}
-\subsection{The LCE Problem}
-\begin{frame}{The LCE Problem and the \proc{DirectComp} algorithm}
+\subsection{The \proc{DirectComp} algorithm}
+\begin{frame}{The \proc{DirectComp} algorithm}
     \begin{block}{Input}
         \begin{itemize}
             \item $s=abbababba$
@@ -104,13 +104,18 @@
         \begin{block}{Result}
             $LCE_s(4,6)=2$
         \end{block}
-        \begin{block}{LCE problem}
-            Efficiently perform multiple queries $(i,j)$ on a static string $s$
-        \end{block}
     }
 \end{frame}
 
-\subsection{The \proc{DirectComp} algorithm}
+\subsection{The LCE Problem}
+\begin{frame}{The LCE Problem}
+    \begin{description}
+        \item[LCE value] $\LCE_s(i,j)$ is the length of the longest common prefix of the two suffixes of $s$ starting at index $i$ and $j$
+        \item[LCE problem] Efficiently query multiple LCE values on a static string $s$
+    \end{description}
+\end{frame}
+
+%\subsection{The \proc{DirectComp} algorithm}
 \begin{frame}{Existing Algorithm: \proc{DirectComp}}
     \begin{tabular}{r l}
         Preprocessing & $O(1)$ \\
@@ -130,28 +135,34 @@
 %    $\LCE_s(i,j) = D[\NCA_\mathcal{T}(L_i,L_j)]$
 %\end{frame}
 
-\subsection{The \proc{LcpRmq} Algorithm}
-\begin{frame}{Existing Algorithm: \proc{LcpRmq}}
-    \begin{multicols}{2}{
-        \begin{align*}
-            s&=abbababba\\
-            s[2\twodots n]&=bbababba\\
-            s[3\twodots n]&=bababba\\
-            \LCE_s(2,3)&=1
-        \end{align*}
-        \newpage
-        \begin{center}
-            %\uncover<2->{
-            \includegraphics[width=0.26\textwidth,page=1]{../doc/sa+lcp+min.pdf}
-            %}
-        \end{center}
-    }
-    \end{multicols}
+\subsection{The \proc{SuffixNca} and \proc{LcpRmq} Algorithms}
+\begin{frame}{Existing Algorithms: \proc{SuffixNca} and \proc{LcpRmq}}
+    %\begin{multicols}{2}{
+    %    \begin{align*}
+    %        s&=abbababba\\
+    %        s[2\twodots n]&=bbababba\\
+    %        s[3\twodots n]&=bababba\\
+    %        \LCE_s(2,3)&=1
+    %    \end{align*}
+    %    \newpage
+    %    \begin{center}
+    %        %\uncover<2->{
+    %        \includegraphics[width=0.26\textwidth,page=1]{../doc/sa+lcp+min.pdf}
+    %        %}
+    %    \end{center}
+    %}
+    %\end{multicols}
     %\uncover<3->{
+    Two algorithms with best known bounds:
+    \begin{description}
+        \item[\proc{SuffixNca}] Nearest common ancestor queries on a suffix tree
+        \item[\proc{LcpRmq}] Range minimum queries on a longest common prefix array
+    \end{description}
+    \vspace{1em}
     \begin{center}
-        $\LCE(i,j)=\LCP[\RMQ_{\LCP}(\SAinv[i] + 1, \SAinv[j])]$\\
-        where $\SAinv[i] < \SAinv[j]$\\
-        \vspace{1em}
+    %    $\LCE(i,j)=\LCP[\RMQ_{\LCP}(\SAinv[i] + 1, \SAinv[j])]$\\
+    %    where $\SAinv[i] < \SAinv[j]$\\
+    %    \vspace{1em}
         \begin{tabular}{r l}
             Preprocessing & $O(\sortt)$ \\
             Space & $O(n)$ \\
@@ -219,6 +230,7 @@
     \end{tabular}
 \end{frame}
 
+\begin{comment}
 \subsection{Preprocessing}
 \begin{frame}{The \fprintk\ Algorithm: Preprocessing}
     \begin{itemize}
@@ -250,6 +262,7 @@
     \end{tabular}
 
 \end{frame}
+\end{comment}
 
 \subsection{I/O}
 \begin{frame}{The \fprintk\ Algorithm: I/O}
@@ -286,41 +299,16 @@
         Query I/O & $O\Big(k\cdot\Big(\frac{n^{1/k}}{B}+1\Big)\Big)$ \\
     \end{tabular}
 
-    \hfill\\$k=1$:
+    \vspace{2em}
 
-    ~~Same as \proc{DirectComp}
-
-%    \hfill\\$k=2$:
-
-%    \begin{tabular}{r l}
-%        Preprocessing & $O(\sortt)$ \\
-%        Space & $O(n)$\\
-%        Query & $O(\sqrt n)$ \\
-%        Average query & $O(1)$ \\
-%    \end{tabular}
-
-    \begin{multicols}{2}{
-        $k=2$:
-
-        \begin{tabular}{r l}
-            Preprocessing & $O(\sortt)$ \\
-            Space & $O(n)$\\
-            Query & $O(\sqrt n)$ \\
-            Average query & $O(1)$ \\
-            Query I/O & $O\Big(\frac{\sqrt n}{B}\Big)$ \\
-        \end{tabular}
-        \newpage
-        $k=\logceil$:
-
-        \begin{tabular}{r l}
-            Preprocessing & $O(n\log n)$ \\
-            Space & $O(n\log n)$\\
-            Query & $O(\log n)$ \\
-            Average query & $O(1)$ \\
-            Query I/O & $O(\log n)$ \\
-        \end{tabular}
-    }
-    \end{multicols}
+    \begin{tabular}{r l l l}
+        & $k=1$ & $k=2$ & $k=\logceil$ \\
+        Preprocessing & $O(\sortt)$ & $O(\sortt)$ & $O(n\log n)$ \\
+        Space & $O(n)$ & $O(n)$ & $O(n\log n)$ \\
+        Query & $O(n)$ & $O(\sqrt n)$ & $O(\log n)$ \\
+        Average query & $O(1)$ & $O(1)$ & $O(1)$ \\
+        Query I/O & $O\Big(\frac{n}{B}\Big)$ & $O\Big(\frac{\sqrt n}{B}\Big)$ & $O(\log n)$ \\
+    \end{tabular}
 \end{frame}
 
 \subsection{Practical Results}
@@ -378,7 +366,7 @@
     \textcolor{red}{without cache optimization}
     and with cache optimization using
     \textcolor{green}{shift operations} vs.\
-    \textcolor{blue}{multiplication and division}
+    \textcolor{blue}{multiplication, division and modulo}
     %by string length
     \begin{multicols}{2}{
         \begin{center}
@@ -397,7 +385,7 @@
     \textcolor{red}{without cache optimization}
     and with cache optimization using
     \textcolor{green}{shift operations} vs.\
-    \textcolor{blue}{multiplication and division}
+    \textcolor{blue}{multiplication, division and modulo}
     %by string length
     \begin{multicols}{2}{
         \begin{center}
@@ -467,12 +455,12 @@
         \begin{itemize}
             \item Data structure:
             \begin{itemize}
-                \item Construct a heavy tree decomposition
-                \item For each heavy path, store characters as a substring
+                \item Construct a heavy path decomposition
+                \item For each heavy path, store characters as a substring of $s$
             \end{itemize}
             \item Query:
             \begin{itemize}
-                \item Use constant time string LCE on each heavy path
+                \item Use constant time string LCE on $s$ for each heavy path
             \end{itemize}
         \end{itemize}
         \begin{center}
