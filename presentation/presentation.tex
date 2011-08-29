@@ -37,6 +37,10 @@
 \begin{frame}{Contents}
 \tableofcontents
 \end{frame}
+% Jeg vil beskrive LCE problemet
+% Eksisterende løsninger er gode enten asymptotisk worst case eller praktisk average case
+% Formålet er at finde en balance mellem de to
+% Sidst vil jeg generalisere LCE til trær, som man kan bruge til LCE på komprimerede strenge
 
 \section{Introduction}
 \subsection{The \proc{DirectComp} algorithm}
@@ -49,6 +53,7 @@
     \end{block}
     \begin{block}{The \proc{DirectComp} algorithm}
         %\setlength{\unitlength}{1cm}
+        \definecolor{ucolor}{rgb}{.8,.8,.8}
         \definecolor{matchcolor}{rgb}{.6,1,.6}
         \definecolor{mismatchcolor}{rgb}{1,.6,.6}
         \begin{picture}(300,50)
@@ -62,39 +67,51 @@
             \put(140, 30){\framebox(20, 20){b}}
             \put(160, 30){\framebox(20, 20){b}}
             \put(180, 30){\framebox(20, 20){a}}
-            \uncover<1-2>{
+            \uncover<1-3>{
                 \put(90, 15){\vector(0,1){13}}
                 \put(80, 0){\makebox(20, 15){4}}
                 \put(130, 15){\vector(0,1){13}}
                 \put(120, 0){\makebox(20, 15){6}}
             }
             \uncover<2-2>{
+                \put(80,30){\framebox(20, 20){\colorbox{ucolor}{\makebox(13,14){a}}}}
+                \put(120,30){\framebox(20, 20){\colorbox{ucolor}{\makebox(13,14){a}}}}
+            }
+            \uncover<3-3>{
                 \put(80,30){\framebox(20, 20){\colorbox{matchcolor}{\makebox(13,14){a}}}}
                 \put(120,30){\framebox(20, 20){\colorbox{matchcolor}{\makebox(13,14){a}}}}
             }
-            \uncover<2-3>{
+            \uncover<3-4>{
                 \put(200, 30){\makebox(100, 20){1 match}}
             }
-            \uncover<3-4>{
+            \uncover<4-5>{
                 \put(110, 15){\vector(0,1){13}}
                 \put(100, 0){\makebox(20, 15){5}}
                 \put(150, 15){\vector(0,1){13}}
                 \put(140, 0){\makebox(20, 15){7}}
             }
             \uncover<4-4>{
+                \put(100,30){\framebox(20, 20){\colorbox{ucolor}{\makebox(13,14){b}}}}
+                \put(140,30){\framebox(20, 20){\colorbox{ucolor}{\makebox(13,14){b}}}}
+            }
+            \uncover<5-5>{
                 \put(100,30){\framebox(20, 20){\colorbox{matchcolor}{\makebox(13,14){b}}}}
                 \put(140,30){\framebox(20, 20){\colorbox{matchcolor}{\makebox(13,14){b}}}}
             }
-            \uncover<4->{
+            \uncover<5->{
                 \put(200, 30){\makebox(100, 20){2 matches}}
             }
-            \uncover<5-6>{
+            \uncover<6-7>{
                 \put(130, 15){\vector(0,1){13}}
                 \put(120, 0){\makebox(20, 15){6}}
                 \put(170, 15){\vector(0,1){13}}
                 \put(160, 0){\makebox(20, 15){8}}
             }
             \uncover<6-6>{
+                \put(120,30){\framebox(20, 20){\colorbox{ucolor}{\makebox(13,14){a}}}}
+                \put(160,30){\framebox(20, 20){\colorbox{ucolor}{\makebox(13,14){b}}}}
+            }
+            \uncover<7-7>{
                 \put(120,30){\framebox(20, 20){\colorbox{mismatchcolor}{\makebox(13,14){a}}}}
                 \put(160,30){\framebox(20, 20){\colorbox{mismatchcolor}{\makebox(13,14){b}}}}
             }
@@ -111,7 +128,7 @@
 \begin{frame}{The LCE Problem}
     \begin{description}
         \item[LCE value] $\LCE_s(i,j)$ is the length of the longest common prefix of the two suffixes of $s$ starting at index $i$ and $j$
-        \item[LCE problem] Efficiently query multiple LCE values on a static string $s$
+        \item[LCE problem] Efficiently query multiple LCE values on a static string $s$ and varying pairs $(i,j)$
     \end{description}
 \end{frame}
 
@@ -530,10 +547,13 @@
     \end{itemize}
 \end {frame}
 
-\begin{frame}{Kommentarer til rapporten}
+\begin{frame}{Kommentarer og rettelser til rapporten}
     \begin{itemize}
-        \item Hvordan jeg fandt frem til $r=0.73n^{0.42}$
-        \item Der står \fprint[3] nogle steder i cache-afsnittet hvor der skal stå \fprint[2]
+        \item Hvor kommer $r=0.73n^{0.42}$ fra?
+        \begin{center}
+            \includegraphics[width=0.45\textwidth,page=1]{../medium-lce-values.pdf}
+        \end{center}
+        \item Afsnit 4.5.3 Cache Optimization: \fprint[3] skal være \fprint[2]
     \end{itemize}
 \end{frame}
 
