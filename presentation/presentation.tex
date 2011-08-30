@@ -132,18 +132,24 @@
     \end{description}
 \end{frame}
 
+
+\newcommand{\bibs}{\hfill\\\rule{7em}{0.5pt}\vspace{.4em}\\\footnotesize References}
+\newcommand{\bib}[1]{\hfill\\\vspace{.5em}\scriptsize #1}
+
 %\subsection{The \proc{DirectComp} algorithm}
 \begin{frame}{Existing Algorithm: \proc{DirectComp}}
     \begin{tabular}{r l}
-        Preprocessing & $O(1)$ \\
-        Space & $O(1)$ \\
+        Preprocessing & None \\
+        Space & $O(1)+|s|$ \\
         Query & $O(|\LCE(i,j)|)=O(n)$ \\
         Average query & $O(1)$ \\
-        Query I/O & $O\Big(\frac{|\LCE(i,j)|}{B}\Big) = O\big(\frac{n}{B}\big)$ \\
+        %Query I/O & $O\Big(\frac{|\LCE(i,j)|}{B}\Big) = O\big(\frac{n}{B}\big)$ \\
     \end{tabular}
 
     \vspace{1cm}
     For a string length $n$ and alphabet size $\sigma$, the average LCE value over all $n^\sigma$ strings and $n^2$ query pairs is $O(1)$.
+    \bibs
+    \bib{L. Ilie, G. Navarro, and L. Tinta. The longest common extension problem revisited and applications to approximate string searching. \textit{J. Disc. Alg.,} 8(4):418-428, 2010.}
 \end{frame}
 
 \section{Existing Results}
@@ -175,8 +181,8 @@
         \item[\proc{SuffixNca}] Nearest common ancestor queries on a suffix tree
         \item[\proc{LcpRmq}] Range minimum queries on a longest common prefix array
     \end{description}
-    \vspace{1em}
-    \begin{center}
+    \vspace{.5em}
+    %\begin{center}
     %    $\LCE(i,j)=\LCP[\RMQ_{\LCP}(\SAinv[i] + 1, \SAinv[j])]$\\
     %    where $\SAinv[i] < \SAinv[j]$\\
     %    \vspace{1em}
@@ -185,10 +191,15 @@
             Space & $O(n)$ \\
             Query & $O(1)$ \\
             Average query & $O(1)$ \\
-            Query I/O & $O(1)$ \\
+            %Query I/O & $O(1)$ \\
         \end{tabular}
-    \end{center}
+    %\end{center}
     %}
+    \vspace{1em}
+    \bibs
+    \bib{J. Fischer, and V. Heun. Theoretical and Practical Improvements on the RMQ-Problem, with Applications to LCA and LCE. In \textit{Proc. 17th CPM}, pages 36-48, 2006.}
+    \bib{D. Harel, R. E. Tarjan. Fast Algorithms for Finding Nearest Common Ancestors. \textit{SIAM J. Comput.}, 13(2):338-355, 1984.}
+
 \end{frame}
 
 \subsection{Practical results}
@@ -309,6 +320,7 @@
 
 \begin{frame}{The \fprintk\ Algorithm}
     \begin{tabular}{r l}
+        & $1\leq k\leq\logceil$ \\
         Preprocessing & $O(k\cdot n + \sortt)$ \\
         Space & $O(k\cdot n)$\\
         Query & $O(k\cdot n^{1/k})$ \\
@@ -416,6 +428,7 @@
     \end{multicols}
 \end{frame}
 
+\begin{comment}
 \begin{frame}{The \fprintk\ Algorithm: Practical Results, I/O}
     Query times of
     \textcolor{red}{\proc{DirectComp}},
@@ -435,6 +448,7 @@
     }
     \end{multicols}
 \end {frame}
+\end{comment}
 
 %\begin{comment}
 \section{LCE on trees}
@@ -516,6 +530,32 @@
             \includegraphics[width=1\textwidth,page=3]{../doc/tree-fingerprint.pdf}
         \end{column}
     \end{columns}
+    \bibs
+    \bib{Michael A. Bendera, Martín Farach-Colton. The Level Ancestor Problem simplified. Theoretical Computer Science 321, 2004, pages 5-12.}
+\end{frame}
+
+\begin{frame}{Constant Time String LCE on Heavy Paths}
+    Data structure:
+    \begin{itemize}
+        \item A {\bf heavy path decomposition}
+        \item A string $s$ storing labels of each heavy path
+        \begin{itemize}
+        \item Constant time {\bf string LCE} on $s$
+        \end{itemize}
+        \item {\bf Pointers} from each node to
+        \begin{itemize}
+            \item its index in $s$
+            \item the end of its heavy path
+        \end{itemize}
+        \item Constant time {\bf nearest common ancestor}
+        \item Constant time {\bf level ancestor}
+    \end{itemize}
+    \vspace{1em}
+        \begin{tabular}{r l}
+            Preprocessing & $O(\sortt)$ \\
+            Space & $O(n)$\\
+            Query & $O(\log n)$ \\
+        \end{tabular}
 \end{frame}
 %\end{comment}
 
@@ -538,7 +578,7 @@
             \item ...significantly better than \proc{DirectComp} but worse than \proc{LcpRmq} in worst case
         \end{itemize}
         \item Cache optimization of \fprintk\ improves query times at $k=2$ and worsens query times at $k\geq 3$
-        %\item We can generalize LCE to use on trees:
+        \item We can generalize LCE to use on trees with $O(\log n)$ query time in linear space
         %\begin{tabular}{r l}
         %    Preprocessing & $O(\sortt)$ \\
         %    Space & $O(n)$\\
