@@ -1,0 +1,65 @@
+\relax 
+\citation{approx-search}
+\citation{nca,jf-rmq}
+\citation{ilie-navarro-tinta}
+\@writefile{toc}{\contentsline {title}{Longest Common Extensions via Fingerprinting}{1}}
+\@writefile{toc}{\authcount {3}}
+\@writefile{toc}{\contentsline {author}{Philip Bille \and Inge Li G{\o }rtz \and Jesper Kristensen}{1}}
+\newlabel{sec:intro}{{1}{1}}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}}
+\citation{ilie-navarro-tinta}
+\citation{ilie-navarro-tinta}
+\citation{nca}
+\citation{jf-rmq}
+\newlabel{sec:existing-results}{{1}{2}}
+\@writefile{toc}{\contentsline {paragraph}{Previous Results}{2}}
+\@writefile{toc}{\contentsline {paragraph}{Our Results}{2}}
+\citation{karp-miller-rosenberg}
+\citation{karp-miller-rosenberg}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces LCE algorithms with their space requirements, worst case query times and preprocessing times. Average case query times are $O(1)$ for all shown algorithms. Rows marked with * show the new algorithm we present.}}{3}}
+\newlabel{tab:article-algorithms}{{1}{3}}
+\citation{sort-complexity}
+\citation{sort-complexity}
+\citation{nca}
+\citation{jf-rmq}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Preliminaries}{4}}
+\newlabel{sec:fprintk}{{3}{4}}
+\@writefile{toc}{\contentsline {section}{\numberline {3}The \fprint [k]\ Algorithm}{4}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces \fprint [k]\ data structure for $s=\textit  {abbaabbababbaabbababaababa\$}$, $n=27$, $k=3$, $t_1=n^{1/3}=3$ and $t_2=n^{2/3}=9$. All substrings $\textit  {bba}$ are highlighted with their $3$-length fingerprint $2$.}}{5}}
+\newlabel{fig:fingerprint-ds}{{1}{5}}
+\newlabel{sec:fingerprint-ds}{{3.1}{5}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Data Structure}{5}}
+\newlabel{sec:fingerprint-query}{{3.2}{5}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Query}{5}}
+\citation{ilie-navarro-tinta}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces \fprint [k]\ query for $\textit  {LCE}(3,12)$ on the data structure of Fig.\nobreakspace  {}1\hbox {}. The top half shows how $H_\ell [i+v]$ moves through the data structure, and the bottom half shows $H_\ell [j+v]$.}}{6}}
+\newlabel{fig:fingerprint-query}{{2}{6}}
+\newlabel{lem:query-correct}{{2}{6}}
+\newlabel{sec:improved-avg}{{3.2}{6}}
+\@writefile{toc}{\contentsline {paragraph}{Average Case vs.\ Worst Case}{6}}
+\citation{karp-miller-rosenberg}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces The first column lists all substrings of $s=abbababba$ with length $t_\ell = 3$. The second column lists fingerprints assigned to each substring. The third column lists the position of each substring in $s$.}}{7}}
+\newlabel{fig:fingerprint-preproc}{{3}{7}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Preprocessing}{7}}
+\citation{sort-complexity}
+\newlabel{sec:results}{{4}{8}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Experimental Results}{8}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Tested Algorithms}{8}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Test Inputs and Setup}{8}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Comparison of our new \fprint [k]\ algorithm for $k=2$, $k=3$ and $k=\delimiter "4264306 \qopname  \relax o{log}n\delimiter "5265307 $ versus the existing \textnormal  {\scshape  DirectComp} and \textnormal  {\scshape  LcpRmq} algorithms.}}{9}}
+\newlabel{fig:test-fingerprint}{{4}{9}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Results}{9}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Query times in nano seconds for \textnormal  {\scshape  DirectComp} (DC), \fprint [k]\ (FP$_k$) and \textnormal  {\scshape  LcpRmq} (RMQ) on the five largest files from the Canterbury corpus.}}{10}}
+\newlabel{tab:text-fprint-files}{{2}{10}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Cache Optimization}{10}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Query times of \fprint [2] with and without cache optimization.}}{11}}
+\newlabel{fig:plot-fingerprint-cache-horiz}{{5}{11}}
+\bibcite{sort-complexity}{1}
+\bibcite{jf-rmq}{2}
+\bibcite{nca}{3}
+\bibcite{ilie-navarro-tinta}{4}
+\bibcite{karp-miller-rosenberg}{5}
+\bibcite{approx-search}{6}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Query times of \fprint [3] with and without cache optimization.}}{12}}
+\newlabel{fig:plot-fingerprint3-cache}{{6}{12}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Conclusions}{12}}
