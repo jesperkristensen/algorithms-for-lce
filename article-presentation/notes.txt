@@ -1,0 +1,17 @@
+20 minutter
+
+Introduktion, LCE-problem, DirectComp, use cases - 2 min
+Eksisterende SuffixNca, LcpRmq - 5 min
+    Teori - 3 min
+    Praksis - 2 min
+(Nye forsøg DirectCompLookup, DirectComp+LcpRmq - 1 min)
+Fingerprint_k - 10 min
+    teori - 5 min
+        DS - 2 min
+        query - 2 min
+        preproc - 1-2 min
+        cache
+    resultater - 5 min
+        overordnede resultater - 3-4 min
+        caching - 1-2 min
+
