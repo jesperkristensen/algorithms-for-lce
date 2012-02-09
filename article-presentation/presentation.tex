@@ -258,7 +258,7 @@
     \end{tabular}
 \end{frame}
 
-\begin{comment}
+%\begin{comment}
 \subsection{Preprocessing}
 \begin{frame}{The \fprintk\ Algorithm: Preprocessing}
     \begin{itemize}
@@ -290,7 +290,7 @@
     \end{tabular}
 
 \end{frame}
-\end{comment}
+%\end{comment}
 
 \begin{frame}{The \fprintk\ Algorithm}
     \begin{tabular}{r l}
@@ -450,115 +450,6 @@
 \end {frame}
 \end{comment}
 
-\begin{comment}
-\section{LCE on trees}
-\subsection{Compression}
-\begin{frame}{LCE on Compressed Strings}
-    Goal
-    \begin{itemize}
-        \item Allow LCE queries without decompressing the string
-        \item Using Ziv-Lempel compression (LZ)
-    \end{itemize}
-    How
-    \begin{itemize}
-        \item LZ compression represents the string as a tree
-        \item An LCE query on a LZ compressed string is a number of LCE queries on a tree
-    \end{itemize}
-\end{frame}
-
-\begin{frame}{LCE on Trees}
-    \begin{itemize}
-        \item Trees:
-        \begin{itemize}
-            \item One character on each edge
-            \item LCE is the length of the longest common prefix of two strings along two paths
-        \end{itemize}
-        \item $p_i=bbc$ and $p_j=bbba$ gives $\LCE(p_i,p_j)=2$
-    \end{itemize}
-    \begin{center}
-        \includegraphics[width=0.4\textwidth,page=1]{tree-lce.pdf}
-    \end{center}
-\end{frame}
-
-\subsection{Constant Time String LCE on Heavy Paths}
-\begin{frame}{Constant Time String LCE on Heavy Paths}
-    \begin{multicols}{2}{
-        \begin{itemize}
-            \item Data structure:
-            \begin{itemize}
-                \item Construct a heavy path decomposition
-                \item For each heavy path, store characters as a substring of $s$
-            \end{itemize}
-            \item Query:
-            \begin{itemize}
-                \item Use constant time string LCE on $s$ for each heavy path
-            \end{itemize}
-        \end{itemize}
-        \begin{center}
-            \includegraphics[width=0.44\textwidth,page=4]{../doc/tree-fingerprint.pdf}
-        \end{center}
-        \begin{tabular}{r l}
-            Preprocessing & $O(\sortt)$ \\
-            Space & $O(n)$\\
-            Query & $O(\log n)$ \\
-        \end{tabular}
-    }
-    \end{multicols}
-\end{frame}
-
-\begin{frame}{Constant Time String LCE on Heavy Paths}
-    \begin{columns}[t]
-        \begin{column}{0.7\textwidth}
-            \begin{itemize}
-                \item How to find the indexes $(i,j)$ in the string:
-                \begin{itemize}
-                    \item Store an index at each node
-                \end{itemize}
-                \item How to know then the heavy path splits from the queried path:
-                \begin{itemize}
-                    \item Store a pointer to the end of the heavy path at each node
-                    \item Find NCA of the end of the heavy path and the end of the queried path
-                \end{itemize}
-                \item How to find a node on the queried path:
-                \begin{itemize}
-                    \item Use level ancestor
-                \end{itemize}
-            \end{itemize}
-        \end{column}
-        \begin{column}{0.3\textwidth}
-        \hfill\\
-            \includegraphics[width=1\textwidth,page=3]{../doc/tree-fingerprint.pdf}
-        \end{column}
-    \end{columns}
-    \bibs
-    \bib{Michael A. Bendera, Martín Farach-Colton. The Level Ancestor Problem simplified. Theoretical Computer Science 321, 2004, pages 5-12.}
-\end{frame}
-
-\begin{frame}{Constant Time String LCE on Heavy Paths}
-    Data structure:
-    \begin{itemize}
-        \item A {\bf heavy path decomposition}
-        \item A string $s$ storing labels of each heavy path
-        \begin{itemize}
-        \item Constant time {\bf string LCE} on $s$
-        \end{itemize}
-        \item {\bf Pointers} from each node to
-        \begin{itemize}
-            \item its index in $s$
-            \item the end of its heavy path
-        \end{itemize}
-        \item Constant time {\bf nearest common ancestor}
-        \item Constant time {\bf level ancestor}
-    \end{itemize}
-    \vspace{1em}
-        \begin{tabular}{r l}
-            Preprocessing & $O(\sortt)$ \\
-            Space & $O(n)$\\
-            Query & $O(\log n)$ \\
-        \end{tabular}
-\end{frame}
-\end{comment}
-
 \section{Summary}
 \begin{frame}{Summary}
     \begin{tabular}{r l l l}
@@ -578,15 +469,10 @@
             \item ...significantly better than \proc{DirectComp} but worse than \proc{LcpRmq} in worst case
         \end{itemize}
         \item Cache optimization of \fprintk\ improves query times at $k=2$ and worsens query times at $k\geq 3$
-        %\item We can generalize LCE to use on trees with $O(\log n)$ query time in linear space
-        %\begin{tabular}{r l}
-        %    Preprocessing & $O(\sortt)$ \\
-        %    Space & $O(n)$\\
-        %    Query & $O(\log n)$ \\
-        %\end{tabular}
     \end{itemize}
 \end {frame}
 
+\begin{comment}
 \begin{frame}{Kommentarer og rettelser til rapporten}
     \begin{itemize}
         \item Hvor kommer $r=0.73n^{0.42}$ fra?
@@ -596,6 +482,7 @@
         %\item Afsnit 4.5.3 Cache Optimization: \fprint[3] skal være \fprint[2]
     \end{itemize}
 \end{frame}
+\end{comment}
 
 \end{document}
 
