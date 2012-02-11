@@ -6,10 +6,10 @@
 \setbeamertemplate{navigation symbols}{}
 %\usetheme{Boadilla}
 \setbeamertemplate{footline}[frame number]
-\title{Algorithms for Longest Common Extensions}
-\author{Jesper Kristensen}
-\institute[DTU Informatics]{DTU Informatics\\Technical University of Denmark}
-\date{August 31, 2011}
+\title{Longest Common Extensions via Fingerprinting}
+\author{Philip Bille \and Inge Li G{\o}rtz \and Jesper Kristensen}
+\institute[DTU Informatics]{Technical University of Denmark\\DTU Informatics}
+\date{LATA, March 9, 2012}
 \begin{document}
 
 \newcommand{\sortt}{\textit{sort}(n,\sigma)}
@@ -160,32 +160,12 @@
 
 \subsection{The \proc{SuffixNca} and \proc{LcpRmq} Algorithms}
 \begin{frame}{Existing Algorithms: \proc{SuffixNca} and \proc{LcpRmq}}
-    %\begin{multicols}{2}{
-    %    \begin{align*}
-    %        s&=abbababba\\
-    %        s[2\twodots n]&=bbababba\\
-    %        s[3\twodots n]&=bababba\\
-    %        \LCE_s(2,3)&=1
-    %    \end{align*}
-    %    \newpage
-    %    \begin{center}
-    %        %\uncover<2->{
-    %        \includegraphics[width=0.26\textwidth,page=1]{../doc/sa+lcp+min.pdf}
-    %        %}
-    %    \end{center}
-    %}
-    %\end{multicols}
-    %\uncover<3->{
     Two algorithms with best known bounds:
     \begin{description}
         \item[\proc{SuffixNca}] Nearest common ancestor queries on a suffix tree
         \item[\proc{LcpRmq}] Range minimum queries on a longest common prefix array
     \end{description}
     \vspace{.5em}
-    %\begin{center}
-    %    $\LCE(i,j)=\LCP[\RMQ_{\LCP}(\SAinv[i] + 1, \SAinv[j])]$\\
-    %    where $\SAinv[i] < \SAinv[j]$\\
-    %    \vspace{1em}
         \begin{tabular}{r l}
             Preprocessing & $O(\sortt)$ \\
             Space & $O(n)$ \\
@@ -193,14 +173,36 @@
             Average query & $O(1)$ \\
             %Query I/O & $O(1)$ \\
         \end{tabular}
-    %\end{center}
-    %}
     \vspace{1em}
     \bibs
     \bib{J. Fischer, and V. Heun. Theoretical and Practical Improvements on the RMQ-Problem, with Applications to LCA and LCE. In \textit{Proc. 17th CPM}, pages 36-48, 2006.}
     \bib{D. Harel, R. E. Tarjan. Fast Algorithms for Finding Nearest Common Ancestors. \textit{SIAM J. Comput.}, 13(2):338-355, 1984.}
 
 \end{frame}
+
+\begin{comment}
+\begin{frame}{Existing Algorithm: \proc{LcpRmq}}
+    \begin{multicols}{2}{
+        \begin{align*}
+            s&=&abbababba\\
+            s[2\twodots n]&=&bbababba\\
+            s[3\twodots n]&=&bababba\\
+            \LCE_s(2,3)&=1
+        \end{align*}
+        \newpage
+        \begin{center}
+            %\uncover<2->{
+            \includegraphics[width=0.26\textwidth,page=1]{../doc/sa+lcp+min.pdf}
+            %}
+        \end{center}
+    }
+    \end{multicols}
+    \begin{center}
+        $\LCE(i,j)=\LCP[\RMQ_{\LCP}(\SAinv[i] + 1, \SAinv[j])]$\\
+        where $\SAinv[i] < \SAinv[j]$\\
+    \end{center}
+\end{frame}
+\end{comment}
 
 \subsection{Practical results}
 \begin{frame}{Existing Algorithms: Practical Results}
