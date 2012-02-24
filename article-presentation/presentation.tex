@@ -43,8 +43,19 @@
 % Sidst vil jeg generalisere LCE til trær, som man kan bruge til LCE på komprimerede strenge
 
 \section{Introduction}
+
+\subsection{The LCE Problem}
+\begin{frame}{The LCE Problem}
+    \begin{description}
+        \item[LCE value] $\LCE_s(i,j)$ is the length of the longest common prefix of the two suffixes of a string $s$ starting at index $i$ and $j$
+        \item[LCE problem] Efficiently query multiple LCE values on a static string $s$ and varying pairs $(i,j)$
+    \end{description}
+\end{frame}
+
+
+\section{Existing Results}
 \subsection{The \proc{DirectComp} algorithm}
-\begin{frame}{The \proc{DirectComp} algorithm}
+\begin{frame}{Existing algorithm: \proc{DirectComp}}
     \begin{block}{Input}
         \begin{itemize}
             \item $s=abbababba$
@@ -124,15 +135,6 @@
     }
 \end{frame}
 
-\subsection{The LCE Problem}
-\begin{frame}{The LCE Problem}
-    \begin{description}
-        \item[LCE value] $\LCE_s(i,j)$ is the length of the longest common prefix of the two suffixes of $s$ starting at index $i$ and $j$
-        \item[LCE problem] Efficiently query multiple LCE values on a static string $s$ and varying pairs $(i,j)$
-    \end{description}
-\end{frame}
-
-
 \newcommand{\bibs}{\hfill\\\rule{7em}{0.5pt}\vspace{.4em}\\\footnotesize References}
 \newcommand{\bib}[1]{\hfill\\\vspace{.5em}\scriptsize #1}
 
@@ -152,7 +154,6 @@
     \bib{L. Ilie, G. Navarro, and L. Tinta. The longest common extension problem revisited and applications to approximate string searching. \textit{J. Disc. Alg.,} 8(4):418-428, 2010.}
 \end{frame}
 
-\section{Existing Results}
 %\subsection{The \proc{SuffixNca} Algorithm}
 %\begin{frame}{Existing Algorithm: \proc{SuffixNca}}
 %    $\LCE_s(i,j) = D[\NCA_\mathcal{T}(L_i,L_j)]$
