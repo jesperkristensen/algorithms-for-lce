@@ -50,6 +50,14 @@
         \item[LCE value] $\LCE_s(i,j)$ is the length of the longest common prefix of the two suffixes of a string $s$ starting at index $i$ and $j$
         \item[LCE problem] Efficiently query multiple LCE values on a static string $s$ and varying pairs $(i,j)$
     \end{description}
+    Example:
+    \begin{description}
+        \item[input:] $s=abbababba$, $(i,j)=(4,6)$
+        \item[suffix $i$] = $ababba$
+        \item[suffix $j$] = $abba$
+        \item[longest common prefix $(i,j)$] = $ab$
+        \item[$\LCE_s(i,j)$] = $2$
+    \end{description}
 \end{frame}
 
 
@@ -141,7 +149,7 @@
 %\subsection{The \proc{DirectComp} algorithm}
 \begin{frame}{Existing Algorithm: \proc{DirectComp}}
     \begin{tabular}{r l}
-        Preprocessing & None \\
+        %Preprocessing & None \\
         Space & $O(1)+|s|$ \\
         Query & $O(\LCE(i,j))=O(n)$ \\
         Average query & $O(1)$ \\
@@ -168,7 +176,7 @@
     \end{description}
     \vspace{.5em}
         \begin{tabular}{r l}
-            Preprocessing & $O(\sortt)$ \\
+            %Preprocessing & $O(\sortt)$ \\
             Space & $O(n)$ \\
             Query & $O(1)$ \\
             Average query & $O(1)$ \\
@@ -261,7 +269,7 @@
     \end{tabular}
 \end{frame}
 
-%\begin{comment}
+\begin{comment}
 \subsection{Preprocessing}
 \begin{frame}{The \fprintk\ Algorithm: Preprocessing}
     \begin{itemize}
@@ -293,12 +301,12 @@
     \end{tabular}
 
 \end{frame}
-%\end{comment}
+\end{comment}
 
 \begin{frame}{The \fprintk\ Algorithm}
     \begin{tabular}{r l}
         & $1\leq k\leq\logceil$ \\
-        Preprocessing & $O(k\cdot n + \sortt)$ \\
+        %Preprocessing & $O(k\cdot n + \sortt)$ \\
         Space & $O(k\cdot n)$\\
         Query & $O(k\cdot n^{1/k})$ \\
         Average query & $O(1)$ \\
@@ -309,7 +317,7 @@
 
     \begin{tabular}{r l l l}
         & $k=1$ & $k=2$ & $k=\logceil$ \\
-        Preprocessing & $O(\sortt)$ & $O(\sortt)$ & $O(n\log n)$ \\
+        %Preprocessing & $O(\sortt)$ & $O(\sortt)$ & $O(n\log n)$ \\
         Space & $O(n)$ & $O(n)$ & $O(n\log n)$ \\
         Query & $O(n)$ & $O(\sqrt n)$ & $O(\log n)$ \\
         Average query & $O(1)$ & $O(1)$ & $O(1)$ \\
@@ -338,6 +346,7 @@
     \end{multicols}
 \end {frame}
 
+\begin{comment}
 \begin{frame}{Practical Results}
     Query times of
     \textcolor{red}{\proc{DirectComp}},
@@ -351,6 +360,7 @@
         \includegraphics[width=0.49\textwidth,type=pdf,ext=.pdf,read=.pdf]{../src/results/length-slides-cache-repeat-pow.plt}
     \end{center}
 \end {frame}
+\end{comment}
 
 \subsection{Cache Optimization}
 \begin{frame}{Cache Optimization of \fprintk}
@@ -458,7 +468,7 @@
     \begin{tabular}{r l l l}
         & \proc{Direct-} & \proc{LcpRmq} / & \\
         & \proc{Comp} & \proc{SuffixNca} & \fprintk \\
-        Preprocessing & $O(1)$ & $O(\sortt)$ & $O(k\cdot n+\sortt)$ \\
+        %Preprocessing & $O(1)$ & $O(\sortt)$ & $O(k\cdot n+\sortt)$ \\
         Space & $O(1)$ & $O(n)$ & $O(k\cdot n)$\\
         Query & $O(n)$ & $O(1)$ & $O(k\cdot n^{1/k})$ \\
         Average query & $O(1)$ & $O(1)$ & $O(1)$ \\
